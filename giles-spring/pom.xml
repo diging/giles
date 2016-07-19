@@ -15,7 +15,6 @@
 		<org.slf4j-version>1.7.5</org.slf4j-version>
 
 		<!-- application properties -->
-		<db.path>/Users/jdamerow/Software/Giles/db_files</db.path>
 		<admin.password>admin</admin.password>
 		<admin.username>admin</admin.username>
 		<github.clientId></github.clientId>
@@ -254,6 +253,12 @@
 			<properties>
 				<admin.pw>${admin.password}</admin.pw>
 			</properties>
+		</profile>
+		<profile>
+			<id>test</id>
+		</profile>
+		<profile>
+			<id>prod</id>
 		</profile>
 	</profiles>
 
