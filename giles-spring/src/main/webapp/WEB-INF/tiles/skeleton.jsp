@@ -14,7 +14,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
     
-    <link rel="stylesheet" href="<c:url value="resources/font-awesome-4.6.3/css/font-awesome.min.css" />" />
+    <link rel="stylesheet" href="<c:url value="/resources/font-awesome-4.6.3/css/font-awesome.min.css" />" />
     <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
     
     <title>Giles</title>
@@ -29,7 +29,7 @@
     <link href="<c:url value="/resources/bootstrap/grid.css" />" rel="stylesheet">
 
     <!-- Just for debugging purposes. Don't actually copy these 2 lines! -->
-    <!--[if lt IE 9]><script src="../../assets/js/ie8-responsive-file-warning.js"></script><![endif]-->
+    <!--[if lt IE 9]><script src="<c:url value="/resources/bootstrap/assets/js/ie8-responsive-file-warning.js" />"></script><![endif]-->
     <script src="<c:url value="/resources/bootstrap/assets/js/ie-emulation-modes-warning.js" />"></script>
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -55,28 +55,33 @@
             </li>
           </sec:authorize>
           <sec:authorize access="isAuthenticated()">
+          	<li role="presentation">
+          		<a href="<c:url value="/files/upload" />">Upload Files</a>
+          	</li>
          	 <li role="presentation">
-         		Logged in as <i class="fa fa-github" aria-hidden="true"></i> 
-         			<sec:authentication
-							property="principal.username" /><br>
-				<a href="<c:url value="/logout" />">Logout</a>
+				<a href="<c:url value="/logout" />"><i class="fa fa-sign-out" aria-hidden="true"></i>
+				Logout</a>
          	 </li>
           </sec:authorize>
           </ul>
         </nav>
         
         <h1>Giles</h1>
-        <p class="lead">Guarding Digilib</p>
-        
-        
+        <p class="lead">Guarding Digilib</p>   
       </div>
+      
+      <sec:authorize access="isAuthenticated()">
+      <p class="text-right">
+      Logged in as <i class="fa fa-github" aria-hidden="true"></i> 
+         			<sec:authentication
+							property="principal.username" />
+	  </p>
+	  </sec:authorize>
 
       <tiles:insertAttribute name="content" />
 
     </div> <!-- /container -->
 
 
-    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
-    <script src="../../assets/js/ie10-viewport-bug-workaround.js"></script>
-  </body>
+     </body>
 </html>

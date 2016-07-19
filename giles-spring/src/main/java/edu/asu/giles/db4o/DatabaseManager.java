@@ -1,4 +1,4 @@
-package edu.asu.giles.users;
+package edu.asu.giles.db4o;
 
 import java.io.Serializable;
 
