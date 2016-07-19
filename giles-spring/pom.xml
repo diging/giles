@@ -27,7 +27,7 @@
 		<digilib.url></digilib.url>
 		<digilibBaseDir></digilibBaseDir>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
-		<tomcat.deploy.path>http://localhost:8080/manager/</tomcat.deploy.path>
+		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
 		<deploy.path.dev>giles</deploy.path.dev>
 		<deploy.path.prod>giles</deploy.path.prod>
