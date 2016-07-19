@@ -57,7 +57,7 @@ public class SocialContext implements SocialConfigurer {
                 connectionFactoryLocator,
                 Encryptors.noOpText()
         );
-    	
+    	repository.setConnectionSignUp(new GilesConnectionSignUp(userManager));
     	return repository;
     }
  

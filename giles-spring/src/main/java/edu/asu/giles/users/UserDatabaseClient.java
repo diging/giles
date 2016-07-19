@@ -12,6 +12,8 @@ import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Predicate;
 
+import edu.asu.giles.db4o.DatabaseManager;
+
 @Component
 public class UserDatabaseClient {
 

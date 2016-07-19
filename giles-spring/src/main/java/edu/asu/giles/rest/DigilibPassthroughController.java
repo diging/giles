@@ -27,7 +27,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class DigilibPassthroughController {
 	
-	Logger logger = LoggerFactory.getLogger(DigilibPassthroughController.class);
+	private static Logger logger = LoggerFactory.getLogger(DigilibPassthroughController.class);
 	
 	@Value("${digilib_scaler_url}")
 	private String digilibUrl;

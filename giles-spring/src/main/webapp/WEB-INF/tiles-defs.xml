@@ -20,5 +20,13 @@
 		<put-attribute name="content" value="/WEB-INF/views/login.jsp" />	
 	</definition>
 	
+	<definition name="files/upload" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/files/upload.jsp" />	
+	</definition>
+	
+	<definition name="uploads/upload" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/uploads/show.jsp" />	
+	</definition>
+	
 	
 </tiles-definitions>

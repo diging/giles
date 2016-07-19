@@ -16,4 +16,8 @@
 	<import resource="spring-security.xml" />
 	<import resource="db4o-config.xml" />
 	
+	<bean id="fileStorageManager" class="edu.asu.giles.files.impl.FileStorageManager">
+		<property name="baseDirectory" value="${digilibBaseDir}" />
+	</bean>
+	
 </beans>
