@@ -27,6 +27,11 @@
 		<digilib.url></digilib.url>
 		<digilibBaseDir></digilibBaseDir>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
+		<tomcat.deploy.path>http://localhost:8080/manager/</tomcat.deploy.path>
+		<deploy.path.test>giles-test</deploy.path.test>
+		<deploy.path.dev>giles</deploy.path.dev>
+		<deploy.path.prod>giles</deploy.path.prod>
+		
 	</properties>
 
 	<dependencies>
@@ -252,13 +257,22 @@
 			<id>mydev</id>
 			<properties>
 				<admin.pw>${admin.password}</admin.pw>
+				<deploy.path>${deploy.path.dev}</deploy.path>
 			</properties>
 		</profile>
 		<profile>
 			<id>test</id>
+			<properties>
+				<admin.pw>${admin.password}</admin.pw>
+				<deploy.path>${deploy.path.test}</deploy.path>
+			</properties>
 		</profile>
 		<profile>
 			<id>prod</id>
+			<properties>
+				<admin.pw>${admin.password}</admin.pw>
+				<deploy.path>${deploy.path.prod}</deploy.path>
+			</properties>
 		</profile>
 	</profiles>
 
@@ -331,6 +345,16 @@
 							</pluginExecution>
 						</pluginExecutions>
 					</lifecycleMappingMetadata>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.tomcat.maven</groupId>
+				<artifactId>tomcat7-maven-plugin</artifactId>
+				<version>2.2</version>
+				<configuration>
+					<url>${tomcat.path}</url>
+					<server>TomcatServer</server>
+					<path>/${deploy.path}</path>
 				</configuration>
 			</plugin>
 
