@@ -80,7 +80,7 @@ public class FilesDatabaseClient implements IFilesDatabaseClient {
 	public List<IFile> getFilesByExample(IFile file) {
 		ObjectSet<File> files = client.queryByExample(file);
 		List<IFile> results = new ArrayList<IFile>();
-		for (File f : files) {
+		for (IFile f : files) {
 			results.add(f);
 		}
 		return results;

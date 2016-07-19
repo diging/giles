@@ -1,15 +1,20 @@
 package edu.asu.giles.core.impl;
 
+import java.util.Date;
+
 import edu.asu.giles.core.IFile;
 
 
 public class File implements IFile {
-
+	
+	
 	private String uploadId;
 	private String filename;
 	private String username;
 	private String zoteroDocumentId;
 	private String id;
+	private Date uploadDate;
+	private String access;
 	
 	public File() {}
 	
@@ -85,6 +90,25 @@ public class File implements IFile {
 	public void setZoteroDocumentId(String zoteroDocumentId) {
 		this.zoteroDocumentId = zoteroDocumentId;
 	}
-	
-	
+
+	@Override
+	public Date getUploadDate() {
+		return uploadDate;
+	}
+
+	@Override
+	public void setUploadDate(Date uploadDate) {
+		this.uploadDate = uploadDate;
+	}
+
+	@Override
+	public String getAccess() {
+		return access;
+	}
+
+	@Override
+	public void setAccess(String access) {
+		this.access = access;
+	}
+
 }

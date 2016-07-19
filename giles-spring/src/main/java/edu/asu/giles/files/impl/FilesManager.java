@@ -1,6 +1,8 @@
 package edu.asu.giles.files.impl;
 
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
@@ -9,16 +11,22 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import edu.asu.giles.core.IFile;
+import edu.asu.giles.core.IUpload;
+import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.files.IUploadDatabaseClient;
 
 @Service
 public class FilesManager implements IFilesManager {
 
 	@Autowired
 	private IFilesDatabaseClient databaseClient;
+	
+	@Autowired
+	private IUploadDatabaseClient uploadDatabaseClient;
 	
 	@Autowired
 	private IFileStorageManager storageManager;
@@ -38,6 +46,11 @@ public class FilesManager implements IFilesManager {
 			}
 		}
 		
+		IUpload upload = new Upload(uploadId);
+		Date uploadDate = new Date();
+		upload.setCreatedDate(uploadDate);
+		upload.setUsername(username);
+		
 		List<StorageStatus> statuses = new ArrayList<StorageStatus>();
 		for (IFile file : files.keySet()) {
 			byte[] content = files.get(file);
@@ -54,6 +67,9 @@ public class FilesManager implements IFilesManager {
 			
 			file.setId(id);
 			file.setUploadId(uploadId);
+			file.setUploadDate(uploadDate);
+			file.setUsername(username);
+			file.setAccess(IFile.PRIVATE);
 			
 			try {
 				storageManager.saveFile(username, uploadId, id, file.getFilename(), content);
@@ -64,10 +80,34 @@ public class FilesManager implements IFilesManager {
 			}
 		}
 		
+		boolean atLeastOneSuccess = statuses.stream().anyMatch(status -> status.getStatus() == StorageStatus.SUCCESS);
+		if (atLeastOneSuccess) {
+			uploadDatabaseClient.store(upload);
+		}
+		
 		return statuses;
 	}
 	
+	@Override
+	public List<IFile> getFilesByUploadId(String uploadId) {
+		return databaseClient.getFileByUploadId(uploadId);
+	}
 	
+	@Override
+	public List<IUpload> getUploadsOfUser(String username) {
+		return uploadDatabaseClient.getUploadsForUser(username);
+	}
+	
+	@Override
+	public IUpload getUpload(String id) {
+		return uploadDatabaseClient.getUpload(id);
+	}
+	
+	@Override
+	public String getPathOfFile(IFile file) {
+		String directory = storageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
+		return directory + File.separator + file.getFilename();
+	}
 
 	/**
 	 * This methods generates a new 6 character long id. Note that this method

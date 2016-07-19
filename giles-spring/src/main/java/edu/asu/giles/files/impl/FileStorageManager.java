@@ -18,18 +18,10 @@ public class FileStorageManager implements IFileStorageManager {
 	 */
 	@Override
 	public void saveFile(String username, String uploadId, String fileId, String filename, byte[] bytes) throws GilesFileStorageException {
-		StringBuffer filePath = new StringBuffer();
-		filePath.append(baseDirectory);
-		filePath.append(File.separator);
-		filePath.append(username);
-		filePath.append(File.separator);
-		filePath.append(uploadId);
-		filePath.append(File.separator);
-		filePath.append(fileId);
+		String filePath = getFileFolderPath(username, uploadId, fileId);
+		createDirectory(filePath);
 		
-		createDirectory(filePath.toString());
-		
-		File file = new File(filePath.toString() + File.separator + filename);
+		File file = new File(filePath + File.separator + filename);
 		BufferedOutputStream stream;
 		try {
 			stream = new BufferedOutputStream(new FileOutputStream(file));
@@ -42,6 +34,22 @@ public class FileStorageManager implements IFileStorageManager {
 		} catch (IOException e) {
 			throw new GilesFileStorageException("Could not store file.", e);
 		}
+	}
+	
+	@Override
+	public String getFileFolderPath(String username, String uploadId, String fileId) {
+		StringBuffer filePath = new StringBuffer();
+		filePath.append(baseDirectory);
+		if (!baseDirectory.endsWith(File.separator)) {
+			filePath.append(File.separator);
+		}
+		filePath.append(username);
+		filePath.append(File.separator);
+		filePath.append(uploadId);
+		filePath.append(File.separator);
+		filePath.append(fileId);
+		
+		return filePath.toString();
 	}
 	
 	public String getBaseDirectory() {

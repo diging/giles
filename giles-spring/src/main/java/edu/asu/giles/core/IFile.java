@@ -1,6 +1,13 @@
 package edu.asu.giles.core;
 
+import java.util.Date;
+
 public interface IFile {
+	
+	public final static String PUBLIC = "PUBLIC";
+	public final static String PRIVATE = "PRIVATE";
+	public final static String AUTHORIZED = "AUTHORIZED";
+
 
 	public abstract String getUploadId();
 
@@ -21,5 +28,13 @@ public interface IFile {
 	public abstract void setZoteroDocumentId(String zoteroDocumentId);
 
 	public abstract String getZoteroDocumentId();
+
+	public abstract void setUploadDate(Date uploadDate);
+
+	public abstract Date getUploadDate();
+
+	public abstract void setAccess(String access);
+
+	public abstract String getAccess();
 
 }

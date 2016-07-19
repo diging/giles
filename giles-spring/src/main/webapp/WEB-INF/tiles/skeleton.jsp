@@ -56,6 +56,9 @@
           </sec:authorize>
           <sec:authorize access="isAuthenticated()">
           	<li role="presentation">
+          		<a href="<c:url value="/" />" >Dashboard</a>
+          	</li>
+          	<li role="presentation">
           		<a href="<c:url value="/files/upload" />">Upload Files</a>
           	</li>
          	 <li role="presentation">
