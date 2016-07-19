@@ -352,7 +352,7 @@
 				<artifactId>tomcat7-maven-plugin</artifactId>
 				<version>2.2</version>
 				<configuration>
-					<url>${tomcat.path}</url>
+					<url>${tomcat.deploy.path}</url>
 					<server>TomcatServer</server>
 					<path>/${deploy.path}</path>
 				</configuration>
