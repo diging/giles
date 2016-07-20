@@ -25,9 +25,9 @@ public interface IFile {
 
 	public abstract void setId(String id);
 
-	public abstract void setZoteroDocumentId(String zoteroDocumentId);
+	public abstract void setDocumentId(String zoteroDocumentId);
 
-	public abstract String getZoteroDocumentId();
+	public abstract String getDocumentId();
 
 	public abstract void setUploadDate(Date uploadDate);
 
