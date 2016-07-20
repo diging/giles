@@ -6,9 +6,13 @@
 
 <h2>Select files to upload</h2>
 
+<div class="alert alert-info" role="alert"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
+ The upload limit for files is 50MB.</div>
+
+
 	<div id="upload-field">
 	<span class="btn btn-success fileinput-button">
-        <i class="glyphicon glyphicon-plus"></i>
+        <i class="fa fa-plus" aria-hidden="true"></i>
         <span>Add files...</span>
         <!-- The file input field used as target for the file upload widget -->
         <input id="fileupload" type="file" name="file" multiple>
@@ -24,6 +28,11 @@
     <ul id="files" class="list-group" style="margin-top: 35px;">
     
     </ul>
+    
+    <div id="failure_box" class="alert alert-danger hidden" role="alert">
+    	<strong>Upload Failed</strong> <br>
+    	Reason: <span id="failure_reason"></span>
+    </div>
 
 <a href="#" id="jarsLink" class="btn btn-primary disabled">Add metadata in Jars</a>
 
@@ -90,19 +99,31 @@ $(function () {
         	
         	var uploadIdsString = "";
         	uploadIds.forEach(function(element, index) {
+        		uploadIdsString += "uploadIds=";
         		uploadIdsString += element;
         		uploadIdsString += ",";
         	});
         	
-        	$('#jarsLink').attr('href', jarsUrl + "?uploadIds=" + uploadIdsString);
+        	$('#jarsLink').attr('href', jarsUrl + "?" + uploadIdsString);
         	$('#jarsLink').removeClass('disabled');
         },
+        fail: function(e, data) {
+        	var response = JSON.parse(data.jqXHR.responseText);
+        	$('#failure_reason').html(response.error);
+        	$('#failure_box').removeClass("hidden");
+        	resetBar();
+        },
         start: function(e, data) {
-        	$('#progress .bar').css(
-                    'width',
-                    0 + '%'
-                );
+        	$('#failure_box').addClass("hidden");
+        	resetBar();
         }
     });
+    
+	function resetBar() {
+		$('#progress .bar').css(
+	            'width',
+	            0 + '%'
+	        );
+}
 });
 </script>
