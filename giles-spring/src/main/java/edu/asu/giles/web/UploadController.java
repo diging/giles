@@ -33,7 +33,7 @@ import edu.asu.giles.users.User;
 @Controller
 public class UploadController {
 	
-	private static Logger logger = LoggerFactory.getLogger(DigilibPassthroughController.class);
+	private static Logger logger = LoggerFactory.getLogger(UploadController.class);
 	
 	
 	@Autowired
