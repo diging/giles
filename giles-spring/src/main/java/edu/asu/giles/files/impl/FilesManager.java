@@ -66,6 +66,7 @@ public class FilesManager implements IFilesManager {
 			}
 			
 			file.setId(id);
+			file.setDocumentId(id);
 			file.setUploadId(uploadId);
 			file.setUploadDate(uploadDate);
 			file.setUsername(username);

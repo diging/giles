@@ -11,7 +11,7 @@ public class File implements IFile {
 	private String uploadId;
 	private String filename;
 	private String username;
-	private String zoteroDocumentId;
+	private String documentId;
 	private String id;
 	private Date uploadDate;
 	private String access;
@@ -82,13 +82,16 @@ public class File implements IFile {
 	}
 
 	@Override
-	public String getZoteroDocumentId() {
-		return zoteroDocumentId;
+	public String getDocumentId() {
+		if (documentId == null) {
+			return id;
+		}
+		return documentId;
 	}
 
 	@Override
-	public void setZoteroDocumentId(String zoteroDocumentId) {
-		this.zoteroDocumentId = zoteroDocumentId;
+	public void setDocumentId(String zoteroDocumentId) {
+		this.documentId = zoteroDocumentId;
 	}
 
 	@Override
