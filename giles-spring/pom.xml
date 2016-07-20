@@ -316,6 +316,7 @@
 							<excludes>
 								<exclude>**/*.woff</exclude>
 								<exclude>**/*.ttf</exclude>
+								<exclude>**/*.woff2</exclude>
 							</excludes>
 						</resource>
 						<resource>
