@@ -325,6 +325,11 @@
 							<includes>
 								<include>**/*</include>
 							</includes>
+							<excludes>
+								<exclude>**/*.woff</exclude>
+								<exclude>**/*.ttf</exclude>
+								<exclude>**/*.woff2</exclude>
+							</excludes>
 						</resource>
 					</webResources>
 				</configuration>

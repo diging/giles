@@ -7,7 +7,7 @@ import edu.asu.giles.core.impl.File;
 
 public interface IFilesDatabaseClient {
 
-	public abstract IFile addFile(IFile file);
+	public abstract IFile saveFile(IFile file);
 
 	public abstract IFile getFile(String filename);
 

@@ -39,10 +39,7 @@ public class FileStorageManager implements IFileStorageManager {
 	@Override
 	public String getFileFolderPath(String username, String uploadId, String fileId) {
 		StringBuffer filePath = new StringBuffer();
-		filePath.append(baseDirectory);
-		if (!baseDirectory.endsWith(File.separator)) {
-			filePath.append(File.separator);
-		}
+		filePath.append(File.separator);
 		filePath.append(username);
 		filePath.append(File.separator);
 		filePath.append(uploadId);

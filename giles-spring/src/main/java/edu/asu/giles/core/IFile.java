@@ -2,13 +2,10 @@ package edu.asu.giles.core;
 
 import java.util.Date;
 
+import edu.asu.giles.core.impl.DocumentAccess;
+
 public interface IFile {
 	
-	public final static String PUBLIC = "PUBLIC";
-	public final static String PRIVATE = "PRIVATE";
-	public final static String AUTHORIZED = "AUTHORIZED";
-
-
 	public abstract String getUploadId();
 
 	public abstract void setUploadId(String uploadId);
@@ -33,8 +30,8 @@ public interface IFile {
 
 	public abstract Date getUploadDate();
 
-	public abstract void setAccess(String access);
+	public abstract void setAccess(DocumentAccess access);
 
-	public abstract String getAccess();
+	public abstract DocumentAccess getAccess();
 
 }

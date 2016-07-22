@@ -36,7 +36,6 @@
 
 <a href="#" id="jarsLink" class="btn btn-primary disabled">Add metadata in Jars</a>
 
-<script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="<c:url value="/resources/jquery-file-upload/js/vendor/jquery.ui.widget.js" />"></script>
 <!-- The Load Image plugin is included for the preview images and image resizing functionality -->

@@ -14,7 +14,7 @@ public class File implements IFile {
 	private String documentId;
 	private String id;
 	private Date uploadDate;
-	private String access;
+	private DocumentAccess access;
 	
 	public File() {}
 	
@@ -105,12 +105,12 @@ public class File implements IFile {
 	}
 
 	@Override
-	public String getAccess() {
+	public DocumentAccess getAccess() {
 		return access;
 	}
 
 	@Override
-	public void setAccess(String access) {
+	public void setAccess(DocumentAccess access) {
 		this.access = access;
 	}
 

@@ -32,7 +32,7 @@ public class DigilibPassthroughController {
 	@Value("${digilib_scaler_url}")
 	private String digilibUrl;
 
-	@RequestMapping(value = "/rest/diglib")
+	@RequestMapping(value = "/rest/digilib")
 	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam String accessToken) {
 		GitHubTemplate template = new GitHubTemplate(accessToken);
 		if (!template.isAuthorized()) {
