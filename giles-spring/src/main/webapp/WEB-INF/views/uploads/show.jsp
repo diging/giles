@@ -1,5 +1,4 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
-<%@ page import="edu.asu.giles.core.impl.DocumentAccess" %>
 
 
 <h3>Upload #${upload.id}</h3>
@@ -15,7 +14,7 @@
     <ul style="list-style-type:none;">
     	<c:forEach items="${doc.files}" var="file">
     		<li><i class="fa fa-picture-o" aria-hidden="true"></i>
-    		 ${file.filename}
+    		 <a href="<c:url value="/files/${file.id}" />" >${file.filename}</a>
     		</li>
     	</c:forEach>
     </ul>
@@ -23,7 +22,9 @@
     </div>
     <c:if test="${not empty doc.files}">
     <div class="pull-right">
-    <img src="<c:url value="/files/${doc.files[0].id}?dw=50" />" >
+    <a href="<c:url value="/files/${doc.files[0].id}" />" >
+    <img src="<c:url value="/files/${doc.files[0].id}/img?dh=70" />" >
+    </a>
     </div>
     </c:if>
     

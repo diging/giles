@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -33,7 +34,7 @@ public class ViewImageController {
 	private IFilesManager filesManager;
 
 	@FileAccessCheck
-	@RequestMapping(value="/files/{fileId}")
+	@RequestMapping(value="/files/{fileId}/img")
 	public ResponseEntity<String> viewImage(@PathVariable("fileId") String fileId, HttpServletResponse response, HttpServletRequest request) {
 		
 		Map<String, String[]> parameters = request.getParameterMap();
@@ -67,5 +68,14 @@ public class ViewImageController {
 		} 
 		
 		return new ResponseEntity<String>(HttpStatus.OK);
+	}
+	
+	@FileAccessCheck
+	@RequestMapping(value="/files/{fileId}")
+	public String showImagePage(Model model, @PathVariable("fileId") String fileId) {
+		IFile file = filesManager.getFile(fileId);
+		model.addAttribute("file", file);
+		
+		return "files/file";
 	}
 }
