@@ -19,7 +19,14 @@
     		</li>
     	</c:forEach>
     </ul>
+     
     </div>
+    <c:if test="${not empty doc.files}">
+    <div class="pull-right">
+    <img src="<c:url value="/files/${doc.files[0].id}?dw=50" />" >
+    </div>
+    </c:if>
+    
     <div class="text-right">
     <c:if test="${doc.access == 'PUBLIC'}">
    	 <span class="label label-info">Public</span>
