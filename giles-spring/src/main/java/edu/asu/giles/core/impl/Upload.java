@@ -8,7 +8,7 @@ public class Upload implements IUpload {
 
 	private String id;
 	private String username;
-	private OffsetDateTime createdDate;
+	private String createdDate;
 	
 	public Upload() {}
 	
@@ -48,14 +48,14 @@ public class Upload implements IUpload {
 	 * @see edu.asu.giles.core.impl.IUpload#getCreatedDate()
 	 */
 	@Override
-	public OffsetDateTime getCreatedDate() {
+	public String getCreatedDate() {
 		return createdDate;
 	}
 	/* (non-Javadoc)
 	 * @see edu.asu.giles.core.impl.IUpload#setCreatedDate(java.util.Date)
 	 */
 	@Override
-	public void setCreatedDate(OffsetDateTime createdDate) {
+	public void setCreatedDate(String createdDate) {
 		this.createdDate = createdDate;
 	}
 	

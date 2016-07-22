@@ -26,9 +26,9 @@ public interface IFile {
 
 	public abstract String getDocumentId();
 
-	public abstract void setUploadDate(OffsetDateTime uploadDate);
+	public abstract void setUploadDate(String uploadDate);
 
-	public abstract OffsetDateTime getUploadDate();
+	public abstract String getUploadDate();
 
 	public abstract void setAccess(DocumentAccess access);
 

@@ -13,7 +13,7 @@ public class File implements IFile {
 	private String username;
 	private String documentId;
 	private String id;
-	private OffsetDateTime uploadDate;
+	private String uploadDate;
 	private DocumentAccess access;
 	private String contentType;
 	private long size;
@@ -98,12 +98,12 @@ public class File implements IFile {
 	}
 
 	@Override
-	public OffsetDateTime getUploadDate() {
+	public String getUploadDate() {
 		return uploadDate;
 	}
 
 	@Override
-	public void setUploadDate(OffsetDateTime uploadDate) {
+	public void setUploadDate(String uploadDate) {
 		this.uploadDate = uploadDate;
 	}
 

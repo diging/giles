@@ -15,9 +15,9 @@ public interface IDocument {
 
 	public abstract void setUploadId(String uploadId);
 
-	public abstract OffsetDateTime getCreatedDate();
+	public abstract String getCreatedDate();
 
-	public abstract void setCreatedDate(OffsetDateTime createdDate);
+	public abstract void setCreatedDate(String createdDate);
 
 	public abstract List<String> getFileIds();
 

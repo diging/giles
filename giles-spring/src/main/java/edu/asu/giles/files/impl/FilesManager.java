@@ -59,7 +59,7 @@ public class FilesManager implements IFilesManager {
 		}
 		
 		IUpload upload = new Upload(uploadId);
-		OffsetDateTime uploadDate = OffsetDateTime.now(ZoneId.of("UTC"));
+		String uploadDate = OffsetDateTime.now(ZoneId.of("UTC")).toString();
 		upload.setCreatedDate(uploadDate);
 		upload.setUsername(username);
 		

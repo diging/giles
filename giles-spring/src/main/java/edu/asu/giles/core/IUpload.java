@@ -12,8 +12,8 @@ public interface IUpload {
 
 	public abstract void setUsername(String username);
 
-	public abstract OffsetDateTime getCreatedDate();
+	public abstract String getCreatedDate();
 
-	public abstract void setCreatedDate(OffsetDateTime createdDate);
+	public abstract void setCreatedDate(String createdDate);
 
 }
