@@ -15,6 +15,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.github.api.impl.GitHubTemplate;
 import org.springframework.stereotype.Component;
 
+import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.exceptions.AspectMisconfigurationException;
 import edu.asu.giles.files.IFilesManager;
@@ -61,6 +62,34 @@ public class SecurityAspect {
 		}
 		
 		if (!upload.getUsername().equals(user.getUsername())) {
+			return "forbidden";
+		}
+		
+		return joinPoint.proceed();
+	}
+	
+	@Around("within(edu.asu.giles.web..*) && @annotation(fileCheck)")
+	public Object checkFileAccess(ProceedingJoinPoint joinPoint, FileAccessCheck fileCheck) throws Throwable {
+		Object[] args = joinPoint.getArgs();
+		MethodSignature sig = (MethodSignature) joinPoint.getSignature();
+		String[] argNames = sig.getParameterNames();
+		
+		String fileId = null;
+		for (int i = 0; i<argNames.length; i++) {
+			if (argNames[i].equals(fileCheck.value())) {
+				fileId = (String) args[i];
+			}
+		}
+		
+		Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+		User user = (User) auth.getPrincipal();
+		
+		IFile file = filesManager.getFile(fileId);
+		if (file == null) {
+			return "notFound";
+		}
+		
+		if (!file.getUsername().equals(user.getUsername())) {
 			return "forbidden";
 		}
 		

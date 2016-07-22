@@ -62,7 +62,7 @@ public class FilesController {
 			
 			docNode.put("documentId", doc.getDocumentId());
 			docNode.put("uploadId", doc.getUploadId());
-			docNode.put("uploadedDate", doc.getCreatedDate().toString());
+			docNode.put("uploadedDate", doc.getCreatedDate());
 			docNode.put("access", doc.getAccess().toString());
 			
 			ArrayNode paths = docNode.putArray("files");
