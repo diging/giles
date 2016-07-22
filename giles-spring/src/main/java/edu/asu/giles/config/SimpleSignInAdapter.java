@@ -62,7 +62,10 @@ public final class SimpleSignInAdapter implements SignInAdapter {
 		SavedRequest savedRequest = 
 			    new HttpSessionRequestCache().getRequest(request.getNativeRequest(HttpServletRequest.class), request.getNativeResponse(HttpServletResponse.class));
 		
-		return savedRequest.getRedirectUrl();
+		if (savedRequest != null) {
+			return savedRequest.getRedirectUrl();
+		}
+		return null;
 	}
 
 }
