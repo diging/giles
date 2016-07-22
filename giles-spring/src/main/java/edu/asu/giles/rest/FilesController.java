@@ -2,10 +2,7 @@ package edu.asu.giles.rest;
 
 import java.io.IOException;
 import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -21,37 +18,33 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.users.User;
 
 @Controller
 public class FilesController {
 
 	@Autowired
 	private IFilesManager filesManager;
-
+	
+	@GitHubAccessCheck
 	@RequestMapping(value = "/rest/files/upload/{uploadId}")
 	public ResponseEntity<String> getFilePathsForUpload(
 			@PathVariable("uploadId") String uploadId,
-			@RequestParam String accessToken) {
-		GitHubTemplate template = new GitHubTemplate(accessToken);
-		if (!template.isAuthorized()) {
-			return new ResponseEntity<>(
-					"{ 'error': 'Github token not valid' }",
-					HttpStatus.FORBIDDEN);
-		}
-
-		String username = template.userOperations().getUserProfile()
-				.getUsername();
+			@RequestParam(defaultValue = "") String accessToken, User user) {
+		
 		IUpload upload = filesManager.getUpload(uploadId);
 		if (upload == null) {
 			return new ResponseEntity<String>(
-					"{'error': 'Upload does not exist.'", HttpStatus.NOT_FOUND);
+					"{'error': 'Upload does not exist.'}", HttpStatus.NOT_FOUND);
 		}
-		if (!upload.getUsername().equals(username)) {
+		if (!upload.getUsername().equals(user.getUsername())) {
 			return new ResponseEntity<String>(
-					"{'error': 'Upload id not valid for user.'",
+					"{'error': 'Upload id not valid for user.'}",
 					HttpStatus.BAD_REQUEST);
 		}
 
@@ -59,22 +52,27 @@ public class FilesController {
 		mapper.enable(SerializationFeature.INDENT_OUTPUT);
 		ArrayNode root = mapper.createArrayNode();
 		
-		List<IFile> files = filesManager.getFilesByUploadId(uploadId);
-		Map<String, List<String>> filesByDoc = new HashMap<String, List<String>>();
-
-		for (IFile file : files) {
-			if (filesByDoc.get(file.getDocumentId()) == null) {
-				filesByDoc.put(file.getDocumentId(), new ArrayList<>());
-			}
-			filesByDoc.get(file.getDocumentId()).add(filesManager.getPathOfFile(file));
-		}
+		List<IDocument> docs = filesManager.getDocumentsByUploadId(uploadId);
 		
-		for (String key : filesByDoc.keySet()) {
-			ObjectNode doc = mapper.createObjectNode();
-			root.add(doc);
-			ArrayNode paths = doc.putArray(key);
-			for (String path : filesByDoc.get(key)) {
-				paths.add(path);
+		//filesManager.getPathOfFile(file)
+		
+		for (IDocument doc: docs) {
+			ObjectNode docNode = mapper.createObjectNode();
+			root.add(docNode);
+			
+			docNode.put("documentId", doc.getDocumentId());
+			docNode.put("uploadId", doc.getUploadId());
+			docNode.put("uploadedDate", doc.getCreatedDate().toString());
+			docNode.put("access", doc.getAccess().toString());
+			
+			ArrayNode paths = docNode.putArray("files");
+			for (IFile file : filesManager.getFilesOfDocument(doc)) {
+				ObjectNode fileNode = mapper.createObjectNode();
+				fileNode.put("filename", file.getFilename());
+				fileNode.put("path", filesManager.getRelativePathOfFile(file));
+				fileNode.put("content-type", file.getContentType());
+				fileNode.put("size", file.getSize());
+				paths.add(fileNode);
 			}
 		}
 

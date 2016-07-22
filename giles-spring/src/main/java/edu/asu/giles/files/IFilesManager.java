@@ -1,9 +1,11 @@
 package edu.asu.giles.files;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.impl.StorageStatus;
@@ -26,6 +28,20 @@ public interface IFilesManager {
 
 	public abstract List<IFile> getFilesByUploadId(String uploadId);
 
-	public abstract String getPathOfFile(IFile file);
+	public abstract String getRelativePathOfFile(IFile file);
+
+	public abstract List<IDocument> getDocumentsByUploadId(String uploadId);
+
+	public abstract IDocument getDocument(String id);
+
+	public abstract void saveDocument(IDocument document);
+
+	public abstract List<IFile> getFilesOfDocument(IDocument doc);
+
+	public abstract IFile getFile(String id);
+
+	public abstract void saveFile(IFile file);
+
+	public abstract IFile getFileByPath(String path);
 
 }

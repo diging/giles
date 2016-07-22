@@ -1,5 +1,6 @@
 package edu.asu.giles.rest;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -14,14 +15,20 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.social.github.api.impl.GitHubTemplate;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.core.IFile;
+import edu.asu.giles.core.impl.DocumentAccess;
+import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.users.User;
 
 @PropertySource("classpath:/config.properties")
 @Controller
@@ -31,17 +38,18 @@ public class DigilibPassthroughController {
 	
 	@Value("${digilib_scaler_url}")
 	private String digilibUrl;
+	
+	@Autowired
+	private IFilesManager filesManager;
 
-	@RequestMapping(value = "/rest/diglib")
-	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam String accessToken) {
-		GitHubTemplate template = new GitHubTemplate(accessToken);
-		if (!template.isAuthorized()) {
-			return new ResponseEntity<>("{ 'error': 'Github token not valid' }", HttpStatus.FORBIDDEN);
-		}
+	@GitHubAccessCheck
+	@RequestMapping(value = "/rest/digilib")
+	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "") String accessToken, User user) {
 		
 		Map<String, String[]> parameters = request.getParameterMap();
 		// remove accessToken since Github doesn't care about
 		
+		String fn = null;
 		StringBuffer parameterBuffer = new StringBuffer();
 		for (String key : parameters.keySet()) {
 			if (key.equals("accessToken")) {
@@ -52,7 +60,23 @@ public class DigilibPassthroughController {
 				parameterBuffer.append("=");
 				parameterBuffer.append(value);
 				parameterBuffer.append("&");
+				
+				if (key.equals("fn")) {
+					fn = value;
+				}
 			}
+		}
+		
+		if (fn.startsWith(File.separator)) {
+			fn = fn.substring(1);
+		}
+		IFile file = filesManager.getFileByPath(fn);
+		if (file == null) {
+			return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+		}
+		
+		if (file.getAccess() == DocumentAccess.PRIVATE && !file.getUsername().equals(user.getUsername())) {
+			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
 		}
 		
 		URL url;

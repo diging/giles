@@ -28,5 +28,13 @@
 		<put-attribute name="content" value="/WEB-INF/views/uploads/show.jsp" />	
 	</definition>
 	
+	<definition name="notFound" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/notFound.jsp" />	
+	</definition>
+	
+	<definition name="forbidden" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/forbidden.jsp" />	
+	</definition>
+	
 	
 </tiles-definitions>

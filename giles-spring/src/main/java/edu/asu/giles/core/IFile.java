@@ -1,14 +1,11 @@
 package edu.asu.giles.core;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
+
+import edu.asu.giles.core.impl.DocumentAccess;
 
 public interface IFile {
 	
-	public final static String PUBLIC = "PUBLIC";
-	public final static String PRIVATE = "PRIVATE";
-	public final static String AUTHORIZED = "AUTHORIZED";
-
-
 	public abstract String getUploadId();
 
 	public abstract void setUploadId(String uploadId);
@@ -29,12 +26,24 @@ public interface IFile {
 
 	public abstract String getDocumentId();
 
-	public abstract void setUploadDate(Date uploadDate);
+	public abstract void setUploadDate(String uploadDate);
 
-	public abstract Date getUploadDate();
+	public abstract String getUploadDate();
 
-	public abstract void setAccess(String access);
+	public abstract void setAccess(DocumentAccess access);
 
-	public abstract String getAccess();
+	public abstract DocumentAccess getAccess();
+
+	public abstract void setSize(long size);
+
+	public abstract long getSize();
+
+	public abstract void setContentType(String contentType);
+
+	public abstract String getContentType();
+
+	public abstract void setFilepath(String filepath);
+
+	public abstract String getFilepath();
 
 }

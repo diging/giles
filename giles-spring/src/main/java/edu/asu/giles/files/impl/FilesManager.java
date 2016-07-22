@@ -1,19 +1,26 @@
 package edu.asu.giles.files.impl;
 
 import java.io.File;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
+import edu.asu.giles.core.impl.Document;
+import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.exceptions.GilesFileStorageException;
+import edu.asu.giles.files.IDocumentDatabaseClient;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.files.IFilesManager;
@@ -21,12 +28,17 @@ import edu.asu.giles.files.IUploadDatabaseClient;
 
 @Service
 public class FilesManager implements IFilesManager {
+	
+	Logger logger = LoggerFactory.getLogger(FilesManager.class);
 
 	@Autowired
 	private IFilesDatabaseClient databaseClient;
 	
 	@Autowired
 	private IUploadDatabaseClient uploadDatabaseClient;
+	
+	@Autowired
+	private IDocumentDatabaseClient documentDatabaseClient;
 	
 	@Autowired
 	private IFileStorageManager storageManager;
@@ -47,13 +59,19 @@ public class FilesManager implements IFilesManager {
 		}
 		
 		IUpload upload = new Upload(uploadId);
-		Date uploadDate = new Date();
+		String uploadDate = OffsetDateTime.now(ZoneId.of("UTC")).toString();
 		upload.setCreatedDate(uploadDate);
 		upload.setUsername(username);
 		
 		List<StorageStatus> statuses = new ArrayList<StorageStatus>();
 		for (IFile file : files.keySet()) {
 			byte[] content = files.get(file);
+			
+			if (content == null) {
+				statuses.add(new StorageStatus(file, null, StorageStatus.FAILURE));
+				continue;
+			}
+			
 			String id = null;
 			
 			// generate unique id
@@ -65,18 +83,42 @@ public class FilesManager implements IFilesManager {
 				}
 			}
 			
+			IDocument document = new Document();
+			String docId = null;
+			while(true) {
+				docId = "DOC" + generateId();
+				IDocument existingDoc = documentDatabaseClient.getDocumentById(docId);
+				if (existingDoc == null) {
+					break;
+				}
+			}
+			
+			if (file.getAccess() == null) {
+				file.setAccess(DocumentAccess.PRIVATE);
+			}
+			
+			document.setDocumentId(docId);
+			document.setId(docId);
+			document.setCreatedDate(uploadDate);
+			document.setAccess(file.getAccess());
+			document.setUploadId(uploadId);
+			document.setFileIds(new ArrayList<>());
+			document.getFileIds().add(id);
+			
 			file.setId(id);
-			file.setDocumentId(id);
+			file.setDocumentId(docId);
 			file.setUploadId(uploadId);
 			file.setUploadDate(uploadDate);
 			file.setUsername(username);
-			file.setAccess(IFile.PRIVATE);
+			file.setFilepath(getRelativePathOfFile(file));
 			
 			try {
 				storageManager.saveFile(username, uploadId, id, file.getFilename(), content);
-				databaseClient.addFile(file);
+				databaseClient.saveFile(file);
+				documentDatabaseClient.saveDocument(document);
 				statuses.add(new StorageStatus(file, null, StorageStatus.SUCCESS));
 			} catch (GilesFileStorageException e) {
+				logger.error("Could not store uploaded files.", e);
 				statuses.add(new StorageStatus(file, e, StorageStatus.FAILURE));
 			}
 		}
@@ -95,6 +137,41 @@ public class FilesManager implements IFilesManager {
 	}
 	
 	@Override
+	public List<IDocument> getDocumentsByUploadId(String uploadId) {
+		List<IDocument> documents = documentDatabaseClient.getDocumentByUploadId(uploadId);
+		for (IDocument doc : documents) {
+			doc.setFiles(new ArrayList<>());
+			for (String fileId : doc.getFileIds()) {
+				doc.getFiles().add(databaseClient.getFileById(fileId));
+			}
+		}
+		return documents;
+	}
+	
+	@Override
+	public IFile getFile(String id) {
+		return databaseClient.getFileById(id);
+	}
+	
+	@Override
+	public IFile getFileByPath(String path) {
+		IFile file = new edu.asu.giles.core.impl.File();
+		file.setFilepath(path);
+		
+		List<IFile> files = databaseClient.getFilesByExample(file);
+		if (files == null || files.isEmpty()) {
+			return null;
+		}
+		
+		return files.get(0);
+	}
+	
+	@Override
+	public void saveFile(IFile file) {
+		databaseClient.saveFile(file);
+	}
+	
+	@Override
 	public List<IUpload> getUploadsOfUser(String username) {
 		return uploadDatabaseClient.getUploadsForUser(username);
 	}
@@ -105,11 +182,31 @@ public class FilesManager implements IFilesManager {
 	}
 	
 	@Override
-	public String getPathOfFile(IFile file) {
+	public String getRelativePathOfFile(IFile file) {
 		String directory = storageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
 		return directory + File.separator + file.getFilename();
 	}
-
+	
+	@Override
+	public IDocument getDocument(String id) {
+		return documentDatabaseClient.getDocumentById(id);
+	}
+	
+	@Override
+	public void saveDocument(IDocument document) {
+		documentDatabaseClient.saveDocument(document);
+	}
+	
+	@Override
+	public List<IFile> getFilesOfDocument(IDocument doc) {
+		List<String> fileIds = doc.getFileIds();
+		
+		List<IFile> files = new ArrayList<>();
+		fileIds.forEach(id -> files.add(getFile(id)));
+		
+		return files;
+	}
+	
 	/**
 	 * This methods generates a new 6 character long id. Note that this method
 	 * does not assure that the id isn't in use yet.

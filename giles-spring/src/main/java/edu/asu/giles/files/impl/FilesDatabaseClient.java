@@ -35,7 +35,7 @@ public class FilesDatabaseClient implements IFilesDatabaseClient {
 	 * @see edu.asu.giles.files.IFilesDatabaseClient#addFile(edu.asu.giles.core.impl.File)
 	 */
 	@Override
-	public IFile addFile(IFile file) {
+	public IFile saveFile(IFile file) {
 		client.store(file);
 		client.commit();
 		return file;
