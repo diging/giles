@@ -1,12 +1,14 @@
 package edu.asu.giles.files.impl;
 
 import java.io.File;
+import java.time.OffsetDateTime;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -25,6 +27,8 @@ import edu.asu.giles.files.IUploadDatabaseClient;
 
 @Service
 public class FilesManager implements IFilesManager {
+	
+	Logger logger = LoggerFactory.getLogger(FilesManager.class);
 
 	@Autowired
 	private IFilesDatabaseClient databaseClient;
@@ -54,13 +58,19 @@ public class FilesManager implements IFilesManager {
 		}
 		
 		IUpload upload = new Upload(uploadId);
-		Date uploadDate = new Date();
+		OffsetDateTime uploadDate = OffsetDateTime.now();
 		upload.setCreatedDate(uploadDate);
 		upload.setUsername(username);
 		
 		List<StorageStatus> statuses = new ArrayList<StorageStatus>();
 		for (IFile file : files.keySet()) {
 			byte[] content = files.get(file);
+			
+			if (content == null) {
+				statuses.add(new StorageStatus(file, null, StorageStatus.FAILURE));
+				continue;
+			}
+			
 			String id = null;
 			
 			// generate unique id
@@ -82,10 +92,14 @@ public class FilesManager implements IFilesManager {
 				}
 			}
 			
+			if (file.getAccess() == null) {
+				file.setAccess(DocumentAccess.PRIVATE);
+			}
+			
 			document.setDocumentId(docId);
 			document.setId(docId);
 			document.setCreatedDate(uploadDate);
-			document.setAccess(DocumentAccess.PRIVATE);
+			document.setAccess(file.getAccess());
 			document.setUploadId(uploadId);
 			document.setFileIds(new ArrayList<>());
 			document.getFileIds().add(id);
@@ -95,7 +109,6 @@ public class FilesManager implements IFilesManager {
 			file.setUploadId(uploadId);
 			file.setUploadDate(uploadDate);
 			file.setUsername(username);
-			file.setAccess(DocumentAccess.PRIVATE);
 			
 			try {
 				storageManager.saveFile(username, uploadId, id, file.getFilename(), content);
@@ -103,6 +116,7 @@ public class FilesManager implements IFilesManager {
 				documentDatabaseClient.saveDocument(document);
 				statuses.add(new StorageStatus(file, null, StorageStatus.SUCCESS));
 			} catch (GilesFileStorageException e) {
+				logger.error("Could not store uploaded files.", e);
 				statuses.add(new StorageStatus(file, e, StorageStatus.FAILURE));
 			}
 		}
@@ -153,7 +167,7 @@ public class FilesManager implements IFilesManager {
 	}
 	
 	@Override
-	public String getPathOfFile(IFile file) {
+	public String getRelativePathOfFile(IFile file) {
 		String directory = storageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
 		return directory + File.separator + file.getFilename();
 	}

@@ -1,6 +1,6 @@
 package edu.asu.giles.core;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import edu.asu.giles.core.impl.DocumentAccess;
@@ -15,9 +15,9 @@ public interface IDocument {
 
 	public abstract void setUploadId(String uploadId);
 
-	public abstract Date getCreatedDate();
+	public abstract OffsetDateTime getCreatedDate();
 
-	public abstract void setCreatedDate(Date createdDate);
+	public abstract void setCreatedDate(OffsetDateTime createdDate);
 
 	public abstract List<String> getFileIds();
 

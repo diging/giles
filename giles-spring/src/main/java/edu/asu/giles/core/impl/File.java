@@ -1,5 +1,6 @@
 package edu.asu.giles.core.impl;
 
+import java.time.OffsetDateTime;
 import java.util.Date;
 
 import edu.asu.giles.core.IFile;
@@ -13,7 +14,7 @@ public class File implements IFile {
 	private String username;
 	private String documentId;
 	private String id;
-	private Date uploadDate;
+	private OffsetDateTime uploadDate;
 	private DocumentAccess access;
 	
 	public File() {}
@@ -95,12 +96,12 @@ public class File implements IFile {
 	}
 
 	@Override
-	public Date getUploadDate() {
+	public OffsetDateTime getUploadDate() {
 		return uploadDate;
 	}
 
 	@Override
-	public void setUploadDate(Date uploadDate) {
+	public void setUploadDate(OffsetDateTime uploadDate) {
 		this.uploadDate = uploadDate;
 	}
 

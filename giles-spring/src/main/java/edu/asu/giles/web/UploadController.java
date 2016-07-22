@@ -24,6 +24,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.giles.core.IFile;
+import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.core.impl.File;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
@@ -45,20 +46,27 @@ public class UploadController {
 	}
 	
 	@RequestMapping(value = "/files/upload", method = RequestMethod.POST)
-	public ResponseEntity<String> uploadFiles(Principal principal, @RequestParam("file") MultipartFile[] files) {
+	public ResponseEntity<String> uploadFiles(Principal principal, @RequestParam("file") MultipartFile[] files, @RequestParam("access") String access) {
 		
 		String username = "";
 		if (principal instanceof UsernamePasswordAuthenticationToken) {
 			username = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getUsername();
 		}
 		
+		DocumentAccess docAccess = DocumentAccess.valueOf(access);
+		if (docAccess == null) {
+			return new ResponseEntity<String>("Access type: " + access + " does not exist.", HttpStatus.BAD_REQUEST);
+		}
+		
 		Map<IFile, byte[]> uploadedFiles = new HashMap<>();
 		for(MultipartFile f : files) {
 			IFile file = new File(f.getOriginalFilename());
+			file.setAccess(docAccess);
 			try {
 				uploadedFiles.put(file, f.getBytes());
 			} catch (IOException e) {
 				logger.error("Couldn't get file content.", e);
+				uploadedFiles.put(file, null);
 			}
 		}
 		

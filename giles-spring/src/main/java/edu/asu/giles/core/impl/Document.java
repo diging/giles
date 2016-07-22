@@ -1,6 +1,6 @@
 package edu.asu.giles.core.impl;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 import edu.asu.giles.core.IDocument;
@@ -11,7 +11,7 @@ public class Document implements IDocument {
 	private String id;
 	private String documentId;
 	private String uploadId;
-	private Date createdDate;
+	private OffsetDateTime createdDate;
 	private List<String> fileIds;
 	private DocumentAccess access;
 	private transient List<IFile> files;
@@ -48,14 +48,14 @@ public class Document implements IDocument {
 	 * @see edu.asu.giles.core.impl.IDocument#getCreatedDate()
 	 */
 	@Override
-	public Date getCreatedDate() {
+	public OffsetDateTime getCreatedDate() {
 		return createdDate;
 	}
 	/* (non-Javadoc)
 	 * @see edu.asu.giles.core.impl.IDocument#setCreatedDate(java.util.Date)
 	 */
 	@Override
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(OffsetDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
 	/* (non-Javadoc)

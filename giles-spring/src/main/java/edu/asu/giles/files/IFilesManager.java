@@ -28,7 +28,7 @@ public interface IFilesManager {
 
 	public abstract List<IFile> getFilesByUploadId(String uploadId);
 
-	public abstract String getPathOfFile(IFile file);
+	public abstract String getRelativePathOfFile(IFile file);
 
 	public abstract List<IDocument> getDocumentsByUploadId(String uploadId);
 

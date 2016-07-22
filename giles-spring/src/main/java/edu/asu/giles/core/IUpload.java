@@ -1,6 +1,6 @@
 package edu.asu.giles.core;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 public interface IUpload {
 
@@ -12,8 +12,8 @@ public interface IUpload {
 
 	public abstract void setUsername(String username);
 
-	public abstract Date getCreatedDate();
+	public abstract OffsetDateTime getCreatedDate();
 
-	public abstract void setCreatedDate(Date createdDate);
+	public abstract void setCreatedDate(OffsetDateTime createdDate);
 
 }

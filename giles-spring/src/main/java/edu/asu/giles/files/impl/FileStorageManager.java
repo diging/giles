@@ -18,7 +18,7 @@ public class FileStorageManager implements IFileStorageManager {
 	 */
 	@Override
 	public void saveFile(String username, String uploadId, String fileId, String filename, byte[] bytes) throws GilesFileStorageException {
-		String filePath = getFileFolderPath(username, uploadId, fileId);
+		String filePath = baseDirectory + File.separator + getFileFolderPath(username, uploadId, fileId);
 		createDirectory(filePath);
 		
 		File file = new File(filePath + File.separator + filename);
@@ -39,7 +39,6 @@ public class FileStorageManager implements IFileStorageManager {
 	@Override
 	public String getFileFolderPath(String username, String uploadId, String fileId) {
 		StringBuffer filePath = new StringBuffer();
-		filePath.append(File.separator);
 		filePath.append(username);
 		filePath.append(File.separator);
 		filePath.append(uploadId);

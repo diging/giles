@@ -9,15 +9,23 @@
 <div class="alert alert-info" role="alert"><i class="fa fa-exclamation-triangle" aria-hidden="true"></i>
  The upload limit for files is 50MB.</div>
 
-
-	<div id="upload-field">
-	<span class="btn btn-success fileinput-button">
-        <i class="fa fa-plus" aria-hidden="true"></i>
-        <span>Add files...</span>
-        <!-- The file input field used as target for the file upload widget -->
-        <input id="fileupload" type="file" name="file" multiple>
-    </span>
-    </div>
+	<form class="form-inline">
+		<div class="form-group">
+			<label>Make uploaded files: </label>
+			<select class="form-control" id="accessInput">
+			  <option value="PRIVATE" selected>Private</option>
+			  <option value="PUBLIC">Public</option>
+			</select>
+		</div>
+		<br>
+		<div class="form-group" id="upload-field">
+		<span class="btn btn-success fileinput-button">
+	        <i class="fa fa-plus" aria-hidden="true"></i>
+	        <span>Add files...</span>
+	        <!-- The file input field used as target for the file upload widget -->
+	        <input id="fileupload" type="file" name="file" multiple>
+	    </span>
+	    </div>
     <br>
     <br>
     <!-- The global progress bar -->
@@ -33,6 +41,7 @@
     	<strong>Upload Failed</strong> <br>
     	Reason: <span id="failure_reason"></span>
     </div>
+ </form>
 
 <a href="#" id="jarsLink" class="btn btn-primary disabled">Add metadata in Jars</a>
 
@@ -71,6 +80,11 @@ $(function () {
         //xhrFields: {withCredentials: true},
         url: '<c:url value="/files/upload" />',
         singleFileUploads: false,
+        submit: function (e, data) {
+            var input = $('#accessInput');
+            data.formData = {access: input.val()};
+            return true;
+        },
         progressall: function (e, data) {
             var progress = parseInt(data.loaded / data.total * 100, 10);
             $('#progress .bar').css(

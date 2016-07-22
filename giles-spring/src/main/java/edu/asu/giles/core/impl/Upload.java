@@ -1,6 +1,6 @@
 package edu.asu.giles.core.impl;
 
-import java.util.Date;
+import java.time.OffsetDateTime;
 
 import edu.asu.giles.core.IUpload;
 
@@ -8,7 +8,7 @@ public class Upload implements IUpload {
 
 	private String id;
 	private String username;
-	private Date createdDate;
+	private OffsetDateTime createdDate;
 	
 	public Upload() {}
 	
@@ -48,14 +48,14 @@ public class Upload implements IUpload {
 	 * @see edu.asu.giles.core.impl.IUpload#getCreatedDate()
 	 */
 	@Override
-	public Date getCreatedDate() {
+	public OffsetDateTime getCreatedDate() {
 		return createdDate;
 	}
 	/* (non-Javadoc)
 	 * @see edu.asu.giles.core.impl.IUpload#setCreatedDate(java.util.Date)
 	 */
 	@Override
-	public void setCreatedDate(Date createdDate) {
+	public void setCreatedDate(OffsetDateTime createdDate) {
 		this.createdDate = createdDate;
 	}
 	
