@@ -114,7 +114,7 @@ $(function () {
         	uploadIds.forEach(function(element, index) {
         		uploadIdsString += "uploadIds=";
         		uploadIdsString += element;
-        		uploadIdsString += ",";
+        		uploadIdsString += "&";
         	});
         	
         	$('#jarsLink').attr('href', jarsUrl + "?" + uploadIdsString);
