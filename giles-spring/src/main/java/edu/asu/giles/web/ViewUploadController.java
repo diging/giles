@@ -8,6 +8,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.giles.aspects.access.UploadIdAccessCheck;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.IFilesManager;
@@ -18,6 +19,7 @@ public class ViewUploadController {
 	@Autowired
 	private IFilesManager filesManager;
 
+	@UploadIdAccessCheck
 	@RequestMapping(value="/uploads/{uploadId}")
 	public String showUploadPage(@PathVariable("uploadId") String uploadId, Model model) {
 		IUpload upload = filesManager.getUpload(uploadId);

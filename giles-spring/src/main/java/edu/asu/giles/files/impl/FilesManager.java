@@ -2,6 +2,7 @@ package edu.asu.giles.files.impl;
 
 import java.io.File;
 import java.time.OffsetDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -58,7 +59,7 @@ public class FilesManager implements IFilesManager {
 		}
 		
 		IUpload upload = new Upload(uploadId);
-		OffsetDateTime uploadDate = OffsetDateTime.now();
+		OffsetDateTime uploadDate = OffsetDateTime.now(ZoneId.of("UTC"));
 		upload.setCreatedDate(uploadDate);
 		upload.setUsername(username);
 		
@@ -109,6 +110,7 @@ public class FilesManager implements IFilesManager {
 			file.setUploadId(uploadId);
 			file.setUploadDate(uploadDate);
 			file.setUsername(username);
+			file.setFilepath(getRelativePathOfFile(file));
 			
 			try {
 				storageManager.saveFile(username, uploadId, id, file.getFilename(), content);
@@ -149,6 +151,19 @@ public class FilesManager implements IFilesManager {
 	@Override
 	public IFile getFile(String id) {
 		return databaseClient.getFileById(id);
+	}
+	
+	@Override
+	public IFile getFileByPath(String path) {
+		IFile file = new edu.asu.giles.core.impl.File();
+		file.setFilepath(path);
+		
+		List<IFile> files = databaseClient.getFilesByExample(file);
+		if (files == null || files.isEmpty()) {
+			return null;
+		}
+		
+		return files.get(0);
 	}
 	
 	@Override

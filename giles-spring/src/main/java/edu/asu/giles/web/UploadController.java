@@ -28,7 +28,6 @@ import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.core.impl.File;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
-import edu.asu.giles.rest.DigilibPassthroughController;
 import edu.asu.giles.users.User;
 
 @Controller
@@ -61,6 +60,8 @@ public class UploadController {
 		Map<IFile, byte[]> uploadedFiles = new HashMap<>();
 		for(MultipartFile f : files) {
 			IFile file = new File(f.getOriginalFilename());
+			file.setContentType(f.getContentType());
+			file.setSize(f.getSize());
 			file.setAccess(docAccess);
 			try {
 				uploadedFiles.put(file, f.getBytes());

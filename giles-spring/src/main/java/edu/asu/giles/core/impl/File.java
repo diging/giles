@@ -1,7 +1,6 @@
 package edu.asu.giles.core.impl;
 
 import java.time.OffsetDateTime;
-import java.util.Date;
 
 import edu.asu.giles.core.IFile;
 
@@ -16,6 +15,9 @@ public class File implements IFile {
 	private String id;
 	private OffsetDateTime uploadDate;
 	private DocumentAccess access;
+	private String contentType;
+	private long size;
+	private String filepath;
 	
 	public File() {}
 	
@@ -113,6 +115,36 @@ public class File implements IFile {
 	@Override
 	public void setAccess(DocumentAccess access) {
 		this.access = access;
+	}
+
+	@Override
+	public String getContentType() {
+		return contentType;
+	}
+
+	@Override
+	public void setContentType(String contentType) {
+		this.contentType = contentType;
+	}
+
+	@Override
+	public long getSize() {
+		return size;
+	}
+
+	@Override
+	public void setSize(long size) {
+		this.size = size;
+	}
+
+	@Override
+	public String getFilepath() {
+		return filepath;
+	}
+
+	@Override
+	public void setFilepath(String filepath) {
+		this.filepath = filepath;
 	}
 
 }

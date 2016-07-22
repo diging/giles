@@ -42,4 +42,6 @@ public interface IFilesManager {
 
 	public abstract void saveFile(IFile file);
 
+	public abstract IFile getFileByPath(String path);
+
 }
