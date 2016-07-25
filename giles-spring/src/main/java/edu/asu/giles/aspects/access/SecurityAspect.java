@@ -133,6 +133,7 @@ public class SecurityAspect {
 		
 		GitHubUserProfile profile = template.userOperations().getUserProfile();
 		User foundUser = userManager.findUser(profile.getUsername());
+		logger.debug("Authorizing: " + profile.getUsername());
 		
 		if (foundUser == null) {
 			return new ResponseEntity<>("{ \"error\": \"The user doesn't seem to have a Giles account.\" } ", HttpStatus.FORBIDDEN);
