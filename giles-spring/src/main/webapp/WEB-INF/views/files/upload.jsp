@@ -43,7 +43,7 @@
     </div>
  </form>
 
-<a href="#" id="jarsLink" class="btn btn-primary disabled">Add metadata in Jars</a>
+<a href="" id="jarsLink" class="btn btn-primary disabled">Add metadata in Jars</a>
 
 <!-- The jQuery UI widget factory, can be omitted if jQuery UI is already included -->
 <script src="<c:url value="/resources/jquery-file-upload/js/vendor/jquery.ui.widget.js" />"></script>
@@ -69,7 +69,7 @@
 <script>
 //# sourceURL=upload.js
 var uploadIds = [];
-var jarsUrl = '${jars.url}';
+var jarsUrl = '${jars.url}/resource/create/giles/callback/';
 
 $(function () {
     'use strict';
