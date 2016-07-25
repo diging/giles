@@ -68,7 +68,7 @@ public class FilesController {
             for (IFile file : filesManager.getFilesOfDocument(doc)) {
                 ObjectNode fileNode = mapper.createObjectNode();
                 fileNode.put("filename", file.getFilename());
-                fileNode.put("path", filesManager.getRelativePathOfFile(file));
+                fileNode.put("path", filesManager.getFileUrl(file));
                 fileNode.put("content-type", file.getContentType());
                 fileNode.put("size", file.getSize());
                 paths.add(fileNode);

@@ -11,6 +11,8 @@ import java.util.Random;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.giles.core.IDocument;
@@ -26,10 +28,14 @@ import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
 
+@PropertySource("classpath:/config.properties")
 @Service
 public class FilesManager implements IFilesManager {
 	
-	Logger logger = LoggerFactory.getLogger(FilesManager.class);
+	private Logger logger = LoggerFactory.getLogger(FilesManager.class);
+	
+	@Value("${digilib_scaler_url}")
+    private String digilibUrl;
 
 	@Autowired
 	private IFilesDatabaseClient databaseClient;
@@ -181,10 +187,16 @@ public class FilesManager implements IFilesManager {
 		return uploadDatabaseClient.getUpload(id);
 	}
 	
-	@Override
-	public String getRelativePathOfFile(IFile file) {
+	protected String getRelativePathOfFile(IFile file) {
 		String directory = storageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
 		return directory + File.separator + file.getFilename();
+	}
+	
+	@Override
+    public String getFileUrl(IFile file) {
+	    String relativePath = getRelativePathOfFile(file);
+	    return digilibUrl + "?fn=" + relativePath;
+	    
 	}
 	
 	@Override
