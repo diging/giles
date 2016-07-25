@@ -12,36 +12,37 @@ import edu.asu.giles.files.impl.StorageStatus;
 
 public interface IFilesManager {
 
-	/**
-	 * This method saves the given files to the database. It generates
-	 * an id for each file and an upload id that is the same for all
-	 * files.
-	 * 
-	 * @param files The files to save.
-	 * @return The list of saved files with ids and upload id set.
-	 */
-	public abstract List<StorageStatus> addFiles(Map<IFile, byte[]> files, String username);
+    /**
+     * This method saves the given files to the database. It generates an id for
+     * each file and an upload id that is the same for all files.
+     * 
+     * @param files
+     *            The files to save.
+     * @return The list of saved files with ids and upload id set.
+     */
+    public abstract List<StorageStatus> addFiles(Map<IFile, byte[]> files,
+            String username);
 
-	public abstract List<IUpload> getUploadsOfUser(String username);
+    public abstract List<IUpload> getUploadsOfUser(String username);
 
-	public abstract IUpload getUpload(String id);
+    public abstract IUpload getUpload(String id);
 
-	public abstract List<IFile> getFilesByUploadId(String uploadId);
+    public abstract List<IFile> getFilesByUploadId(String uploadId);
 
-	public abstract String getRelativePathOfFile(IFile file);
+    public abstract String getRelativePathOfFile(IFile file);
 
-	public abstract List<IDocument> getDocumentsByUploadId(String uploadId);
+    public abstract List<IDocument> getDocumentsByUploadId(String uploadId);
 
-	public abstract IDocument getDocument(String id);
+    public abstract IDocument getDocument(String id);
 
-	public abstract void saveDocument(IDocument document);
+    public abstract void saveDocument(IDocument document);
 
-	public abstract List<IFile> getFilesOfDocument(IDocument doc);
+    public abstract List<IFile> getFilesOfDocument(IDocument doc);
 
-	public abstract IFile getFile(String id);
+    public abstract IFile getFile(String id);
 
-	public abstract void saveFile(IFile file);
+    public abstract void saveFile(IFile file);
 
-	public abstract IFile getFileByPath(String path);
+    public abstract IFile getFileByPath(String path);
 
 }

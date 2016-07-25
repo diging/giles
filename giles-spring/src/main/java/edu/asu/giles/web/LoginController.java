@@ -16,30 +16,29 @@ import edu.asu.giles.users.User;
 
 @Controller
 public class LoginController {
-	
-	@Autowired
-	private IFilesManager filesManager;
 
-	@RequestMapping(value ="/")
-	public String login(Principal principal, Model model) {
-		
-		String username = null;
-		if (principal instanceof UsernamePasswordAuthenticationToken) {
-			UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
-			if (token.getPrincipal() instanceof User) {
-				username = ((User) token.getPrincipal()).getUsername();
-			} else if (token.getPrincipal() instanceof UserDetails) {
-				username = ((UserDetails) token.getPrincipal()).getUsername();
-			}
-		}
-		
-		if (username != null) {
-			List<IUpload> uploads = filesManager.getUploadsOfUser(username);
-			model.addAttribute("uploads", uploads);
-		}
-		
-		
-		return "login";
-	}
-	
+    @Autowired
+    private IFilesManager filesManager;
+
+    @RequestMapping(value = "/")
+    public String login(Principal principal, Model model) {
+
+        String username = null;
+        if (principal instanceof UsernamePasswordAuthenticationToken) {
+            UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
+            if (token.getPrincipal() instanceof User) {
+                username = ((User) token.getPrincipal()).getUsername();
+            } else if (token.getPrincipal() instanceof UserDetails) {
+                username = ((UserDetails) token.getPrincipal()).getUsername();
+            }
+        }
+
+        if (username != null) {
+            List<IUpload> uploads = filesManager.getUploadsOfUser(username);
+            model.addAttribute("uploads", uploads);
+        }
+
+        return "login";
+    }
+
 }

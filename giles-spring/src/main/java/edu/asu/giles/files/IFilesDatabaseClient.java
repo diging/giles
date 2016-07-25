@@ -7,14 +7,14 @@ import edu.asu.giles.core.impl.File;
 
 public interface IFilesDatabaseClient {
 
-	public abstract IFile saveFile(IFile file);
+    public abstract IFile saveFile(IFile file);
 
-	public abstract IFile getFile(String filename);
+    public abstract IFile getFile(String filename);
 
-	public abstract List<IFile> getFilesByExample(IFile file);
+    public abstract List<IFile> getFilesByExample(IFile file);
 
-	public abstract List<IFile> getFileByUploadId(String uploadId);
+    public abstract List<IFile> getFileByUploadId(String uploadId);
 
-	public abstract IFile getFileById(String id);
+    public abstract IFile getFileById(String id);
 
 }

@@ -6,12 +6,12 @@ import edu.asu.giles.core.IDocument;
 
 public interface IDocumentDatabaseClient {
 
-	public abstract IDocument saveDocument(IDocument document);
+    public abstract IDocument saveDocument(IDocument document);
 
-	public abstract IDocument getDocumentById(String id);
+    public abstract IDocument getDocumentById(String id);
 
-	public abstract List<IDocument> getDocumentByUploadId(String uploadId);
+    public abstract List<IDocument> getDocumentByUploadId(String uploadId);
 
-	public abstract List<IDocument> getDocumentByExample(IDocument doc);
+    public abstract List<IDocument> getDocumentByExample(IDocument doc);
 
 }
