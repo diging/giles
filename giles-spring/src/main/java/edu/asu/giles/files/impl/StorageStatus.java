@@ -32,6 +32,11 @@ public class StorageStatus {
 	public void setException(GilesFileStorageException exception) {
 		this.exception = exception;
 	}
+	
+	/**
+	 * Returns if an upload was successful.
+	 * @return 0 = SUCCESS, 1 = FAILURE
+	 */
 	public int getStatus() {
 		return status;
 	}

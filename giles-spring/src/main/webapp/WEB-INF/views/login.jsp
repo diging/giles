@@ -27,8 +27,8 @@ To use Giles, you need to log in with your GitHub account. Don't have one? You c
 </sec:authorize>
 
 <sec:authorize access="isAuthenticated()">
-<c:catch var="exception"><sec:authentication
-							property="principal.fullname" /></c:catch>
+<div class="hidden"><c:catch var="exception"><sec:authentication
+							property="principal.fullname" /></c:catch></div>
 <c:if test="${empty exception}">
 <h2>Welcome, <sec:authentication
 							property="principal.fullname" />!</h2>

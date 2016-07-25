@@ -29,6 +29,7 @@ import edu.asu.giles.core.impl.File;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
 import edu.asu.giles.users.User;
+import edu.asu.giles.util.FileUploadHelper;
 
 @Controller
 public class UploadController {
@@ -38,6 +39,9 @@ public class UploadController {
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private FileUploadHelper uploadHelper;
 
     @RequestMapping(value = "/files/upload", method = RequestMethod.GET)
     public String showUploadPage(Principal principal, Model model) {
@@ -55,28 +59,14 @@ public class UploadController {
                     .getPrincipal()).getUsername();
         }
 
+        
         DocumentAccess docAccess = DocumentAccess.valueOf(access);
         if (docAccess == null) {
             return new ResponseEntity<String>("Access type: " + access
                     + " does not exist.", HttpStatus.BAD_REQUEST);
         }
-
-        Map<IFile, byte[]> uploadedFiles = new HashMap<>();
-        for (MultipartFile f : files) {
-            IFile file = new File(f.getOriginalFilename());
-            file.setContentType(f.getContentType());
-            file.setSize(f.getSize());
-            file.setAccess(docAccess);
-            try {
-                uploadedFiles.put(file, f.getBytes());
-            } catch (IOException e) {
-                logger.error("Couldn't get file content.", e);
-                uploadedFiles.put(file, null);
-            }
-        }
-
-        List<StorageStatus> statuses = filesManager.addFiles(uploadedFiles,
-                username);
+        
+        List<StorageStatus> statuses = uploadHelper.processUpload(docAccess, files, username);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();

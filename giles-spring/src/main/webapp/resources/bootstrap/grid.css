@@ -20,9 +20,9 @@ hr {
 }
 
 .footer {
-    position: absolute;
+    position: fixed;
     background-color: white;
     width: 100%;
-    bottom: 0;
+    bottom: 0px;
 }
 

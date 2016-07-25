@@ -30,7 +30,7 @@ public class DigilibConnector {
 
         HttpURLConnection con = (HttpURLConnection) url.openConnection();
         con.setRequestMethod("GET");
-
+        
         con = (HttpURLConnection) url.openConnection();
 
         InputStream input = con.getInputStream();
