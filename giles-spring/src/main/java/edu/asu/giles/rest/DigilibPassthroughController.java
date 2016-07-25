@@ -97,6 +97,8 @@ public class DigilibPassthroughController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 		
+		Map<String, String> simpleMap = headers.toSingleValueMap();
+		response.setContentType(simpleMap.get(HttpHeaders.CONTENT_TYPE));
 		return new ResponseEntity<String>(headers, HttpStatus.OK);
 	}
 	
