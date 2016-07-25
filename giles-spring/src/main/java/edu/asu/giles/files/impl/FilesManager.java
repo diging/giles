@@ -15,11 +15,12 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
+import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.Document;
-import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IDocumentDatabaseClient;
@@ -53,7 +54,7 @@ public class FilesManager implements IFilesManager {
 	 * @see edu.asu.giles.files.impl.IFilesManager#addFiles(java.util.List)
 	 */
 	@Override
-	public List<StorageStatus> addFiles(Map<IFile, byte[]> files, String username) {
+	public List<StorageStatus> addFiles(Map<IFile, byte[]> files, String username, DocumentType docType, DocumentAccess access) {
 		
 		String uploadId = null;
 		while(true) {
@@ -70,6 +71,10 @@ public class FilesManager implements IFilesManager {
 		upload.setUsername(username);
 		
 		List<StorageStatus> statuses = new ArrayList<StorageStatus>();
+		IDocument document = null;
+		if (docType == DocumentType.MULTI_PAGE) {
+		    document = createDocument(uploadId, uploadDate, access);
+		}
 		for (IFile file : files.keySet()) {
 			byte[] content = files.get(file);
 			
@@ -89,34 +94,23 @@ public class FilesManager implements IFilesManager {
 				}
 			}
 			
-			IDocument document = new Document();
-			String docId = null;
-			while(true) {
-				docId = "DOC" + generateId();
-				IDocument existingDoc = documentDatabaseClient.getDocumentById(docId);
-				if (existingDoc == null) {
-					break;
-				}
-			}
 			
 			if (file.getAccess() == null) {
 				file.setAccess(DocumentAccess.PRIVATE);
 			}
 			
-			document.setDocumentId(docId);
-			document.setId(docId);
-			document.setCreatedDate(uploadDate);
-			document.setAccess(file.getAccess());
-			document.setUploadId(uploadId);
-			document.setFileIds(new ArrayList<>());
-			document.getFileIds().add(id);
-			
+			if (docType == DocumentType.SINGLE_PAGE) {
+			    document = createDocument(uploadId, uploadDate, file.getAccess());
+			}
+			    
 			file.setId(id);
-			file.setDocumentId(docId);
+			file.setDocumentId(document.getId());
 			file.setUploadId(uploadId);
 			file.setUploadDate(uploadDate);
 			file.setUsername(username);
 			file.setFilepath(getRelativePathOfFile(file));
+			
+			document.getFileIds().add(id);
 			
 			try {
 				storageManager.saveFile(username, uploadId, id, file.getFilename(), content);
@@ -136,6 +130,32 @@ public class FilesManager implements IFilesManager {
 		
 		return statuses;
 	}
+
+    private IDocument createDocument(String uploadId, String uploadDate, DocumentAccess access) {
+        
+        IDocument document = new Document();
+        String docId = generateDocumentId();
+        document.setDocumentId(docId);
+        document.setId(docId);
+        document.setCreatedDate(uploadDate);
+        document.setAccess(access);
+        document.setUploadId(uploadId);
+        document.setFileIds(new ArrayList<>());
+        
+        return document;
+    }
+
+    private String generateDocumentId() {
+        String docId = null;
+        while(true) {
+        	docId = "DOC" + generateId();
+        	IDocument existingDoc = documentDatabaseClient.getDocumentById(docId);
+        	if (existingDoc == null) {
+        		break;
+        	}
+        }
+        return docId;
+    }
 	
 	@Override
 	public List<IFile> getFilesByUploadId(String uploadId) {

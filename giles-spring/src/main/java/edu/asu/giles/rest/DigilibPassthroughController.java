@@ -23,8 +23,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IFile;
-import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.users.User;
 import edu.asu.giles.util.DigilibConnector;

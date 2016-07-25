@@ -2,8 +2,6 @@ package edu.asu.giles.core;
 
 import java.time.OffsetDateTime;
 
-import edu.asu.giles.core.impl.DocumentAccess;
-
 public interface IFile {
 
     public abstract String getUploadId();

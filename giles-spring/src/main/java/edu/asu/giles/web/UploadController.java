@@ -23,8 +23,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IFile;
-import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.core.impl.File;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
@@ -66,7 +67,7 @@ public class UploadController {
                     + " does not exist.", HttpStatus.BAD_REQUEST);
         }
         
-        List<StorageStatus> statuses = uploadHelper.processUpload(docAccess, files, username);
+        List<StorageStatus> statuses = uploadHelper.processUpload(docAccess, DocumentType.SINGLE_PAGE, files, username);
 
         ObjectMapper mapper = new ObjectMapper();
         ObjectNode root = mapper.createObjectNode();

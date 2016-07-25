@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
@@ -21,7 +23,7 @@ public interface IFilesManager {
      * @return The list of saved files with ids and upload id set.
      */
     public abstract List<StorageStatus> addFiles(Map<IFile, byte[]> files,
-            String username);
+            String username, DocumentType docType, DocumentAccess access);
 
     public abstract List<IUpload> getUploadsOfUser(String username);
 

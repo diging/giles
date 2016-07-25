@@ -13,8 +13,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IFile;
-import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.core.impl.File;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
@@ -27,7 +28,7 @@ public class FileUploadHelper {
     @Autowired
     private IFilesManager filesManager;
  
-    public List<StorageStatus> processUpload(DocumentAccess access, MultipartFile[] files, String username) {
+    public List<StorageStatus> processUpload(DocumentAccess access, DocumentType docType, MultipartFile[] files, String username) {
         Map<IFile, byte[]> uploadedFiles = new HashMap<>();
         for (MultipartFile f : files) {
             IFile file = new File(f.getOriginalFilename());
@@ -42,6 +43,6 @@ public class FileUploadHelper {
             }
         }
 
-        return filesManager.addFiles(uploadedFiles, username);
+        return filesManager.addFiles(uploadedFiles, username, docType, access);
     }
 }
