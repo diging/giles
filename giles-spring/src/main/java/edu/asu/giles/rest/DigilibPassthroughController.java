@@ -4,15 +4,18 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.ProtocolException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,7 +48,7 @@ public class DigilibPassthroughController {
 
 	@GitHubAccessCheck
 	@RequestMapping(value = "/rest/digilib")
-	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "") String accessToken, User user) {
+	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "") String accessToken, User user) throws UnsupportedEncodingException {
 		
 		Map<String, String[]> parameters = request.getParameterMap();
 		// remove accessToken since Github doesn't care about
@@ -59,7 +62,8 @@ public class DigilibPassthroughController {
 			for (String value : parameters.get(key)) {
 				parameterBuffer.append(key);
 				parameterBuffer.append("=");
-				parameterBuffer.append(value);
+				
+				parameterBuffer.append(URLEncoder.encode(value, "UTF-8"));
 				parameterBuffer.append("&");
 				
 				if (key.equals("fn")) {
