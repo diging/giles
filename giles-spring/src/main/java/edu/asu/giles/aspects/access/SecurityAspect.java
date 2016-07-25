@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.social.github.api.GitHubUserProfile;
 import org.springframework.social.github.api.impl.GitHubTemplate;
 import org.springframework.stereotype.Component;
 
@@ -98,6 +99,7 @@ public class SecurityAspect {
 	
 	@Around("within(edu.asu.giles.rest..*) && @annotation(github)")
 	public Object checkUserAccess(ProceedingJoinPoint joinPoint, GitHubAccessCheck github) throws Throwable {
+		logger.debug("Checking GitHub access token for REST endpoint.");
 		Object[] args = joinPoint.getArgs();
 		MethodSignature sig = (MethodSignature) joinPoint.getSignature();
 		String[] argNames = sig.getParameterNames();
@@ -129,8 +131,9 @@ public class SecurityAspect {
 					HttpStatus.FORBIDDEN);
 		}
 		
-		User foundUser = userManager.findUser(template.userOperations().getUserProfile()
-				.getUsername());
+		GitHubUserProfile profile = template.userOperations().getUserProfile();
+		User foundUser = userManager.findUser(profile.getUsername());
+		logger.debug("Authorizing: " + profile.getUsername());
 		
 		if (foundUser == null) {
 			return new ResponseEntity<>("{ \"error\": \"The user doesn't seem to have a Giles account.\" } ", HttpStatus.FORBIDDEN);

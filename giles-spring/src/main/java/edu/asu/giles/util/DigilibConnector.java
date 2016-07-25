@@ -5,6 +5,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.util.List;
+import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +23,7 @@ public class DigilibConnector {
 	@Value("${digilib_scaler_url}")
 	private String digilibUrl;
 
-	public void getDigilibImage(String parameters, OutputStream output) throws IOException {
+	public Map<String, List<String>> getDigilibImage(String parameters, OutputStream output) throws IOException {
 		URL url = new URL(digilibUrl + "?" + parameters);
 		logger.debug("Getting: " + url.toString());
 		
@@ -29,6 +31,7 @@ public class DigilibConnector {
 		con.setRequestMethod("GET");
 		
 		con = (HttpURLConnection) url.openConnection();
+		
 		InputStream input = con.getInputStream();
 
 		byte[] buffer = new byte[4096];
@@ -38,5 +41,7 @@ public class DigilibConnector {
 			output.write(buffer, 0, n);
 		}
 		input.close();
+		
+		return con.getHeaderFields();
 	}
 }

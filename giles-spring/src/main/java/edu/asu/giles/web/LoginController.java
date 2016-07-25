@@ -5,6 +5,7 @@ import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -24,7 +25,12 @@ public class LoginController {
 		
 		String username = null;
 		if (principal instanceof UsernamePasswordAuthenticationToken) {
-			username = ((User) ((UsernamePasswordAuthenticationToken) principal).getPrincipal()).getUsername();
+			UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
+			if (token.getPrincipal() instanceof User) {
+				username = ((User) token.getPrincipal()).getUsername();
+			} else if (token.getPrincipal() instanceof UserDetails) {
+				username = ((UserDetails) token.getPrincipal()).getUsername();
+			}
 		}
 		
 		if (username != null) {

@@ -27,16 +27,24 @@ To use Giles, you need to log in with your GitHub account. Don't have one? You c
 </sec:authorize>
 
 <sec:authorize access="isAuthenticated()">
+<c:catch var="exception"><sec:authentication
+							property="principal.fullname" /></c:catch>
+<c:if test="${empty exception}">
 <h2>Welcome, <sec:authentication
 							property="principal.fullname" />!</h2>
-
+</c:if>
+<c:if test="${not empty exception}">
+<h2>Welcome, <sec:authentication
+							property="principal.username" />!</h2>
+</c:if>
 <p>
 What do you want to do? To upload new files, head over to the upload page. You can find your previous uploads below.
 </p>							
 <p>						
 <a href="<c:url value="/files/upload" />" class="btn btn-primary btn-md">Upload new files</a>
-</sec:authorize>
 </p>
+</sec:authorize>
+
 </div>
 
 <sec:authorize access="isAuthenticated()">
@@ -52,3 +60,4 @@ What do you want to do? To upload new files, head over to the upload page. You c
 </div>
 
 </sec:authorize>
+

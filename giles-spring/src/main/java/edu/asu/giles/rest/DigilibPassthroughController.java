@@ -2,12 +2,11 @@ package edu.asu.giles.rest;
 
 import java.io.File;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
-import java.net.ProtocolException;
-import java.net.URL;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -16,11 +15,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
@@ -45,7 +45,7 @@ public class DigilibPassthroughController {
 
 	@GitHubAccessCheck
 	@RequestMapping(value = "/rest/digilib")
-	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "") String accessToken, User user) {
+	public ResponseEntity<String> passthroughToDigilib(HttpServletRequest request, HttpServletResponse response, @RequestParam(defaultValue = "") String accessToken, User user) throws UnsupportedEncodingException {
 		
 		Map<String, String[]> parameters = request.getParameterMap();
 		// remove accessToken since Github doesn't care about
@@ -59,7 +59,8 @@ public class DigilibPassthroughController {
 			for (String value : parameters.get(key)) {
 				parameterBuffer.append(key);
 				parameterBuffer.append("=");
-				parameterBuffer.append(value);
+				
+				parameterBuffer.append(URLEncoder.encode(value, "UTF-8"));
 				parameterBuffer.append("&");
 				
 				if (key.equals("fn")) {
@@ -80,8 +81,14 @@ public class DigilibPassthroughController {
 			return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
 		}
 		
+		MultiValueMap<String, String> headers = new HttpHeaders();
 		try {
-			digilibConnector.getDigilibImage(parameterBuffer.toString(), response.getOutputStream());
+			Map<String, List<String>> digilibHeaders = digilibConnector.getDigilibImage(parameterBuffer.toString(), response.getOutputStream());
+			for (String key : digilibHeaders.keySet()) {
+				if (key != null) {
+					headers.put(key, digilibHeaders.get(key));
+				}
+			}
 		} catch (MalformedURLException e) {
 			logger.error(e.getMessage(), e);
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
@@ -90,7 +97,9 @@ public class DigilibPassthroughController {
 			return new ResponseEntity<String>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
 		} 
 		
-		return new ResponseEntity<String>(HttpStatus.OK);
+		Map<String, String> simpleMap = headers.toSingleValueMap();
+		response.setContentType(simpleMap.get(HttpHeaders.CONTENT_TYPE));
+		return new ResponseEntity<String>(headers, HttpStatus.OK);
 	}
 	
 }
