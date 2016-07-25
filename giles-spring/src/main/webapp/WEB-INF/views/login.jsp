@@ -61,13 +61,3 @@ What do you want to do? To upload new files, head over to the upload page. You c
 
 </sec:authorize>
 
-
-<sec:authorize access="isAnonymous()">
-<form name='f' action="<c:url value="/login/authenticate" />" method="POST">
-	<label for="username">Username</label>
-    <input type="text" id="username" name="username"/>        
-    <label for="password">Password</label>
-    <input type="password" id="password" name="password"/>    
-    <button type="submit" class="btn">Log in</button>
-</form>
-</sec:authorize>

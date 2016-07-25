@@ -91,6 +91,31 @@
       <tiles:insertAttribute name="content" />
 
     </div> <!-- /container -->
+    
+    <footer class="footer">
+      <div class="container">
+      
+        <div class="row">
+        <div class="col-md-12">
+		<hr style="margin-bottom: 25px;">
+	    <p class="text-muted">
+	       
+	         
+	   	<sec:authorize access="isAnonymous()">
+	   	
+		<form name='f' class="form-inline pull-right" action="<c:url value="/login/authenticate" />" method="POST">
+			Admin login:
+			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
+		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
+		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
+		</form>
+</sec:authorize>
+        </p>
+        </div>
+        </div>
+      </div>
+    </footer>
+    
 
      </body>
 </html>
