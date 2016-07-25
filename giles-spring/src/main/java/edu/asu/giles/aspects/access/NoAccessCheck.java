@@ -6,8 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Use this annotation to indicate a specific controller method
- * should not be checked regarding user access.
+ * Use this annotation to indicate a specific controller method should not be
+ * checked regarding user access.
+ * 
  * @author jdamerow
  *
  */

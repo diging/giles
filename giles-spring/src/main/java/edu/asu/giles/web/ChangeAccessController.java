@@ -17,46 +17,51 @@ import edu.asu.giles.files.IFilesManager;
 
 @Controller
 public class ChangeAccessController {
-	
-	@Autowired
-	private IFilesManager filesManager;
 
-	@RequestMapping(value = "/documents/{documentId}/access/change", method = RequestMethod.POST)
-	public String changeAccess(@PathVariable("documentId") String documentId, @RequestParam("access") String access, @RequestParam("uploadId") String uploadId, RedirectAttributes redirectAttrs) {
-		
-		if (documentId == null || documentId.isEmpty() || access == null || access.isEmpty()) {
-			// soemthing is wrong here
-			// let's just silently ignore it...
-			return "redirect:/files/upload";
-		}
-		
-		IDocument document = filesManager.getDocument(documentId);
-		if (document == null) {
-			// and again, something weird going on
-			// let's ignore it
-			return "redirect:/files/upload";
-		}
-		
-		DocumentAccess docAccess = DocumentAccess.valueOf(access);
-		if (docAccess == null) {
-			// and again, something weird going on
-			// let's ignore it
-			return "redirect:/files/upload";
-		}
-		
-		document.setAccess(docAccess);
-		filesManager.saveDocument(document);
-		
-		List<IFile> files = filesManager.getFilesOfDocument(document);
-		for (IFile file : files) {
-			file.setAccess(docAccess);
-			filesManager.saveFile(file);
-		}
-		
-		redirectAttrs.addAttribute("show_alert", true);
-		redirectAttrs.addAttribute("alert_type", "success");
-		redirectAttrs.addAttribute("alert_msg", "Access type successfully updated.");
-		
-		return "redirect:/uploads/" + uploadId;
-	}
+    @Autowired
+    private IFilesManager filesManager;
+
+    @RequestMapping(value = "/documents/{documentId}/access/change", method = RequestMethod.POST)
+    public String changeAccess(@PathVariable("documentId") String documentId,
+            @RequestParam("access") String access,
+            @RequestParam("uploadId") String uploadId,
+            RedirectAttributes redirectAttrs) {
+
+        if (documentId == null || documentId.isEmpty() || access == null
+                || access.isEmpty()) {
+            // soemthing is wrong here
+            // let's just silently ignore it...
+            return "redirect:/files/upload";
+        }
+
+        IDocument document = filesManager.getDocument(documentId);
+        if (document == null) {
+            // and again, something weird going on
+            // let's ignore it
+            return "redirect:/files/upload";
+        }
+
+        DocumentAccess docAccess = DocumentAccess.valueOf(access);
+        if (docAccess == null) {
+            // and again, something weird going on
+            // let's ignore it
+            return "redirect:/files/upload";
+        }
+
+        document.setAccess(docAccess);
+        filesManager.saveDocument(document);
+
+        List<IFile> files = filesManager.getFilesOfDocument(document);
+        for (IFile file : files) {
+            file.setAccess(docAccess);
+            filesManager.saveFile(file);
+        }
+
+        redirectAttrs.addAttribute("show_alert", true);
+        redirectAttrs.addAttribute("alert_type", "success");
+        redirectAttrs.addAttribute("alert_msg",
+                "Access type successfully updated.");
+
+        return "redirect:/uploads/" + uploadId;
+    }
 }

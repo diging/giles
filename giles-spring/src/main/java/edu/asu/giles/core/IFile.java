@@ -5,45 +5,45 @@ import java.time.OffsetDateTime;
 import edu.asu.giles.core.impl.DocumentAccess;
 
 public interface IFile {
-	
-	public abstract String getUploadId();
 
-	public abstract void setUploadId(String uploadId);
+    public abstract String getUploadId();
 
-	public abstract String getFilename();
+    public abstract void setUploadId(String uploadId);
 
-	public abstract void setFilename(String filename);
+    public abstract String getFilename();
 
-	public abstract String getUsername();
+    public abstract void setFilename(String filename);
 
-	public abstract void setUsername(String username);
+    public abstract String getUsername();
 
-	public abstract String getId();
+    public abstract void setUsername(String username);
 
-	public abstract void setId(String id);
+    public abstract String getId();
 
-	public abstract void setDocumentId(String zoteroDocumentId);
+    public abstract void setId(String id);
 
-	public abstract String getDocumentId();
+    public abstract void setDocumentId(String zoteroDocumentId);
 
-	public abstract void setUploadDate(String uploadDate);
+    public abstract String getDocumentId();
 
-	public abstract String getUploadDate();
+    public abstract void setUploadDate(String uploadDate);
 
-	public abstract void setAccess(DocumentAccess access);
+    public abstract String getUploadDate();
 
-	public abstract DocumentAccess getAccess();
+    public abstract void setAccess(DocumentAccess access);
 
-	public abstract void setSize(long size);
+    public abstract DocumentAccess getAccess();
 
-	public abstract long getSize();
+    public abstract void setSize(long size);
 
-	public abstract void setContentType(String contentType);
+    public abstract long getSize();
 
-	public abstract String getContentType();
+    public abstract void setContentType(String contentType);
 
-	public abstract void setFilepath(String filepath);
+    public abstract String getContentType();
 
-	public abstract String getFilepath();
+    public abstract void setFilepath(String filepath);
+
+    public abstract String getFilepath();
 
 }

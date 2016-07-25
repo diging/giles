@@ -7,10 +7,10 @@ import edu.asu.giles.core.impl.Upload;
 
 public interface IUploadDatabaseClient {
 
-	public abstract IUpload store(IUpload upload);
+    public abstract IUpload store(IUpload upload);
 
-	public abstract IUpload getUpload(String id);
+    public abstract IUpload getUpload(String id);
 
-	public abstract List<IUpload> getUploadsForUser(String username);
+    public abstract List<IUpload> getUploadsForUser(String username);
 
 }

@@ -15,19 +15,20 @@ import edu.asu.giles.files.IFilesManager;
 
 @Controller
 public class ViewUploadController {
-	
-	@Autowired
-	private IFilesManager filesManager;
 
-	@UploadIdAccessCheck
-	@RequestMapping(value="/uploads/{uploadId}")
-	public String showUploadPage(@PathVariable("uploadId") String uploadId, Model model) {
-		IUpload upload = filesManager.getUpload(uploadId);
-		List<IDocument> docs = filesManager.getDocumentsByUploadId(uploadId);
-		
-		model.addAttribute("upload", upload);
-		model.addAttribute("docs", docs);
-		
-		return "uploads/upload";
-	}
+    @Autowired
+    private IFilesManager filesManager;
+
+    @UploadIdAccessCheck
+    @RequestMapping(value = "/uploads/{uploadId}")
+    public String showUploadPage(@PathVariable("uploadId") String uploadId,
+            Model model) {
+        IUpload upload = filesManager.getUpload(uploadId);
+        List<IDocument> docs = filesManager.getDocumentsByUploadId(uploadId);
+
+        model.addAttribute("upload", upload);
+        model.addAttribute("docs", docs);
+
+        return "uploads/upload";
+    }
 }

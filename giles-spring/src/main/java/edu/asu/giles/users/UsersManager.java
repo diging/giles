@@ -36,11 +36,13 @@ public class UsersManager implements IUserManager {
     @PostConstruct
     public void init() throws IOException {
         admins = new HashMap<String, String>();
-        for (Iterator it = ((AbstractEnvironment) env).getPropertySources().iterator(); it.hasNext();) {
+        for (Iterator it = ((AbstractEnvironment) env).getPropertySources()
+                .iterator(); it.hasNext();) {
             Object source = (Object) it.next();
             if (source instanceof ResourcePropertySource) {
                 ResourcePropertySource propertySource = (ResourcePropertySource) source;
-                String[] names = ((ResourcePropertySource) propertySource).getPropertyNames();
+                String[] names = ((ResourcePropertySource) propertySource)
+                        .getPropertyNames();
                 for (String name : names) {
                     admins.put(name, env.getProperty(name).split(",")[0].trim());
                 }
@@ -83,12 +85,12 @@ public class UsersManager implements IUserManager {
         User user = client.getUser(name, pw);
         return user;
     }
-    
+
     @Override
     public User findUserByEmail(String email) {
         User user = new User();
         user.setEmail(email);
-        
+
         List<User> users = client.findUsers(user);
         if (users.size() > 0)
             return users.get(0);
@@ -117,13 +119,12 @@ public class UsersManager implements IUserManager {
         client.addUser(user);
         return user;
     }
-    
+
     @Override
     public void updatePasswordEncryption(String username) {
         User user = client.findUser(username);
         client.update(user);
     }
-
 
     /*
      * (non-Javadoc)

@@ -18,30 +18,31 @@ import org.springframework.stereotype.Service;
 @Service
 public class DigilibConnector {
 
-	private Logger logger = LoggerFactory.getLogger(DigilibConnector.class);
+    private Logger logger = LoggerFactory.getLogger(DigilibConnector.class);
 
-	@Value("${digilib_scaler_url}")
-	private String digilibUrl;
+    @Value("${digilib_scaler_url}")
+    private String digilibUrl;
 
-	public Map<String, List<String>> getDigilibImage(String parameters, OutputStream output) throws IOException {
-		URL url = new URL(digilibUrl + "?" + parameters);
-		logger.debug("Getting: " + url.toString());
-		
-		HttpURLConnection con = (HttpURLConnection) url.openConnection();
-		con.setRequestMethod("GET");
-		
-		con = (HttpURLConnection) url.openConnection();
-		
-		InputStream input = con.getInputStream();
+    public Map<String, List<String>> getDigilibImage(String parameters,
+            OutputStream output) throws IOException {
+        URL url = new URL(digilibUrl + "?" + parameters);
+        logger.debug("Getting: " + url.toString());
 
-		byte[] buffer = new byte[4096];
-		int n = -1;
+        HttpURLConnection con = (HttpURLConnection) url.openConnection();
+        con.setRequestMethod("GET");
 
-		while ((n = input.read(buffer)) != -1) {
-			output.write(buffer, 0, n);
-		}
-		input.close();
-		
-		return con.getHeaderFields();
-	}
+        con = (HttpURLConnection) url.openConnection();
+
+        InputStream input = con.getInputStream();
+
+        byte[] buffer = new byte[4096];
+        int n = -1;
+
+        while ((n = input.read(buffer)) != -1) {
+            output.write(buffer, 0, n);
+        }
+        input.close();
+
+        return con.getHeaderFields();
+    }
 }

@@ -26,50 +26,47 @@ import edu.asu.giles.users.IUserManager;
 @EnableSocial
 @PropertySource("classpath:/config.properties")
 public class SocialContext implements SocialConfigurer {
- 
+
     @Autowired
     private DataSource dataSource;
-    
+
     @Autowired
     private IUserManager userManager;
-    
+
     @Value("${github_client_id}")
     private String githubClientId;
-    
+
     @Value("${github_secret}")
     private String githubSecret;
- 
+
     @Override
-    public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig, Environment env) {
-		cfConfig.addConnectionFactory(new GitHubConnectionFactory(githubClientId,
-				githubSecret));
+    public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig,
+            Environment env) {
+        cfConfig.addConnectionFactory(new GitHubConnectionFactory(
+                githubClientId, githubSecret));
     }
- 
+
     @Override
     public UserIdSource getUserIdSource() {
         return new AuthenticationNameUserIdSource();
     }
- 
+
     @Override
-    public UsersConnectionRepository getUsersConnectionRepository(ConnectionFactoryLocator connectionFactoryLocator) {
-    	JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(
-                dataSource,
-                connectionFactoryLocator,
-                Encryptors.noOpText()
-        );
-    	repository.setConnectionSignUp(new GilesConnectionSignUp(userManager));
-    	return repository;
+    public UsersConnectionRepository getUsersConnectionRepository(
+            ConnectionFactoryLocator connectionFactoryLocator) {
+        JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(
+                dataSource, connectionFactoryLocator, Encryptors.noOpText());
+        repository.setConnectionSignUp(new GilesConnectionSignUp(userManager));
+        return repository;
     }
- 
-    
+
     @Bean
     public ProviderSignInController providerSignInController(
-                ConnectionFactoryLocator connectionFactoryLocator,
-                UsersConnectionRepository usersConnectionRepository) {
+            ConnectionFactoryLocator connectionFactoryLocator,
+            UsersConnectionRepository usersConnectionRepository) {
         ProviderSignInController controller = new ProviderSignInController(
-            connectionFactoryLocator,
-            usersConnectionRepository,
-            new SimpleSignInAdapter(userManager));
+                connectionFactoryLocator, usersConnectionRepository,
+                new SimpleSignInAdapter(userManager));
         return controller;
     }
 }
