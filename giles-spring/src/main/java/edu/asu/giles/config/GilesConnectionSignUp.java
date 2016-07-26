@@ -19,7 +19,7 @@ public class GilesConnectionSignUp implements ConnectionSignUp {
     public GilesConnectionSignUp(IUserManager userManager) {
         this.userManager = userManager;
     }
-
+ 
     public String execute(Connection<?> connection) {
         UserProfile profile = connection.fetchUserProfile();
         List<GrantedAuthority> authorities = new ArrayList<>();
