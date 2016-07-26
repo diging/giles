@@ -35,7 +35,7 @@
 	    <i class="fa fa-unlock-alt" aria-hidden="true"></i>
 	 </button>
     </c:if>
-    <c:if test="${doc.access == 'PRIVATE'}">
+    <c:if test="${doc.access != 'PUBLIC'}">
      <span class="label label-danger">Private</span>
      <button type="button" class="btn btn-link" title="Make document public" data-toggle="modal" data-docid="${doc.id}" data-target="#makePublicModal">
      	<i class="fa fa-lock" aria-hidden="true"></i>

@@ -45,7 +45,7 @@ public class DigilibPassthroughController {
     @RequestMapping(value = "/rest/digilib")
     public ResponseEntity<String> passthroughToDigilib(
             HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(defaultValue = "") String accessToken, User user)
+            @RequestParam String accessToken, User user)
             throws UnsupportedEncodingException {
 
         Map<String, String[]> parameters = request.getParameterMap();
@@ -78,7 +78,7 @@ public class DigilibPassthroughController {
             return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
 
-        if (file.getAccess() == DocumentAccess.PRIVATE
+        if (file.getAccess() != DocumentAccess.PUBLIC
                 && !file.getUsername().equals(user.getUsername())) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         }
@@ -107,5 +107,64 @@ public class DigilibPassthroughController {
         logger.debug("Response headers: " + response.getContentType());
         return new ResponseEntity<String>(headers, HttpStatus.OK);
     }
+    
+    @RequestMapping(value = "/rest/digilib/public")
+    public ResponseEntity<String> passthroughToDigilibPublic(
+            HttpServletRequest request, HttpServletResponse response,
+            User user)
+            throws UnsupportedEncodingException {
+        Map<String, String[]> parameters = request.getParameterMap();
+        // remove accessToken since Github doesn't care about
 
+        String fn = null;
+        StringBuffer parameterBuffer = new StringBuffer();
+        for (String key : parameters.keySet()) {
+            for (String value : parameters.get(key)) {
+                parameterBuffer.append(key);
+                parameterBuffer.append("=");
+
+                parameterBuffer.append(URLEncoder.encode(value, "UTF-8"));
+                parameterBuffer.append("&");
+
+                if (key.equals("fn")) {
+                    fn = value;
+                }
+            }
+        }
+        
+        if (fn.startsWith(File.separator)) {
+            fn = fn.substring(1);
+        }
+        
+        IFile file = filesManager.getFileByPath(fn);
+        if (file == null) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+
+        if (file.getAccess() != DocumentAccess.PUBLIC) {
+            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+        }
+        
+        MultiValueMap<String, String> headers = new HttpHeaders();
+        try {
+            Map<String, List<String>> digilibHeaders = digilibConnector
+                    .getDigilibImage(parameterBuffer.toString(),
+                            response);
+            for (String key : digilibHeaders.keySet()) {
+                if (key != null) {
+                    headers.put(key, digilibHeaders.get(key));
+                }
+            }
+        } catch (MalformedURLException e) {
+            logger.error(e.getMessage(), e);
+            return new ResponseEntity<String>(e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (IOException e) {
+            logger.error(e.getMessage(), e);
+            return new ResponseEntity<String>(e.getMessage(),
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<String>(headers, HttpStatus.OK);
+    }
 }
