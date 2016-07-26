@@ -103,8 +103,10 @@ public class DigilibPassthroughController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Map<String, String> simpleMap = headers.toSingleValueMap();
-        response.setContentType(simpleMap.get(HttpHeaders.CONTENT_TYPE));
+        List<String> contentTypes = headers.get(HttpHeaders.CONTENT_TYPE);
+        if (contentTypes != null && !contentTypes.isEmpty()) {
+            response.setContentType(contentTypes.get(0));
+        }
         logger.debug("Setting headers: " + headers);
         logger.debug("Response headers: " + response.getHeaders(HttpHeaders.CONTENT_TYPE));
         return new ResponseEntity<String>(headers, HttpStatus.OK);
