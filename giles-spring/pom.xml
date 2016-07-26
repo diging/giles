@@ -32,8 +32,8 @@
 		<deploy.path.test>giles-test</deploy.path.test>
 		<deploy.path.dev>giles</deploy.path.dev>
 		<deploy.path.prod>giles</deploy.path.prod>
-		<pullrequest>1</pullrequest>
-		<buildNumber>1</buildNumber>
+		<pullrequest></pullrequest>
+		<buildNumber></buildNumber>
 	</properties>
 
 	<dependencies>
