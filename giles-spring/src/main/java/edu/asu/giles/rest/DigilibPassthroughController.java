@@ -106,6 +106,7 @@ public class DigilibPassthroughController {
         List<String> contentTypes = headers.get(HttpHeaders.CONTENT_TYPE);
         if (contentTypes != null && !contentTypes.isEmpty()) {
             logger.debug("Set content type for response: " + contentTypes.get(0));
+            logger.debug("is committed: " + response.isCommitted());
             response.setContentType(contentTypes.get(0));
         }
         logger.debug("Setting headers: " + headers);
