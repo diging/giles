@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
+import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
@@ -21,15 +23,13 @@ public interface IFilesManager {
      * @return The list of saved files with ids and upload id set.
      */
     public abstract List<StorageStatus> addFiles(Map<IFile, byte[]> files,
-            String username);
+            String username, DocumentType docType, DocumentAccess access);
 
     public abstract List<IUpload> getUploadsOfUser(String username);
 
     public abstract IUpload getUpload(String id);
 
     public abstract List<IFile> getFilesByUploadId(String uploadId);
-
-    public abstract String getRelativePathOfFile(IFile file);
 
     public abstract List<IDocument> getDocumentsByUploadId(String uploadId);
 
@@ -44,5 +44,9 @@ public interface IFilesManager {
     public abstract void saveFile(IFile file);
 
     public abstract IFile getFileByPath(String path);
+
+    public abstract String getFileUrl(IFile file);
+
+    public abstract String getRelativePathOfFile(IFile file);
 
 }

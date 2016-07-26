@@ -1,5 +1,6 @@
 package edu.asu.giles.core.impl;
 
+import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IFile;
 
 

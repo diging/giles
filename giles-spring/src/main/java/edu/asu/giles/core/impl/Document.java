@@ -3,6 +3,7 @@ package edu.asu.giles.core.impl;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 

@@ -1,4 +1,4 @@
-package edu.asu.giles.core.impl;
+package edu.asu.giles.core;
 
 public enum DocumentAccess {
 	PUBLIC,

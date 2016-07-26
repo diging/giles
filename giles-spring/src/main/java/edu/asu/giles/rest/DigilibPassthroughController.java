@@ -5,7 +5,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URLEncoder;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,7 +14,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,13 +23,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
 import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IFile;
-import edu.asu.giles.core.impl.DocumentAccess;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.users.User;
 import edu.asu.giles.util.DigilibConnector;
 
-@PropertySource("classpath:/config.properties")
 @Controller
 public class DigilibPassthroughController {
 
@@ -90,7 +87,7 @@ public class DigilibPassthroughController {
         try {
             Map<String, List<String>> digilibHeaders = digilibConnector
                     .getDigilibImage(parameterBuffer.toString(),
-                            response.getOutputStream());
+                            response);
             for (String key : digilibHeaders.keySet()) {
                 if (key != null) {
                     headers.put(key, digilibHeaders.get(key));
@@ -106,8 +103,8 @@ public class DigilibPassthroughController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Map<String, String> simpleMap = headers.toSingleValueMap();
-        response.setContentType(simpleMap.get(HttpHeaders.CONTENT_TYPE));
+        logger.debug("Setting headers: " + headers);
+        logger.debug("Response headers: " + response.getContentType());
         return new ResponseEntity<String>(headers, HttpStatus.OK);
     }
 

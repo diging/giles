@@ -3,8 +3,6 @@ package edu.asu.giles.core;
 import java.time.OffsetDateTime;
 import java.util.List;
 
-import edu.asu.giles.core.impl.DocumentAccess;
-
 public interface IDocument {
 
     public abstract String getId();
