@@ -108,7 +108,7 @@ public class DigilibPassthroughController {
             response.setContentType(contentTypes.get(0));
         }
         logger.debug("Setting headers: " + headers);
-        logger.debug("Response headers: " + response.getHeaders(HttpHeaders.CONTENT_TYPE));
+        logger.debug("Response headers: " + response.getContentType());
         return new ResponseEntity<String>(headers, HttpStatus.OK);
     }
 
