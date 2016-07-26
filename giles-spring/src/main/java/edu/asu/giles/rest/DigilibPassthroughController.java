@@ -106,6 +106,7 @@ public class DigilibPassthroughController {
         Map<String, String> simpleMap = headers.toSingleValueMap();
         response.setContentType(simpleMap.get(HttpHeaders.CONTENT_TYPE));
         logger.debug("Setting headers: " + headers);
+        logger.debug("Response headers: " + response.getHeaders(HttpHeaders.CONTENT_TYPE));
         return new ResponseEntity<String>(headers, HttpStatus.OK);
     }
 
