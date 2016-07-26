@@ -61,7 +61,7 @@ public class ViewImageController {
 
         try {
             digilibConnector.getDigilibImage(parameterBuffer.toString(),
-                    response.getOutputStream());
+                    response);
         } catch (MalformedURLException e) {
             logger.error(e.getMessage(), e);
             return new ResponseEntity<String>(e.getMessage(),

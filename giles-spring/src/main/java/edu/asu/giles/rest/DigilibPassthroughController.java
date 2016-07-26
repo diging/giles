@@ -87,7 +87,7 @@ public class DigilibPassthroughController {
         try {
             Map<String, List<String>> digilibHeaders = digilibConnector
                     .getDigilibImage(parameterBuffer.toString(),
-                            response.getOutputStream());
+                            response);
             for (String key : digilibHeaders.keySet()) {
                 if (key != null) {
                     headers.put(key, digilibHeaders.get(key));
@@ -103,12 +103,6 @@ public class DigilibPassthroughController {
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        List<String> contentTypes = headers.get(HttpHeaders.CONTENT_TYPE);
-        if (contentTypes != null && !contentTypes.isEmpty()) {
-            logger.debug("Set content type for response: " + contentTypes.get(0));
-            logger.debug("is committed: " + response.isCommitted());
-            response.setContentType(contentTypes.get(0));
-        }
         logger.debug("Setting headers: " + headers);
         logger.debug("Response headers: " + response.getContentType());
         return new ResponseEntity<String>(headers, HttpStatus.OK);
