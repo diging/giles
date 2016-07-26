@@ -18,6 +18,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
@@ -62,7 +63,7 @@ public class FilesController {
             docNode.put("documentId", doc.getDocumentId());
             docNode.put("uploadId", doc.getUploadId());
             docNode.put("uploadedDate", doc.getCreatedDate());
-            docNode.put("access", doc.getAccess().toString());
+            docNode.put("access", (doc.getAccess() != null ? doc.getAccess().toString() : DocumentAccess.PRIVATE.toString()));
 
             ArrayNode paths = docNode.putArray("files");
             for (IFile file : filesManager.getFilesOfDocument(doc)) {

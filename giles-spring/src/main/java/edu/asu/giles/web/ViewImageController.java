@@ -57,7 +57,7 @@ public class ViewImageController {
 
         IFile file = filesManager.getFile(fileId);
         parameterBuffer.append("fn=");
-        parameterBuffer.append(filesManager.getFileUrl(file));
+        parameterBuffer.append(filesManager.getRelativePathOfFile(file));
 
         try {
             digilibConnector.getDigilibImage(parameterBuffer.toString(),

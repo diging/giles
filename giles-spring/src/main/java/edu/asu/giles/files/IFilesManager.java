@@ -47,4 +47,6 @@ public interface IFilesManager {
 
     public abstract String getFileUrl(IFile file);
 
+    public abstract String getRelativePathOfFile(IFile file);
+
 }

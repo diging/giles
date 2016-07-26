@@ -35,8 +35,11 @@ public class FilesManager implements IFilesManager {
 	
 	private Logger logger = LoggerFactory.getLogger(FilesManager.class);
 	
-	@Value("${digilib_scaler_url}")
-    private String digilibUrl;
+	@Value("${giles_url}")
+    private String gilesUrl;
+	
+	@Value("${giles_digilib_endpoint}")
+    private String gilesDigilibEndpoint;
 
 	@Autowired
 	private IFilesDatabaseClient databaseClient;
@@ -92,11 +95,6 @@ public class FilesManager implements IFilesManager {
 				if (existingFile == null) {
 					break;
 				}
-			}
-			
-			
-			if (file.getAccess() == null) {
-				file.setAccess(DocumentAccess.PRIVATE);
 			}
 			
 			if (docType == DocumentType.SINGLE_PAGE) {
@@ -207,7 +205,8 @@ public class FilesManager implements IFilesManager {
 		return uploadDatabaseClient.getUpload(id);
 	}
 	
-	protected String getRelativePathOfFile(IFile file) {
+	@Override
+    public String getRelativePathOfFile(IFile file) {
 		String directory = storageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
 		return directory + File.separator + file.getFilename();
 	}
@@ -215,7 +214,7 @@ public class FilesManager implements IFilesManager {
 	@Override
     public String getFileUrl(IFile file) {
 	    String relativePath = getRelativePathOfFile(file);
-	    return digilibUrl + "?fn=" + relativePath;
+	    return gilesUrl + gilesDigilibEndpoint + "?fn=" + relativePath;
 	    
 	}
 	

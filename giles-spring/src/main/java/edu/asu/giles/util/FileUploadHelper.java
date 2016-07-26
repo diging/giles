@@ -30,6 +30,10 @@ public class FileUploadHelper {
  
     public List<StorageStatus> processUpload(DocumentAccess access, DocumentType docType, MultipartFile[] files, String username) {
         Map<IFile, byte[]> uploadedFiles = new HashMap<>();
+        
+        if (access == null) {
+            access = DocumentAccess.PRIVATE;
+        }
         for (MultipartFile f : files) {
             IFile file = new File(f.getOriginalFilename());
             file.setContentType(f.getContentType());
