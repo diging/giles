@@ -5,7 +5,7 @@ import java.util.List;
 
 public class User implements Serializable {
 
-	/**
+    /**
      * 
      */
     private static final long serialVersionUID = 1019105087386557957L;
@@ -36,67 +36,67 @@ public class User implements Serializable {
         this.email = email;
     }
 
-	public String getProvider() {
-		return provider;
-	}
+    public String getProvider() {
+        return provider;
+    }
 
-	public void setProvider(String provider) {
-		this.provider = provider;
-	}
+    public void setProvider(String provider) {
+        this.provider = provider;
+    }
 
-	public String getUserIdOfProvider() {
-		return userIdOfProvider;
-	}
+    public String getUserIdOfProvider() {
+        return userIdOfProvider;
+    }
 
-	public void setUserIdOfProvider(String userIdOfProvider) {
-		this.userIdOfProvider = userIdOfProvider;
-	}
+    public void setUserIdOfProvider(String userIdOfProvider) {
+        this.userIdOfProvider = userIdOfProvider;
+    }
 
-	public String getUsername() {
-		return username;
-	}
+    public String getUsername() {
+        return username;
+    }
 
-	public void setUsername(String username) {
-		this.username = username;
-	}
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
-	public String getFirstname() {
-		return firstname;
-	}
+    public String getFirstname() {
+        return firstname;
+    }
 
-	public void setFirstname(String firstname) {
-		this.firstname = firstname;
-	}
+    public void setFirstname(String firstname) {
+        this.firstname = firstname;
+    }
 
-	public String getLastname() {
-		return lastname;
-	}
+    public String getLastname() {
+        return lastname;
+    }
 
-	public void setLastname(String lastname) {
-		this.lastname = lastname;
-	}
+    public void setLastname(String lastname) {
+        this.lastname = lastname;
+    }
 
-	public List<String> getRoles() {
-		return roles;
-	}
+    public List<String> getRoles() {
+        return roles;
+    }
 
-	public void setRoles(List<String> roles) {
-		this.roles = roles;
-	}
+    public void setRoles(List<String> roles) {
+        this.roles = roles;
+    }
 
-	public void setAdmin(boolean isAdmin) {
-		this.isAdmin = isAdmin;
-	}
+    public void setAdmin(boolean isAdmin) {
+        this.isAdmin = isAdmin;
+    }
 
-	public String getFullname() {
-		return firstname + " " + lastname;
-	}
+    public String getFullname() {
+        return firstname + " " + lastname;
+    }
 
-	public String getPassword() {
-		return password;
-	}
+    public String getPassword() {
+        return password;
+    }
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public void setPassword(String password) {
+        this.password = password;
+    }
 }
