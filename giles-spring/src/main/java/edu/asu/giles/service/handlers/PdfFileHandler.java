@@ -33,7 +33,7 @@ import edu.asu.giles.service.IFileTypeHandler;
 
 @PropertySource("classpath:/config.properties")
 @Service
-public class PdfFileHandler implements IFileTypeHandler {
+public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
 
@@ -45,6 +45,15 @@ public class PdfFileHandler implements IFileTypeHandler {
 
     @Value("${pdf_to_image_format}")
     private String format;
+    
+    @Value("${giles_url}")
+    private String gilesUrl;
+    
+    @Value("${giles_file_endpoint}")
+    private String pdfEndpoint;
+    
+    @Value("${giles_file_content_suffix}")
+    private String contentSuffix;
 
     @Autowired
     @Qualifier("fileStorageManager")
@@ -73,7 +82,7 @@ public class PdfFileHandler implements IFileTypeHandler {
 
     @Override
     public boolean processFile(String username, IFile file, IDocument document,
-            IUpload upload, String id, byte[] content)
+            IUpload upload, byte[] content)
             throws GilesFileStorageException {
         PDDocument pdfDocument;
         try {
@@ -87,7 +96,7 @@ public class PdfFileHandler implements IFileTypeHandler {
         int numPages = pdfDocument.getNumberOfPages();
         PDFRenderer renderer = new PDFRenderer(pdfDocument);
         String dirFolder = storageManager.getAndCreateStoragePath(username,
-                file.getUploadId(), file.getId());
+                file.getUploadId(), file.getDocumentId());
 
         for (int i = 0; i < numPages; i++) {
             try {
@@ -123,7 +132,7 @@ public class PdfFileHandler implements IFileTypeHandler {
         }
 
         pdfStorageManager.saveFile(file.getUsername(), file.getUploadId(),
-                file.getId(), file.getFilename(), content);
+                document.getDocumentId(), file.getFilename(), content);
         filesDbClient.saveFile(file);
 
         return success;
@@ -132,8 +141,19 @@ public class PdfFileHandler implements IFileTypeHandler {
     @Override
     public String getRelativePathOfFile(IFile file) {
         String directory = pdfStorageManager.getFileFolderPath(
-                file.getUsername(), file.getUploadId(), file.getId());
+                file.getUsername(), file.getUploadId(), file.getDocumentId());
         return directory + File.separator + file.getFilename();
     }
+
+    @Override
+    public String getFileUrl(IFile file) {
+        return gilesUrl + pdfEndpoint + file.getId() + contentSuffix;
+    }
+
+    @Override
+    protected IFileStorageManager getStorageManager() {
+        return pdfStorageManager;
+    }
+
 
 }

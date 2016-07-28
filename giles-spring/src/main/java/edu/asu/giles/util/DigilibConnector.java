@@ -36,8 +36,6 @@ public class DigilibConnector {
         
         con = (HttpURLConnection) url.openConnection();
         
-        
-        
         logger.debug("Set content type for response: " + con.getHeaderField(HttpHeaders.CONTENT_TYPE));
         response.setContentType(con.getHeaderField(HttpHeaders.CONTENT_TYPE));
         

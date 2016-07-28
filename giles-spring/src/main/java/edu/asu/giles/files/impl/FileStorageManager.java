@@ -17,8 +17,8 @@ public class FileStorageManager implements IFileStorageManager {
 	 * @see edu.asu.giles.files.impl.IFileSystemManager#saveFile(java.lang.String, java.lang.String, java.lang.String, java.lang.String, byte[])
 	 */
 	@Override
-	public void saveFile(String username, String uploadId, String fileId, String filename, byte[] bytes) throws GilesFileStorageException {
-		String filePath = getAndCreateStoragePath(username, uploadId, fileId);
+	public void saveFile(String username, String uploadId, String documentId, String filename, byte[] bytes) throws GilesFileStorageException {
+		String filePath = getAndCreateStoragePath(username, uploadId, documentId);
 		
 		File file = new File(filePath + File.separator + filename);
 		BufferedOutputStream stream;
@@ -36,14 +36,14 @@ public class FileStorageManager implements IFileStorageManager {
 	}
 	
 	@Override
-    public String getAndCreateStoragePath(String username, String uploadId, String fileId) {
-	    String path = baseDirectory + File.separator + getFileFolderPath(username, uploadId, fileId);
+    public String getAndCreateStoragePath(String username, String uploadId, String documentId) {
+	    String path = baseDirectory + File.separator + getFileFolderPath(username, uploadId, documentId);
 	    createDirectory(path);
 	    return path;
 	}
 	
 	@Override
-	public String getFileFolderPath(String username, String uploadId, String fileId) {
+    public String getFileFolderPath(String username, String uploadId, String fileId) {
 		StringBuffer filePath = new StringBuffer();
 		filePath.append(username);
 		filePath.append(File.separator);

@@ -96,6 +96,7 @@ public class UploadImagesController {
             
                 ObjectNode fileNode = mapper.createObjectNode();
                 fileNode.put("filename", file.getFilename());
+                fileNode.put("id", file.getId());
                 fileNode.put("path", filesManager.getFileUrl(file));
                 fileNode.put("content-type", file.getContentType());
                 fileNode.put("size", file.getSize());

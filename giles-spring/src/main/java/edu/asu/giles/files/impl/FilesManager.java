@@ -9,8 +9,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.giles.core.DocumentAccess;
@@ -28,18 +26,11 @@ import edu.asu.giles.files.IUploadDatabaseClient;
 import edu.asu.giles.service.IFileHandlerRegistry;
 import edu.asu.giles.service.IFileTypeHandler;
 
-@PropertySource("classpath:/config.properties")
 @Service
 public class FilesManager implements IFilesManager {
 	
 	private Logger logger = LoggerFactory.getLogger(FilesManager.class);
 	
-	@Value("${giles_url}")
-    private String gilesUrl;
-	
-	@Value("${giles_digilib_endpoint}")
-    private String gilesDigilibEndpoint;
-
 	@Autowired
 	private IFilesDatabaseClient databaseClient;
 	
@@ -76,8 +67,6 @@ public class FilesManager implements IFilesManager {
 				continue;
 			}
 			
-			
-			// generate unique id
 			String id = databaseClient.generateId();
 			
 			if (docType == DocumentType.SINGLE_PAGE) {
@@ -96,7 +85,7 @@ public class FilesManager implements IFilesManager {
 			IFileTypeHandler handler = fileHandlerRegistry.getHandler(file.getContentType());
 			
 			try {
-				boolean success = handler.processFile(username, file, document, upload, id, content);
+				boolean success = handler.processFile(username, file, document, upload, content);
 			    documentDatabaseClient.saveDocument(document);
 				statuses.add(new StorageStatus(file, null, (success ? StorageStatus.SUCCESS : StorageStatus.FAILURE)));
 			} catch (GilesFileStorageException e) {
@@ -177,6 +166,12 @@ public class FilesManager implements IFilesManager {
 	}
 	
 	@Override
+    public byte[] getFileContent(IFile file) {
+	    IFileTypeHandler handler = fileHandlerRegistry.getHandler(file.getContentType());
+        return handler.getFileContent(file);
+	}
+	
+	@Override
 	public void saveFile(IFile file) {
 		databaseClient.saveFile(file);
 	}
@@ -199,9 +194,8 @@ public class FilesManager implements IFilesManager {
 	
 	@Override
     public String getFileUrl(IFile file) {
-	    String relativePath = getRelativePathOfFile(file);
-	    return gilesUrl + gilesDigilibEndpoint + "?fn=" + relativePath;
-	    
+	    IFileTypeHandler handler = fileHandlerRegistry.getHandler(file.getContentType());
+        return handler.getFileUrl(file);   
 	}
 	
 	@Override

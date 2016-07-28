@@ -11,6 +11,7 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.impl.StorageStatus;
+import edu.asu.giles.service.IFileTypeHandler;
 
 public interface IFilesManager {
 
@@ -48,5 +49,7 @@ public interface IFilesManager {
     public abstract String getFileUrl(IFile file);
 
     public abstract String getRelativePathOfFile(IFile file);
+
+    public abstract byte[] getFileContent(IFile file);
 
 }

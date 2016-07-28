@@ -18,7 +18,11 @@ public interface IFileTypeHandler {
      */
     List<String> getHandledFileTypes();
     
-    boolean processFile(String username, IFile file, IDocument document, IUpload upload, String id, byte[] content) throws GilesFileStorageException;
+    boolean processFile(String username, IFile file, IDocument document, IUpload upload, byte[] content) throws GilesFileStorageException;
 
     String getRelativePathOfFile(IFile file);
+    
+    String getFileUrl(IFile file);
+    
+    byte[] getFileContent(IFile file);
 }
