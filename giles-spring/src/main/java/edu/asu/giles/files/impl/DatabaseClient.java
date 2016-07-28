@@ -6,13 +6,15 @@ import edu.asu.giles.files.IDatabaseClient;
 
 public abstract class DatabaseClient implements IDatabaseClient {
 
-    /* (non-Javadoc)
+    /*
+     * (non-Javadoc)
+     * 
      * @see edu.asu.giles.files.impl.IDatabaseClient#generateFileId()
      */
     @Override
     public String generateId() {
         String id = null;
-        while(true) {
+        while (true) {
             id = getIdPrefix() + generateUniqueId();
             Object existingFile = getById(id);
             if (existingFile == null) {
@@ -21,11 +23,11 @@ public abstract class DatabaseClient implements IDatabaseClient {
         }
         return id;
     }
-    
+
     protected abstract String getIdPrefix();
-    
+
     protected abstract Object getById(String id);
-    
+
     /**
      * This methods generates a new 6 character long id. Note that this method
      * does not assure that the id isn't in use yet.

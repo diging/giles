@@ -1,6 +1,5 @@
 package edu.asu.giles.core;
 
-
 public interface IFile {
 
     public abstract String getUploadId();
