@@ -20,14 +20,14 @@
 		<admin.username>admin</admin.username>
 		<github.clientId></github.clientId>
 		<github.secret></github.secret>
-		<db_files>/Users/jdamerow/Software/Giles/db_files</db_files>
+		<db_files></db_files>
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url></db.database.url>
 		<db.user></db.user>
 		<db.password></db.password>
 		<digilib.url></digilib.url>
 		<digilibBaseDir></digilibBaseDir>
-		<pdfBaseDir>/Users/jdamerow/Software/Giles/pdfs</pdfBaseDir>
+		<pdfBaseDir></pdfBaseDir>
 		<pdf.conversion.dpi>600</pdf.conversion.dpi>
 		<pdf.conversion.type>RGB</pdf.conversion.type>
 		<pdf.conversion.format>tiff</pdf.conversion.format>
