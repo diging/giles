@@ -6,11 +6,11 @@ import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -28,6 +28,8 @@ import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
+import edu.asu.giles.service.IFileHandlerRegistry;
+import edu.asu.giles.service.IFileTypeHandler;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -51,7 +53,7 @@ public class FilesManager implements IFilesManager {
 	private IDocumentDatabaseClient documentDatabaseClient;
 	
 	@Autowired
-	private IFileStorageManager storageManager;
+	private IFileHandlerRegistry fileHandlerRegistry;
 
 	/* (non-Javadoc)
 	 * @see edu.asu.giles.files.impl.IFilesManager#addFiles(java.util.List)
@@ -59,24 +61,15 @@ public class FilesManager implements IFilesManager {
 	@Override
 	public List<StorageStatus> addFiles(Map<IFile, byte[]> files, String username, DocumentType docType, DocumentAccess access) {
 		
-		String uploadId = null;
-		while(true) {
-			uploadId = "UP" + generateId();
-			List<IFile> existingFiles = databaseClient.getFileByUploadId(uploadId);
-			if (existingFiles == null || existingFiles.isEmpty()) {
-				break;
-			}
-		}
-		
-		IUpload upload = new Upload(uploadId);
+		String uploadId = uploadDatabaseClient.generateId();
 		String uploadDate = OffsetDateTime.now(ZoneId.of("UTC")).toString();
-		upload.setCreatedDate(uploadDate);
-		upload.setUsername(username);
+        
+		IUpload upload = createUpload(username, uploadId, uploadDate);
 		
 		List<StorageStatus> statuses = new ArrayList<StorageStatus>();
 		IDocument document = null;
 		if (docType == DocumentType.MULTI_PAGE) {
-		    document = createDocument(uploadId, uploadDate, access);
+		    document = createDocument(uploadId, uploadDate, access, docType);
 		}
 		for (IFile file : files.keySet()) {
 			byte[] content = files.get(file);
@@ -86,19 +79,12 @@ public class FilesManager implements IFilesManager {
 				continue;
 			}
 			
-			String id = null;
 			
 			// generate unique id
-			while(true) {
-				id = "FILE" + generateId();
-				IFile existingFile = databaseClient.getFileById(id);
-				if (existingFile == null) {
-					break;
-				}
-			}
+			String id = databaseClient.generateId();
 			
 			if (docType == DocumentType.SINGLE_PAGE) {
-			    document = createDocument(uploadId, uploadDate, file.getAccess());
+			    document = createDocument(uploadId, uploadDate, file.getAccess(), docType);
 			}
 			    
 			file.setId(id);
@@ -110,11 +96,12 @@ public class FilesManager implements IFilesManager {
 			
 			document.getFileIds().add(id);
 			
+			IFileTypeHandler handler = fileHandlerRegistry.getHandler(file.getContentType());
+			
 			try {
-				storageManager.saveFile(username, uploadId, id, file.getFilename(), content);
-				databaseClient.saveFile(file);
-				documentDatabaseClient.saveDocument(document);
-				statuses.add(new StorageStatus(file, null, StorageStatus.SUCCESS));
+				boolean success = handler.processFile(username, file, document, upload, id, content);
+			    documentDatabaseClient.saveDocument(document);
+				statuses.add(new StorageStatus(file, null, (success ? StorageStatus.SUCCESS : StorageStatus.FAILURE)));
 			} catch (GilesFileStorageException e) {
 				logger.error("Could not store uploaded files.", e);
 				statuses.add(new StorageStatus(file, e, StorageStatus.FAILURE));
@@ -129,30 +116,27 @@ public class FilesManager implements IFilesManager {
 		return statuses;
 	}
 
-    private IDocument createDocument(String uploadId, String uploadDate, DocumentAccess access) {
-        
+    
+    private IUpload createUpload(String username, String uploadId,
+            String uploadDate) {
+        IUpload upload = new Upload(uploadId);
+		upload.setCreatedDate(uploadDate);
+		upload.setUsername(username);
+        return upload;
+    }
+
+    private IDocument createDocument(String uploadId, String uploadDate, DocumentAccess access, DocumentType docType) {
         IDocument document = new Document();
-        String docId = generateDocumentId();
+        String docId = documentDatabaseClient.generateId();
         document.setDocumentId(docId);
         document.setId(docId);
         document.setCreatedDate(uploadDate);
         document.setAccess(access);
         document.setUploadId(uploadId);
         document.setFileIds(new ArrayList<>());
+        document.setDocumentType(docType);
         
         return document;
-    }
-
-    private String generateDocumentId() {
-        String docId = null;
-        while(true) {
-        	docId = "DOC" + generateId();
-        	IDocument existingDoc = documentDatabaseClient.getDocumentById(docId);
-        	if (existingDoc == null) {
-        		break;
-        	}
-        }
-        return docId;
     }
 	
 	@Override
@@ -207,8 +191,8 @@ public class FilesManager implements IFilesManager {
 	
 	@Override
     public String getRelativePathOfFile(IFile file) {
-		String directory = storageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
-		return directory + File.separator + file.getFilename();
+		IFileTypeHandler handler = fileHandlerRegistry.getHandler(file.getContentType());
+		return handler.getRelativePathOfFile(file);
 	}
 	
 	@Override
@@ -238,27 +222,6 @@ public class FilesManager implements IFilesManager {
 		return files;
 	}
 	
-	/**
-	 * This methods generates a new 6 character long id. Note that this method
-	 * does not assure that the id isn't in use yet.
-	 * 
-	 * Adapted from
-	 * http://stackoverflow.com/questions/9543715/generating-human-readable
-	 * -usable-short-but-unique-ids
-	 * 
-	 * @return 6 character id
-	 */
-	private String generateId() {
-		char[] chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
-				.toCharArray();
-
-		Random random = new Random();
-		StringBuilder builder = new StringBuilder();
-		for (int i = 0; i < 6; i++) {
-			builder.append(chars[random.nextInt(62)]);
-		}
-
-		return builder.toString();
-	}
+	
 
 }

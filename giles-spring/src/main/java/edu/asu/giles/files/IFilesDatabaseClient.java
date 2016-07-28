@@ -3,9 +3,8 @@ package edu.asu.giles.files;
 import java.util.List;
 
 import edu.asu.giles.core.IFile;
-import edu.asu.giles.core.impl.File;
 
-public interface IFilesDatabaseClient {
+public interface IFilesDatabaseClient extends IDatabaseClient {
 
     public abstract IFile saveFile(IFile file);
 

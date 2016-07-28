@@ -18,8 +18,7 @@ public class FileStorageManager implements IFileStorageManager {
 	 */
 	@Override
 	public void saveFile(String username, String uploadId, String fileId, String filename, byte[] bytes) throws GilesFileStorageException {
-		String filePath = baseDirectory + File.separator + getFileFolderPath(username, uploadId, fileId);
-		createDirectory(filePath);
+		String filePath = getAndCreateStoragePath(username, uploadId, fileId);
 		
 		File file = new File(filePath + File.separator + filename);
 		BufferedOutputStream stream;
@@ -34,6 +33,13 @@ public class FileStorageManager implements IFileStorageManager {
 		} catch (IOException e) {
 			throw new GilesFileStorageException("Could not store file.", e);
 		}
+	}
+	
+	@Override
+    public String getAndCreateStoragePath(String username, String uploadId, String fileId) {
+	    String path = baseDirectory + File.separator + getFileFolderPath(username, uploadId, fileId);
+	    createDirectory(path);
+	    return path;
 	}
 	
 	@Override
@@ -64,4 +70,6 @@ public class FileStorageManager implements IFileStorageManager {
 		}
 		return true;
 	}
+
+	
 }

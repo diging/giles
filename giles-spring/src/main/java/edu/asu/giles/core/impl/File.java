@@ -1,6 +1,7 @@
 package edu.asu.giles.core.impl;
 
 import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IFile;
 
 
@@ -146,4 +147,18 @@ public class File implements IFile {
 		this.filepath = filepath;
 	}
 
+    @Override
+    public IFile clone() {
+        IFile file = new File();
+        file.setAccess(access);
+        file.setContentType(contentType);
+        file.setDocumentId(documentId);
+        file.setFilename(filename);
+        file.setFilepath(filepath);
+        file.setSize(size);
+        file.setUploadDate(uploadDate);
+        file.setUploadId(uploadId);
+        file.setUsername(username);
+        return file;
+    }
 }

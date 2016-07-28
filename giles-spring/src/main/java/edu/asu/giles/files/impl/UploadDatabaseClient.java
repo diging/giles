@@ -12,13 +12,14 @@ import org.springframework.stereotype.Service;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 
+import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.db4o.DatabaseManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
 
 @Service
-public class UploadDatabaseClient implements IUploadDatabaseClient {
+public class UploadDatabaseClient extends DatabaseClient implements IUploadDatabaseClient {
 
 	private ObjectContainer client;
 
@@ -76,4 +77,15 @@ public class UploadDatabaseClient implements IUploadDatabaseClient {
 		}
 		return results;
 	}
+
+    @Override
+    protected String getIdPrefix() {
+        return "UP";
+    }
+
+    @Override
+    protected Object getById(String id) {
+        return getUpload(id);
+    }
+	
 }

@@ -18,7 +18,7 @@ import edu.asu.giles.db4o.DatabaseManager;
 import edu.asu.giles.files.IDocumentDatabaseClient;
 
 @Component
-public class DocumentDatabaseClient implements IDocumentDatabaseClient {
+public class DocumentDatabaseClient extends DatabaseClient implements IDocumentDatabaseClient {
 
 	private ObjectContainer client;
 
@@ -81,4 +81,14 @@ public class DocumentDatabaseClient implements IDocumentDatabaseClient {
 		}
 		return null;
 	}
+
+    @Override
+    protected String getIdPrefix() {
+        return "DOC";
+    }
+
+    @Override
+    protected Object getById(String id) {
+        return getDocumentById(id);
+    }
 }

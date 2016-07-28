@@ -1,6 +1,5 @@
 package edu.asu.giles.core;
 
-import java.time.OffsetDateTime;
 
 public interface IFile {
 
@@ -43,5 +42,7 @@ public interface IFile {
     public abstract void setFilepath(String filepath);
 
     public abstract String getFilepath();
+
+    public abstract IFile clone();
 
 }

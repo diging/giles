@@ -18,7 +18,7 @@ import edu.asu.giles.db4o.DatabaseManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 
 @Component
-public class FilesDatabaseClient implements IFilesDatabaseClient {
+public class FilesDatabaseClient extends DatabaseClient implements IFilesDatabaseClient {
 	
 	private ObjectContainer client;
 
@@ -85,4 +85,16 @@ public class FilesDatabaseClient implements IFilesDatabaseClient {
 		}
 		return results;
 	}
+
+    @Override
+    protected String getIdPrefix() {
+        return "FILE";
+    }
+
+    @Override
+    protected Object getById(String id) {
+        return getFileById(id);
+    }
+
+    
 }

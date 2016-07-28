@@ -1,9 +1,9 @@
 package edu.asu.giles.core.impl;
 
-import java.time.OffsetDateTime;
 import java.util.List;
 
 import edu.asu.giles.core.DocumentAccess;
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 
@@ -16,6 +16,8 @@ public class Document implements IDocument {
 	private List<String> fileIds;
 	private DocumentAccess access;
 	private transient List<IFile> files;
+    private DocumentType documentType;
+    private int pageCount;
 	
 	/* (non-Javadoc)
 	 * @see edu.asu.giles.core.impl.IDocument#getId()
@@ -103,4 +105,25 @@ public class Document implements IDocument {
 	public void setFiles(List<IFile> files) {
 		this.files = files;
 	}
+	@Override
+    public DocumentType getDocumentType() {
+        if (documentType == null) {
+            return DocumentType.SINGLE_PAGE;
+        }
+        return documentType;
+    }
+	@Override
+    public void setDocumentType(DocumentType documentType) {
+        this.documentType = documentType;
+    }
+
+	@Override
+    public int getPageCount() {
+        return pageCount;
+    }
+
+    @Override
+    public void setPageCount(int pageCount) {
+        this.pageCount = pageCount;
+    }
 }
