@@ -4,6 +4,10 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
+import javax.servlet.http.HttpServletResponse;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +31,8 @@ import edu.asu.giles.users.User;
 
 @Controller
 public class FilesController {
+    
+    private Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private IFilesManager filesManager;
@@ -63,12 +69,14 @@ public class FilesController {
             docNode.put("documentId", doc.getDocumentId());
             docNode.put("uploadId", doc.getUploadId());
             docNode.put("uploadedDate", doc.getCreatedDate());
-            docNode.put("access", (doc.getAccess() != null ? doc.getAccess().toString() : DocumentAccess.PRIVATE.toString()));
+            docNode.put("access", (doc.getAccess() != null ? doc.getAccess()
+                    .toString() : DocumentAccess.PRIVATE.toString()));
 
             ArrayNode paths = docNode.putArray("files");
             for (IFile file : filesManager.getFilesOfDocument(doc)) {
                 ObjectNode fileNode = mapper.createObjectNode();
                 fileNode.put("filename", file.getFilename());
+                fileNode.put("id", file.getId());
                 fileNode.put("path", filesManager.getFileUrl(file));
                 fileNode.put("content-type", file.getContentType());
                 fileNode.put("size", file.getSize());
@@ -87,4 +95,38 @@ public class FilesController {
 
         return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
     }
+
+    @GitHubAccessCheck
+    @RequestMapping(value = "/rest/files/{fileId}/content")
+    public ResponseEntity<String> getFile(
+            @PathVariable String fileId,
+            @RequestParam(defaultValue="") String accessToken, 
+            User user,
+            HttpServletResponse response) {
+
+        IFile file = filesManager.getFile(fileId);
+        if (file == null) {
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
+        }
+
+        if (file.getAccess() != DocumentAccess.PUBLIC
+                && !file.getUsername().equals(user.getUsername())) {
+            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+        }
+
+        byte[] content = filesManager.getFileContent(file);
+        response.setContentType(file.getContentType());
+        response.setContentLength(content.length);
+        response.setHeader("Content-disposition", "filename=\"" + file.getFilename() + "\""); 
+        try {
+            response.getOutputStream().write(content);
+            response.getOutputStream().close();
+        } catch (IOException e) {
+            logger.error("Could not write to output stream.", e);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<String>(HttpStatus.OK);
+    }
+
 }

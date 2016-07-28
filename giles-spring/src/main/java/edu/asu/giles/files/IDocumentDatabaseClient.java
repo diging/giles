@@ -4,7 +4,7 @@ import java.util.List;
 
 import edu.asu.giles.core.IDocument;
 
-public interface IDocumentDatabaseClient {
+public interface IDocumentDatabaseClient extends IDatabaseClient {
 
     public abstract IDocument saveDocument(IDocument document);
 

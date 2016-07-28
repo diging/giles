@@ -33,4 +33,12 @@ public interface IDocument {
 
     public abstract List<IFile> getFiles();
 
+    public abstract void setPageCount(int pageCount);
+
+    public abstract int getPageCount();
+
+    public abstract void setDocumentType(DocumentType documentType);
+
+    public abstract DocumentType getDocumentType();
+
 }
