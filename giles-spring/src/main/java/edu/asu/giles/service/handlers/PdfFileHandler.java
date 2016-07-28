@@ -34,36 +34,36 @@ import edu.asu.giles.service.IFileTypeHandler;
 @PropertySource("classpath:/config.properties")
 @Service
 public class PdfFileHandler implements IFileTypeHandler {
-    
+
     private final Logger logger = LoggerFactory.getLogger(getClass());
-    
+
     @Value("${pdf_to_image_dpi}")
     private String dpi;
-    
+
     @Value("${pdf_to_image_type}")
     private String type;
-    
+
     @Value("${pdf_to_image_format}")
     private String format;
 
     @Autowired
     @Qualifier("fileStorageManager")
     private IFileStorageManager storageManager;
-    
+
     @Autowired
     @Qualifier("pdfStorageManager")
     private IFileStorageManager pdfStorageManager;
-    
+
     @Autowired
     private IFilesDatabaseClient filesDbClient;
-    
+
     @PostConstruct
     public void init() {
         dpi = dpi.trim();
         type = type.trim();
         format = format.trim();
     }
-    
+
     @Override
     public List<String> getHandledFileTypes() {
         List<String> types = new ArrayList<String>();
@@ -72,53 +72,67 @@ public class PdfFileHandler implements IFileTypeHandler {
     }
 
     @Override
-    public boolean processFile(String username, IFile file, IDocument document, IUpload upload, String id, byte[] content) throws GilesFileStorageException {
+    public boolean processFile(String username, IFile file, IDocument document,
+            IUpload upload, String id, byte[] content)
+            throws GilesFileStorageException {
         PDDocument pdfDocument;
         try {
             pdfDocument = PDDocument.load(content);
         } catch (IOException e) {
             throw new GilesFileStorageException(e);
         }
-        
+
         boolean success = true;
+
         int numPages = pdfDocument.getNumberOfPages();
         PDFRenderer renderer = new PDFRenderer(pdfDocument);
-        String dirFolder = storageManager.getAndCreateStoragePath(username, file.getUploadId(), file.getId());
-        
+        String dirFolder = storageManager.getAndCreateStoragePath(username,
+                file.getUploadId(), file.getId());
+
         for (int i = 0; i < numPages; i++) {
             try {
-                BufferedImage image = renderer.renderImageWithDPI(i, Float.parseFloat(dpi), ImageType.valueOf(type));
+                BufferedImage image = renderer.renderImageWithDPI(i,
+                        Float.parseFloat(dpi), ImageType.valueOf(type));
                 String fileName = file.getFilename() + "." + i + "." + format;
                 String filePath = dirFolder + File.separator + fileName;
                 File fileObject = new File(filePath);
                 OutputStream output = new FileOutputStream(fileObject);
-                success &= ImageIOUtil.writeImage(image, format, output, new Integer(dpi));
-                
+                success &= ImageIOUtil.writeImage(image, format, output,
+                        new Integer(dpi));
+
                 IFile imageFile = file.clone();
                 imageFile.setFilepath(dirFolder);
                 imageFile.setFilename(fileName);
                 imageFile.setId(filesDbClient.generateId());
                 imageFile.setContentType("image/" + format);
                 imageFile.setSize(fileObject.length());
-                
+
                 document.getFileIds().add(imageFile.getId());
-                
-                filesDbClient.saveFile(imageFile);                
+
+                filesDbClient.saveFile(imageFile);
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
                 success = false;
-            }          
+            }
         }
         
-        pdfStorageManager.saveFile(file.getUsername(), file.getUploadId(), file.getId(), file.getFilename(), content);
+        try {
+            pdfDocument.close();
+        } catch (IOException e) {
+            logger.error("Error closing document.", e);
+        }
+
+        pdfStorageManager.saveFile(file.getUsername(), file.getUploadId(),
+                file.getId(), file.getFilename(), content);
         filesDbClient.saveFile(file);
-        
+
         return success;
     }
 
     @Override
     public String getRelativePathOfFile(IFile file) {
-        String directory = pdfStorageManager.getFileFolderPath(file.getUsername(), file.getUploadId(), file.getId());
+        String directory = pdfStorageManager.getFileFolderPath(
+                file.getUsername(), file.getUploadId(), file.getId());
         return directory + File.separator + file.getFilename();
     }
 
