@@ -1,6 +1,5 @@
 package edu.asu.giles.files.impl;
 
-import java.io.File;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
@@ -10,7 +9,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
@@ -24,7 +22,6 @@ import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IDocumentDatabaseClient;
-import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
@@ -105,6 +102,11 @@ public class FilesManager implements IFilesManager {
 			} catch (GilesFileStorageException e) {
 				logger.error("Could not store uploaded files.", e);
 				statuses.add(new StorageStatus(file, e, StorageStatus.FAILURE));
+			} catch (Exception e) {
+			    // this is meant to be Exception to make sure we give the 
+			    // user appropriate feedback
+			    logger.error("An unexpected exception was thrown.", e);
+			    statuses.add(new StorageStatus(file, new GilesFileStorageException(e), StorageStatus.FAILURE));
 			}
 		}
 		

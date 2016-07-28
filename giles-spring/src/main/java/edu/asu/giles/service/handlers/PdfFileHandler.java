@@ -8,6 +8,8 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.annotation.PostConstruct;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -54,6 +56,13 @@ public class PdfFileHandler implements IFileTypeHandler {
     
     @Autowired
     private IFilesDatabaseClient filesDbClient;
+    
+    @PostConstruct
+    public void init() {
+        dpi = dpi.trim();
+        type = type.trim();
+        format = format.trim();
+    }
     
     @Override
     public List<String> getHandledFileTypes() {

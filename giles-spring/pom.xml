@@ -28,6 +28,9 @@
 		<digilib.url></digilib.url>
 		<digilibBaseDir></digilibBaseDir>
 		<pdfBaseDir>/Users/jdamerow/Software/Giles/pdfs</pdfBaseDir>
+		<pdf.conversion.dpi>600</pdf.conversion.dpi>
+		<pdf.conversion.type>RGB</pdf.conversion.type>
+		<pdf.conversion.format>tiff</pdf.conversion.format>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
@@ -274,7 +277,7 @@
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>
 			<artifactId>pdfbox</artifactId>
-			<version>2.0.0</version>
+			<version>2.0.2</version>
 		</dependency>
 		<dependency>
 			<groupId>org.apache.pdfbox</groupId>

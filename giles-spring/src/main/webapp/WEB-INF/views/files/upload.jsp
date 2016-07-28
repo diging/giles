@@ -29,8 +29,14 @@
     <br>
     <br>
     <!-- The global progress bar -->
-    <div id="progress">
-	    <div class="bar" style="width: 0%;"></div>
+    <div id="progress" class="hidden">
+	    <i class="fa fa-refresh spinner-animate" aria-hidden="true"></i> Uploading your files. Please wait...
+	</div>
+	<div id="uploadDoneSuccess" class="hidden">
+		<i class="fa fa-check-circle" aria-hidden="true"></i> Your upload successfully finished!
+	</div>
+	<div id="uploadDoneFail" class="hidden">
+		<i class="fa fa-exclamation-triangle" aria-hidden="true"></i> One or more files could not be uploaded.
 	</div>
     <!-- The container for the uploaded files -->
     <ul id="files" class="list-group" style="margin-top: 35px;">
@@ -86,28 +92,28 @@ $(function () {
             return true;
         },
         progressall: function (e, data) {
-            var progress = parseInt(data.loaded / data.total * 100, 10);
-            $('#progress .bar').css(
-                'width',
-                progress + '%'
-            );
+            $('#progress').removeClass("hidden");
         },
         done: function (e, data) {
         	$('#upload-field').prop("disabled",true);
         	var response = JSON.parse(data.result);
+        	var success = true;
         	response.files.forEach(function(element, index) {
         		var newItem = '<li class="list-group-item">';
         		if (element.status == 0) {
         			newItem += '<span class="badge badge-success">Success</span>';
         		} else {
         			newItem += '<span class="badge badge-failure">Failure</span>';
+        			success = false;
         		}
         		newItem += element.name;
         		newItem += '</li>';
           		$('#files').append(newItem);
-          		if (!uploadIds.includes(element.uploadId)) {
-          			uploadIds.push(element.uploadId);
-          		}
+          		if (success) {
+	          		if (!uploadIds.includes(element.uploadId)) {
+	          			uploadIds.push(element.uploadId);
+	          		}
+        		}
           	});
         	
         	var uploadIdsString = "";
@@ -117,8 +123,14 @@ $(function () {
         		uploadIdsString += "&";
         	});
         	
-        	$('#jarsLink').attr('href', jarsUrl + "?" + uploadIdsString);
-        	$('#jarsLink').removeClass('disabled');
+        	resetBar();
+        	if (success) {
+        		$('#jarsLink').attr('href', jarsUrl + "?" + uploadIdsString);
+            	$('#jarsLink').removeClass('disabled');
+        		$('#uploadDoneSuccess').removeClass("hidden");
+        	} else {
+        		$('#uploadDoneFail').removeClass("hidden");
+        	}
         },
         fail: function(e, data) {
         	var response = JSON.parse(data.jqXHR.responseText);
@@ -133,10 +145,9 @@ $(function () {
     });
     
 	function resetBar() {
-		$('#progress .bar').css(
-	            'width',
-	            0 + '%'
-	        );
-}
+		$('#progress').addClass("hidden");
+		$('#uploadDoneSuccess').addClass("hidden");
+		$('#uploadDoneFail').addClass("hidden");
+	}
 });
 </script>
