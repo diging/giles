@@ -1,10 +1,7 @@
 package edu.asu.giles.web;
 
-import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,8 +22,6 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
-import edu.asu.giles.core.IFile;
-import edu.asu.giles.core.impl.File;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
 import edu.asu.giles.users.User;

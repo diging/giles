@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,7 +46,7 @@ public class UploadImagesController {
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/files/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImages(
-            @RequestParam String accessToken,
+            @RequestParam(defaultValue = "") String accessToken,
             @RequestParam(value = "access", defaultValue = "PRIVATE") String access,
             @RequestParam("files") MultipartFile[] files,
             @RequestParam(value = "document_type", defaultValue = "SINGLE_PAGE") String docType, User user) {
@@ -89,15 +90,17 @@ public class UploadImagesController {
             Stream<StorageStatus> docFileStatues = statuses.stream().filter(
                     status -> status.getFile().getDocumentId().equals(docId));
 
-            for (StorageStatus status : docFileStatues.collect(Collectors
-                    .toList())) {
+            Map<String, StorageStatus> fileMap = docFileStatues.collect(Collectors.toMap(s -> s.getFile().getId(), s -> s));
+            for (IFile file : filesManager.getFilesOfDocument(doc)) {
+                
+            
                 ObjectNode fileNode = mapper.createObjectNode();
-                IFile file = status.getFile();
                 fileNode.put("filename", file.getFilename());
+                fileNode.put("id", file.getId());
                 fileNode.put("path", filesManager.getFileUrl(file));
                 fileNode.put("content-type", file.getContentType());
                 fileNode.put("size", file.getSize());
-                fileNode.put("success", status.getStatus());
+                fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
                 paths.add(fileNode);
             }
         }

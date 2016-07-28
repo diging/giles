@@ -3,9 +3,8 @@ package edu.asu.giles.files;
 import java.util.List;
 
 import edu.asu.giles.core.IUpload;
-import edu.asu.giles.core.impl.Upload;
 
-public interface IUploadDatabaseClient {
+public interface IUploadDatabaseClient extends IDatabaseClient {
 
     public abstract IUpload store(IUpload upload);
 
