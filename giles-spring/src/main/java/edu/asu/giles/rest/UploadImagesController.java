@@ -46,7 +46,7 @@ public class UploadImagesController {
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/files/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImages(
-            @RequestParam String accessToken,
+            @RequestParam(defaultValue = "") String accessToken,
             @RequestParam(value = "access", defaultValue = "PRIVATE") String access,
             @RequestParam("files") MultipartFile[] files,
             @RequestParam(value = "document_type", defaultValue = "SINGLE_PAGE") String docType, User user) {

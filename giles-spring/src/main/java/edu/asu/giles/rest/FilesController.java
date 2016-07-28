@@ -100,7 +100,7 @@ public class FilesController {
     @RequestMapping(value = "/rest/files/{fileId}/content")
     public ResponseEntity<String> getFile(
             @PathVariable String fileId,
-            @RequestParam String accessToken, 
+            @RequestParam(defaultValue="") String accessToken, 
             User user,
             HttpServletResponse response) {
 
