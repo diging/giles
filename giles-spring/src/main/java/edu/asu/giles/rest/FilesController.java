@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
@@ -40,8 +41,10 @@ public class FilesController {
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/files/upload/{uploadId}")
     public ResponseEntity<String> getFilePathsForUpload(
+            @RequestParam(defaultValue = "") String accessToken, 
+            HttpServletRequest request,
             @PathVariable("uploadId") String uploadId,
-            @RequestParam(defaultValue = "") String accessToken, User user) {
+            User user) {
 
         IUpload upload = filesManager.getUpload(uploadId);
         if (upload == null) {

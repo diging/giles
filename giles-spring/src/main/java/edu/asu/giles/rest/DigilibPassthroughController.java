@@ -44,8 +44,10 @@ public class DigilibPassthroughController {
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/digilib")
     public ResponseEntity<String> passthroughToDigilib(
-            HttpServletRequest request, HttpServletResponse response,
-            @RequestParam(defaultValue = "") String accessToken, User user)
+            @RequestParam(defaultValue = "") String accessToken,
+            HttpServletRequest request, 
+            HttpServletResponse response,
+            User user)
             throws UnsupportedEncodingException {
 
         Map<String, String[]> parameters = request.getParameterMap();
