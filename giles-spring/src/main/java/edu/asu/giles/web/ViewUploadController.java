@@ -42,12 +42,12 @@ public class ViewUploadController {
         
         List<DocumentPageBean> mappedDocs = new ArrayList<DocumentPageBean>();
         for (IDocument doc : docs) {
-            DocumentPageBean docBean = docMappingService.convert(doc, new DocumentPageBean());
+            DocumentPageBean docBean = docMappingService.convertToT2(doc, new DocumentPageBean());
             mappedDocs.add(docBean);
             docBean.setFiles(new ArrayList<>());
             
             for (IFile file : doc.getFiles()) {
-                FilePageBean bean = fileMappingService.convert(file, new FilePageBean());
+                FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
                 bean.setMetadataLink(metadataService.getFileLink(file));
                 docBean.getFiles().add(bean);
             }

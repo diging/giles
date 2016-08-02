@@ -91,7 +91,7 @@ public class ViewImageController {
         IFile file = filesManager.getFile(fileId);
         IGilesMappingService<IFile, FilePageBean> fileMappingService = new GilesMappingService<>();
         
-        FilePageBean fileBean = fileMappingService.convert(file, new FilePageBean());
+        FilePageBean fileBean = fileMappingService.convertToT2(file, new FilePageBean());
         fileBean.setMetadataLink(metadataService.getFileLink(file));
         model.addAttribute("file", fileBean);
 

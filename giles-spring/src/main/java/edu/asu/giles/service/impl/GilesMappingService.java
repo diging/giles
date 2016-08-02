@@ -28,7 +28,7 @@ public class GilesMappingService<T1, T2> implements IGilesMappingService<T1, T2>
      * @see edu.asu.giles.service.impl.IGilesMappingService#convert(T1, T2)
      */
     @Override
-    public T2 convert(T1 t1, T2 t2) throws GilesMappingException {
+    public T2 convertToT2(T1 t1, T2 t2) throws GilesMappingException {
         Map<String, Field> t1FieldMap = new HashMap<String, Field>();
         Map<String, Field> t2FieldMap = new HashMap<String, Field>();
         
@@ -38,6 +38,29 @@ public class GilesMappingService<T1, T2> implements IGilesMappingService<T1, T2>
         t1FieldsList.forEach(field -> t1FieldMap.put(field.getName(), field));
         t2FieldsList.forEach(field -> t2FieldMap.put(field.getName(), field));
         
+        mapFields(t1FieldMap, t2FieldMap, t1, t2);
+        
+        return t2;
+    }
+    
+    @Override
+    public T1 convertToT1(T1 t1, T2 t2) throws GilesMappingException {
+        Map<String, Field> t1FieldMap = new HashMap<String, Field>();
+        Map<String, Field> t2FieldMap = new HashMap<String, Field>();
+        
+        List<Field> t1FieldsList = Arrays.asList(t1.getClass().getDeclaredFields());
+        List<Field> t2FieldsList = Arrays.asList(t2.getClass().getDeclaredFields());
+        
+        t1FieldsList.forEach(field -> t1FieldMap.put(field.getName(), field));
+        t2FieldsList.forEach(field -> t2FieldMap.put(field.getName(), field));
+        
+        mapFields(t2FieldMap, t1FieldMap, t2, t1);
+        
+        return t1;
+    }
+
+    private void mapFields(Map<String, Field> t1FieldMap, Map<String, Field> t2FieldMap, Object t1, Object t2) throws GilesMappingException {
+         
         for (String fieldName : t1FieldMap.keySet()) {
             if (t2FieldMap.containsKey(fieldName)) {
                 try {
@@ -51,7 +74,5 @@ public class GilesMappingService<T1, T2> implements IGilesMappingService<T1, T2>
                 }
             }
         }
-        
-        return t2;
     }
 }
