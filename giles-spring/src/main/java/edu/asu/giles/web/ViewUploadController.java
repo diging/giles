@@ -1,5 +1,6 @@
 package edu.asu.giles.web;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,24 +11,50 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.giles.aspects.access.UploadIdAccessCheck;
 import edu.asu.giles.core.IDocument;
+import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
+import edu.asu.giles.exceptions.GilesMappingException;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.service.IGilesMappingService;
+import edu.asu.giles.service.IMetadataUrlService;
+import edu.asu.giles.service.impl.GilesMappingService;
+import edu.asu.giles.web.pages.DocumentPageBean;
+import edu.asu.giles.web.pages.FilePageBean;
 
 @Controller
 public class ViewUploadController {
 
     @Autowired
     private IFilesManager filesManager;
-
+    
+    @Autowired
+    private IMetadataUrlService metadataService;
+    
     @UploadIdAccessCheck
     @RequestMapping(value = "/uploads/{uploadId}")
     public String showUploadPage(@PathVariable("uploadId") String uploadId,
-            Model model) {
+            Model model) throws GilesMappingException {
         IUpload upload = filesManager.getUpload(uploadId);
         List<IDocument> docs = filesManager.getDocumentsByUploadId(uploadId);
-
+        
+        IGilesMappingService<IFile, FilePageBean> fileMappingService = new GilesMappingService<>();
+        IGilesMappingService<IDocument, DocumentPageBean> docMappingService = new GilesMappingService<>();
+        
+        List<DocumentPageBean> mappedDocs = new ArrayList<DocumentPageBean>();
+        for (IDocument doc : docs) {
+            DocumentPageBean docBean = docMappingService.convert(doc, new DocumentPageBean());
+            mappedDocs.add(docBean);
+            docBean.setFiles(new ArrayList<>());
+            
+            for (IFile file : doc.getFiles()) {
+                FilePageBean bean = fileMappingService.convert(file, new FilePageBean());
+                bean.setMetadataLink(metadataService.getFileLink(file));
+                docBean.getFiles().add(bean);
+            }
+        }
+        
         model.addAttribute("upload", upload);
-        model.addAttribute("docs", docs);
+        model.addAttribute("docs", mappedDocs);
 
         return "uploads/upload";
     }

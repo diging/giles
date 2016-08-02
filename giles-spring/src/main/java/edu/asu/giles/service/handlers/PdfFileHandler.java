@@ -98,6 +98,7 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
         String dirFolder = storageManager.getAndCreateStoragePath(username,
                 file.getUploadId(), file.getDocumentId());
 
+        document.setPageCount(numPages);
         for (int i = 0; i < numPages; i++) {
             try {
                 BufferedImage image = renderer.renderImageWithDPI(i,
