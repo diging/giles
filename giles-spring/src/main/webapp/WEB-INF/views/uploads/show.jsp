@@ -15,6 +15,8 @@
     	<c:forEach items="${doc.files}" var="file">
     		<li><i class="fa fa-picture-o" aria-hidden="true"></i>
     		 <a href="<c:url value="/files/${file.id}" />" >${file.filename}</a>
+    		 | <a href="${file.metadataLink}"><i class="fa fa-globe" aria-hidden="true"></i> view metadata
+    </a>
     		</li>
     	</c:forEach>
     </ul>
@@ -24,7 +26,7 @@
     <div class="pull-right">
     <a href="<c:url value="/files/${doc.files[0].id}" />" >
     <img src="<c:url value="/files/${doc.files[0].id}/img?dh=70" />" >
-    </a>
+    </a> 
     </div>
     </c:if>
     

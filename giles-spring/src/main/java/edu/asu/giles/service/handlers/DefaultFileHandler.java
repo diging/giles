@@ -1,9 +1,13 @@
 package edu.asu.giles.service.handlers;
 
 import java.io.File;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -22,6 +26,8 @@ import edu.asu.giles.service.IFileTypeHandler;
 @Service
 public class DefaultFileHandler extends AbstractFileHandler implements IFileTypeHandler {
 
+    private final Logger logger = LoggerFactory.getLogger(getClass());
+    
     @Autowired
     @Qualifier("fileStorageManager")
     private IFileStorageManager storageManager;
@@ -60,7 +66,13 @@ public class DefaultFileHandler extends AbstractFileHandler implements IFileType
     @Override
     public String getFileUrl(IFile file) {
         String relativePath = getRelativePathOfFile(file);
-        return gilesUrl + gilesDigilibEndpoint + "?fn=" + relativePath;
+        
+        try {
+            return gilesUrl + gilesDigilibEndpoint + "?fn=" + URLEncoder.encode(relativePath, "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Could not encode path.", e);
+            return gilesUrl + gilesDigilibEndpoint + "?fn=" + relativePath;
+        }
     }
 
     @Override

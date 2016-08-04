@@ -1,7 +1,6 @@
 package edu.asu.giles.core.impl;
 
 import edu.asu.giles.core.DocumentAccess;
-import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IFile;
 
 public class File implements IFile {
@@ -15,7 +14,7 @@ public class File implements IFile {
     private DocumentAccess access;
     private String contentType;
     private long size;
-    private String filepath;
+    private String filepath; 
 
     public File() {
     }

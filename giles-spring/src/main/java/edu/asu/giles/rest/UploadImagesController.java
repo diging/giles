@@ -9,6 +9,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -47,6 +49,7 @@ public class UploadImagesController {
     @RequestMapping(value = "/rest/files/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImages(
             @RequestParam(defaultValue = "") String accessToken,
+            HttpServletRequest request,
             @RequestParam(value = "access", defaultValue = "PRIVATE") String access,
             @RequestParam("files") MultipartFile[] files,
             @RequestParam(value = "document_type", defaultValue = "SINGLE_PAGE") String docType, User user) {

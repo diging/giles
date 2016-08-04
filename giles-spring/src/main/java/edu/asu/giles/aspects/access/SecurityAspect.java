@@ -1,13 +1,15 @@
 package edu.asu.giles.aspects.access;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.aspectj.lang.ProceedingJoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -114,8 +116,16 @@ public class SecurityAspect {
         User user = null;
         String token = null;
         for (int i = 0; i < argNames.length; i++) {
+            // check if GitHub token is passed as parameters
             if (argNames[i].equals(github.value())) {
                 token = (String) args[i];
+            }
+            // check if there is a request header with github token
+            if (HttpServletRequest.class.isAssignableFrom(argTypes[i])) {
+                String tokenHeader = ((HttpServletRequest)args[i]).getHeader(HttpHeaders.AUTHORIZATION);
+                if (tokenHeader != null) {
+                    token = tokenHeader.substring(6);
+                }
             }
             if (argTypes[i].equals(User.class)) {
                 user = (User) args[i];
@@ -132,12 +142,6 @@ public class SecurityAspect {
         }
 
         GitHubTemplate template = new GitHubTemplate(token);
-        if (!template.isAuthorized()) {
-            return new ResponseEntity<>(
-                    "{ \"error\": \"Github token not valid\" }",
-                    HttpStatus.FORBIDDEN);
-        }
-
         GitHubUserProfile profile = template.userOperations().getUserProfile();
         User foundUser = userManager.findUser(profile.getUsername());
         logger.debug("Authorizing: " + profile.getUsername());

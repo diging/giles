@@ -98,6 +98,7 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
         String dirFolder = storageManager.getAndCreateStoragePath(username,
                 file.getUploadId(), file.getDocumentId());
 
+        document.setPageCount(numPages);
         for (int i = 0; i < numPages; i++) {
             try {
                 BufferedImage image = renderer.renderImageWithDPI(i,
@@ -110,7 +111,8 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                         new Integer(dpi));
 
                 IFile imageFile = file.clone();
-                imageFile.setFilepath(dirFolder);
+                String docFoler = storageManager.getFileFolderPath(username, file.getUploadId(), file.getDocumentId());
+                imageFile.setFilepath(docFoler + File.separator + fileName);
                 imageFile.setFilename(fileName);
                 imageFile.setId(filesDbClient.generateId());
                 imageFile.setContentType("image/" + format);

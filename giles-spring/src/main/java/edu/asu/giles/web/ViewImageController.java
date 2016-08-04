@@ -19,8 +19,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.giles.aspects.access.FileAccessCheck;
 import edu.asu.giles.core.IFile;
+import edu.asu.giles.exceptions.GilesMappingException;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.service.IGilesMappingService;
+import edu.asu.giles.service.IMetadataUrlService;
+import edu.asu.giles.service.impl.GilesMappingService;
 import edu.asu.giles.util.DigilibConnector;
+import edu.asu.giles.web.pages.FilePageBean;
 
 @Controller
 public class ViewImageController {
@@ -32,6 +37,10 @@ public class ViewImageController {
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private IMetadataUrlService metadataService;
+    
 
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}/img")
@@ -78,9 +87,13 @@ public class ViewImageController {
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}")
     public String showImagePage(Model model,
-            @PathVariable("fileId") String fileId) {
+            @PathVariable("fileId") String fileId) throws GilesMappingException {
         IFile file = filesManager.getFile(fileId);
-        model.addAttribute("file", file);
+        IGilesMappingService<IFile, FilePageBean> fileMappingService = new GilesMappingService<>();
+        
+        FilePageBean fileBean = fileMappingService.convertToT2(file, new FilePageBean());
+        fileBean.setMetadataLink(metadataService.getFileLink(file));
+        model.addAttribute("file", fileBean);
 
         return "files/file";
     }
