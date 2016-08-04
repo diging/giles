@@ -111,7 +111,8 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                         new Integer(dpi));
 
                 IFile imageFile = file.clone();
-                imageFile.setFilepath(dirFolder);
+                String docFoler = storageManager.getFileFolderPath(username, file.getUploadId(), file.getDocumentId());
+                imageFile.setFilepath(docFoler + File.separator + fileName);
                 imageFile.setFilename(fileName);
                 imageFile.setId(filesDbClient.generateId());
                 imageFile.setContentType("image/" + format);
