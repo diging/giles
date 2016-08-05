@@ -49,5 +49,9 @@
 		<put-attribute name="content" value="/WEB-INF/views/users/users.jsp" />
 	</definition>
 	
+	<!--  user errors -->
+	<definition name="error/noSuchRole" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/error/noSuchRole.jsp" />
+	</definition>
 	
 </tiles-definitions>

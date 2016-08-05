@@ -1,5 +1,7 @@
 package edu.asu.giles.users;
 
+import java.util.ArrayList;
+
 
 public interface IUserManager {
 
@@ -28,6 +30,10 @@ public interface IUserManager {
 
     public abstract void updatePasswordEncryption(String username);
 
-    public abstract void approveUser(String username);
+    public abstract void approveUserAccount(String username);
+
+    public abstract void revokeUserAccount(String username);
+
+    public void addRoleToUser(String username, GilesRole role);
 
 }

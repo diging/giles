@@ -23,11 +23,23 @@
   	</td>
   	<td>${user.accountStatus}</td>
   	<td>
-  		<c:if test="${user.accountStatus == 'ADDED'}">
+  		<c:if test="${user.accountStatus != 'APPROVED'}">
   		<form action="<c:url value="/users/user/${user.username}/approve" />" method="POST">
   		<button style="padding: 0px;" class="btn-link" type="submit" title="Approve user account"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
   		</form>
+  		</c:if>
   		
+  		<c:if test="${user.accountStatus == 'APPROVED'}">
+  		<form class="pull-right" class="form-inline" action="<c:url value="/users/user/${user.username}/revoke" />" method="POST">
+  		<button style="padding: 0px;" class="btn-link" type="submit" title="Revoke user account"><i class="fa fa-thumbs-o-down" aria-hidden="true"></i></button>
+  		</form>
+  		</c:if>
+  		
+  		<c:if test="${user.accountStatus == 'APPROVED' and not user.roles.contains('ROLE_ADMIN')}">
+  		<form class="pull-right" action="<c:url value="/users/user/${user.username}/role/add" />" method="POST">
+  		<input type="hidden" name="role" value="ROLE_ADMIN" />
+  		<button style="padding: 0px;" class="btn-link" type="submit" title="Make user admin"><i class="fa fa-key" aria-hidden="true"></i></button>
+  		</form>
   		</c:if>
   	</td>
   </tr>

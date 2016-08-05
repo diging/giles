@@ -71,10 +71,12 @@
           		<a href="<c:url value="/users" />" >Users</a>
           	</li>
           </sec:authorize>
+          <sec:authorize access="isAuthenticated()">
          	 <li role="presentation">
 				<a href="<c:url value="/logout" />"><i class="fa fa-sign-out" aria-hidden="true"></i>
 				Logout</a>
          	 </li>
+          </sec:authorize>
           </ul>
         </nav>
         

@@ -38,7 +38,7 @@ To use Giles, you need to log in with your GitHub account. Don't have one? You c
 							property="principal.username" />!</h2>
 </c:if>
 
-<sec:authorize access="hasRole('GILES_USER')">
+<sec:authorize access="hasRole('ROLE_USER')">
 <p>
 What do you want to do? To upload new files, head over to the upload page. You can find your previous uploads below.
 </p>							
@@ -50,6 +50,12 @@ What do you want to do? To upload new files, head over to the upload page. You c
 <c:if test="${not empty user and user.accountStatus == 'ADDED' }">
 <p>
 Your account has not be approved yet. Please contact a Giles administrator.
+</p>
+</c:if>
+
+<c:if test="${not empty user and user.accountStatus == 'REVOKED' }">
+<p>
+Your account has been revoked. Please contact a Giles administrator.
 </p>
 </c:if>
 

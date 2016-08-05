@@ -1,18 +1,9 @@
 package edu.asu.giles.users;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -122,12 +113,28 @@ public class UsersManager implements IUserManager {
     }
 
     @Override
-    public void approveUser(String username) {
+    public void approveUserAccount(String username) {
         User user = findUser(username);
         user.setAccountStatus(AccountStatus.APPROVED);
-        if (!user.getRoles().contains(Roles.ROLE_USER)) {
-            user.getRoles().add(Roles.ROLE_USER);
+        if (!user.getRoles().contains(GilesRole.ROLE_USER.name())) {
+            user.getRoles().add(GilesRole.ROLE_USER.name());
         }
         client.update(user);
     }
+    
+    @Override
+    public void revokeUserAccount(String username) {
+        User user = findUser(username);
+        user.setAccountStatus(AccountStatus.REVOKED);
+        user.setRoles(new ArrayList<String>());
+        client.update(user);
+    }
+    
+    @Override
+    public void addRoleToUser(String username, GilesRole role) {
+        User user = findUser(username);
+        user.getRoles().add(role.name());
+        client.update(user);
+    }
+    
 }
