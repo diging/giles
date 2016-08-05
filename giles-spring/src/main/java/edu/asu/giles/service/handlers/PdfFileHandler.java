@@ -1,8 +1,11 @@
 package edu.asu.giles.service.handlers;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -13,6 +16,7 @@ import javax.annotation.PostConstruct;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
+import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,6 +58,9 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
     
     @Value("${giles_file_content_suffix}")
     private String contentSuffix;
+    
+    @Value("${pdf_extract_text}")
+    private String extractText;
 
     @Autowired
     @Qualifier("fileStorageManager")
@@ -62,6 +69,10 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
     @Autowired
     @Qualifier("pdfStorageManager")
     private IFileStorageManager pdfStorageManager;
+    
+    @Autowired
+    @Qualifier("textStorageManager")
+    private IFileStorageManager textStorageManager;
 
     @Autowired
     private IFilesDatabaseClient filesDbClient;
@@ -71,6 +82,7 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
         dpi = dpi.trim();
         type = type.trim();
         format = format.trim();
+        extractText = extractText.trim();
     }
 
     @Override
@@ -104,27 +116,29 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                 BufferedImage image = renderer.renderImageWithDPI(i,
                         Float.parseFloat(dpi), ImageType.valueOf(type));
                 String fileName = file.getFilename() + "." + i + "." + format;
-                String filePath = dirFolder + File.separator + fileName;
-                File fileObject = new File(filePath);
-                OutputStream output = new FileOutputStream(fileObject);
-                success &= ImageIOUtil.writeImage(image, format, output,
-                        new Integer(dpi));
-
-                IFile imageFile = file.clone();
-                String docFoler = storageManager.getFileFolderPath(username, file.getUploadId(), file.getDocumentId());
-                imageFile.setFilepath(docFoler + File.separator + fileName);
-                imageFile.setFilename(fileName);
-                imageFile.setId(filesDbClient.generateId());
-                imageFile.setContentType("image/" + format);
-                imageFile.setSize(fileObject.length());
-
-                document.getFileIds().add(imageFile.getId());
-
-                filesDbClient.saveFile(imageFile);
+                success &= saveImage(username, file, document, dirFolder, image, fileName);
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
                 success = false;
             }
+        }
+        
+        if (extractText.equals("true")) {
+           String fileName = file.getFilename() + ".txt";
+           String docFolder = extractText(pdfDocument, username, document, fileName);
+           
+           if (docFolder != null) {
+               IFile textFile = file.clone();
+               textFile.setFilepath(docFolder + File.separator + fileName);
+               textFile.setFilename(fileName);
+               textFile.setId(filesDbClient.generateId());
+               textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
+               File fileObject = new File(textFile.getFilepath());
+               textFile.setSize(fileObject.length());
+               filesDbClient.saveFile(textFile);
+               
+               document.getTextFileIds().add(textFile.getId());
+           }
         }
         
         try {
@@ -137,6 +151,53 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                 document.getDocumentId(), file.getFilename(), content);
         filesDbClient.saveFile(file);
 
+        return success;
+    }
+    
+    private String extractText(PDDocument pdfDocument, String username, IDocument document, String filename) {
+        String docFolder = textStorageManager.getAndCreateStoragePath(username, document.getUploadId(), document.getDocumentId());
+        String filePath = docFolder + File.separator + filename;
+        File fileObject = new File(filePath);
+        try {
+            fileObject.createNewFile();
+        } catch (IOException e) {
+            logger.error("Could not create file.", e);
+            return null;
+        }
+        
+        try {
+            FileWriter writer = new FileWriter(fileObject);
+            BufferedWriter bfWriter = new BufferedWriter(writer);
+            PDFTextStripper stripper = new PDFTextStripper();
+            stripper.writeText(pdfDocument, bfWriter);
+            bfWriter.close();
+            writer.close();            
+        } catch (IOException e) {
+            logger.error("Could not extract text.", e);
+            return null;
+        }
+        return textStorageManager.getFileFolderPath(username, document.getUploadId(), document.getDocumentId());
+    }
+
+    private boolean saveImage(String username, IFile file,
+            IDocument document, String dirFolder, BufferedImage image, String fileName) throws IOException, FileNotFoundException {
+        String filePath = dirFolder + File.separator + fileName;
+        File fileObject = new File(filePath);
+        OutputStream output = new FileOutputStream(fileObject);
+        boolean success = ImageIOUtil.writeImage(image, format, output,
+                new Integer(dpi));
+
+        IFile imageFile = file.clone();
+        String docFoler = storageManager.getFileFolderPath(username, file.getUploadId(), file.getDocumentId());
+        imageFile.setFilepath(docFoler + File.separator + fileName);
+        imageFile.setFilename(fileName);
+        imageFile.setId(filesDbClient.generateId());
+        imageFile.setContentType("image/" + format);
+        imageFile.setSize(fileObject.length());
+
+        document.getFileIds().add(imageFile.getId());
+
+        filesDbClient.saveFile(imageFile);
         return success;
     }
 

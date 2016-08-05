@@ -25,6 +25,10 @@
 		<property name="baseDirectory" value="${pdfBaseDir}" />
 	</bean>
 	
+	<bean id="textStorageManager" class="edu.asu.giles.files.impl.FileStorageManager">
+		<property name="baseDirectory" value="${textBaseDir}" />
+	</bean>
+	
 	
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	

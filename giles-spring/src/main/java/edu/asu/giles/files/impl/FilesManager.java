@@ -136,6 +136,7 @@ public class FilesManager implements IFilesManager {
         document.setAccess(access);
         document.setUploadId(uploadId);
         document.setFileIds(new ArrayList<>());
+        document.setTextFileIds(new ArrayList<>());
         document.setDocumentType(docType);
 
         return document;
