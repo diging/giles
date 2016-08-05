@@ -7,6 +7,11 @@ import com.db4o.ObjectServer;
 import com.db4o.cs.Db4oClientServer;
 import com.db4o.cs.config.ServerConfiguration;
 
+import edu.asu.giles.core.impl.Document;
+import edu.asu.giles.core.impl.File;
+import edu.asu.giles.core.impl.Upload;
+import edu.asu.giles.users.User;
+
 public class DatabaseManager implements Serializable {
 
     /**
@@ -21,6 +26,22 @@ public class DatabaseManager implements Serializable {
         ServerConfiguration configuration = Db4oClientServer
                 .newServerConfiguration();
         configuration.file().blockSize(80);
+        configuration.common().objectClass(User.class).cascadeOnUpdate(true);
+        configuration.common().objectClass(User.class).cascadeOnDelete(true);
+        configuration.common().objectClass(User.class).cascadeOnActivate(true);
+        
+        configuration.common().objectClass(Document.class).cascadeOnUpdate(true);
+        configuration.common().objectClass(Document.class).cascadeOnDelete(true);
+        configuration.common().objectClass(Document.class).cascadeOnActivate(true);
+        
+        configuration.common().objectClass(File.class).cascadeOnUpdate(true);
+        configuration.common().objectClass(File.class).cascadeOnDelete(true);
+        configuration.common().objectClass(File.class).cascadeOnActivate(true);
+        
+        configuration.common().objectClass(Upload.class).cascadeOnUpdate(true);
+        configuration.common().objectClass(Upload.class).cascadeOnDelete(true);
+        configuration.common().objectClass(Upload.class).cascadeOnActivate(true);
+        
         server = Db4oClientServer.openServer(configuration, databasePath, 0);
     }
 

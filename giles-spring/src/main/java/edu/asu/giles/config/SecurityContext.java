@@ -43,6 +43,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                 .deleteCookies("JSESSIONID")
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
+                .and().exceptionHandling().accessDeniedPage("/403")
                 // Configures url based authorization
                 .and()
                 .authorizeRequests()
@@ -51,7 +52,9 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                         "/signup/**", "/user/register/**", "/resources/**",
                         "/rest/**").permitAll()
                 // The rest of the our application is protected.
-                .antMatchers("/**").hasRole("USER")
+                .antMatchers("/users").hasRole("ADMIN")
+                .antMatchers("/users/**").hasRole("ADMIN")
+                .anyRequest().hasRole("USER")
                 // Adds the SocialAuthenticationFilter to Spring Security's
                 // filter chain.
                 .and().apply(new SpringSocialConfigurer());
