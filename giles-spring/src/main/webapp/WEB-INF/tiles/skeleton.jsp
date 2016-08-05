@@ -58,22 +58,22 @@
             	</form>
             </li>
           </sec:authorize>
-          <sec:authorize access="isAuthenticated()">
+          <sec:authorize access="hasRole('GILES_USER')">
           	<li role="presentation">
           		<a href="<c:url value="/" />" >Dashboard</a>
           	</li>
           	<li role="presentation">
           		<a href="<c:url value="/files/upload" />">Upload Files</a>
           	</li>
+          </sec:authorize>
          	 <li role="presentation">
 				<a href="<c:url value="/logout" />"><i class="fa fa-sign-out" aria-hidden="true"></i>
 				Logout</a>
          	 </li>
-          </sec:authorize>
           </ul>
         </nav>
         
-        <h1>Giles</h1>
+        <h1><a class="appName" href="<c:url value="/" />">Giles</a></h1>
         <p class="lead">Guarding Digilib</p>   
       </div>
       

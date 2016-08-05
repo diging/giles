@@ -16,6 +16,7 @@ import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.SignInAdapter;
 import org.springframework.web.context.request.NativeWebRequest;
 
+import edu.asu.giles.users.AccountStatus;
 import edu.asu.giles.users.GilesGrantedAuthority;
 import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
@@ -44,15 +45,15 @@ public final class SimpleSignInAdapter implements SignInAdapter {
             user.setEmail(profile.getEmail());
             user.setProvider(connection.getKey().getProviderId());
             user.setUserIdOfProvider(connection.getKey().getProviderUserId());
-            List<String> roles = new ArrayList<>();
-            roles.add(GilesGrantedAuthority.ROLE_USER);
-            user.setRoles(roles);
+            user.setAccountStatus(AccountStatus.ADDED);
 
             userManager.addUser(user);
         } else {
             List<String> roles = user.getRoles();
-            for (String role : roles) {
-                authorities.add(new GilesGrantedAuthority(role));
+            if (roles != null) {
+                for (String role : roles) {
+                    authorities.add(new GilesGrantedAuthority(role));
+                }
             }
         }
         SecurityContextHolder.getContext()

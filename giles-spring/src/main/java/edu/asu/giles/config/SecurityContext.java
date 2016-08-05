@@ -43,6 +43,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                 .deleteCookies("JSESSIONID")
                 .logoutUrl("/logout")
                 .logoutSuccessUrl("/")
+                .and().exceptionHandling().accessDeniedPage("/403")
                 // Configures url based authorization
                 .and()
                 .authorizeRequests()

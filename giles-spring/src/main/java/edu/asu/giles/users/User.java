@@ -19,6 +19,7 @@ public class User implements Serializable {
     private String userIdOfProvider;
     private List<String> roles;
     private String password;
+    private AccountStatus accountStatus;
 
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
@@ -98,5 +99,13 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
+    }
+
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }
