@@ -1,6 +1,5 @@
 package edu.asu.giles.users;
 
-import java.util.ArrayList;
 
 
 public interface IUserManager {

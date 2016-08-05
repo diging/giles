@@ -1,7 +1,5 @@
 package edu.asu.giles.files;
 
-import java.io.File;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -11,7 +9,6 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.impl.StorageStatus;
-import edu.asu.giles.service.IFileTypeHandler;
 
 public interface IFilesManager {
 
