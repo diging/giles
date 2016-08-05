@@ -21,47 +21,11 @@ import org.springframework.stereotype.Service;
  * @author Julia Damerow
  * 
  */
-@PropertySource(value = "classpath:/user.properties")
 @Service
 public class UsersManager implements IUserManager {
 
     @Autowired
     private UserDatabaseClient client;
-
-    private Map<String, String> admins;
-
-    @Autowired
-    private Environment env;
-
-    @PostConstruct
-    public void init() throws IOException {
-        admins = new HashMap<String, String>();
-        for (Iterator it = ((AbstractEnvironment) env).getPropertySources()
-                .iterator(); it.hasNext();) {
-            Object source = (Object) it.next();
-            if (source instanceof ResourcePropertySource) {
-                ResourcePropertySource propertySource = (ResourcePropertySource) source;
-                String[] names = ((ResourcePropertySource) propertySource)
-                        .getPropertyNames();
-                for (String name : names) {
-                    admins.put(name, env.getProperty(name).split(",")[0].trim());
-                }
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see edu.asu.conceptpower.users.IUserManager#setAdmins(java.util.Map)
-     */
-    @Override
-    public void setAdmins(Map<String, String> admins) {
-        if (admins != null)
-            this.admins = admins;
-        else
-            admins = new HashMap<String, String>();
-    }
 
     /*
      * (non-Javadoc)
@@ -157,4 +121,13 @@ public class UsersManager implements IUserManager {
         client.update(user);
     }
 
+    @Override
+    public void approveUser(String username) {
+        User user = findUser(username);
+        user.setAccountStatus(AccountStatus.APPROVED);
+        if (!user.getRoles().contains(Roles.ROLE_USER)) {
+            user.getRoles().add(Roles.ROLE_USER);
+        }
+        client.update(user);
+    }
 }

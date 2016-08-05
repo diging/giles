@@ -57,7 +57,7 @@ Your account has not be approved yet. Please contact a Giles administrator.
 
 </div>
 
-<sec:authorize access="hasRole('GILES_USER')">
+<sec:authorize access="hasRole('ROLE_USER')">
 
 <h4>Your latest uploads:</h4>
 <div class="list-group">

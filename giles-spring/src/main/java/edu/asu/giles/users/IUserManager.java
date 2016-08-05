@@ -1,10 +1,7 @@
 package edu.asu.giles.users;
 
-import java.util.Map;
 
 public interface IUserManager {
-
-    public abstract void setAdmins(Map<String, String> admins);
 
     /**
      * Find a user by its user id.
@@ -30,5 +27,7 @@ public interface IUserManager {
     public abstract User findUserByEmail(String email);
 
     public abstract void updatePasswordEncryption(String username);
+
+    public abstract void approveUser(String username);
 
 }

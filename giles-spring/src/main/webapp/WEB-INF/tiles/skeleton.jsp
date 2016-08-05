@@ -58,12 +58,17 @@
             	</form>
             </li>
           </sec:authorize>
-          <sec:authorize access="hasRole('GILES_USER')">
+          <sec:authorize access="hasRole('ROLE_USER')">
           	<li role="presentation">
           		<a href="<c:url value="/" />" >Dashboard</a>
           	</li>
           	<li role="presentation">
           		<a href="<c:url value="/files/upload" />">Upload Files</a>
+          	</li>
+          </sec:authorize>
+          <sec:authorize access="hasRole('ROLE_ADMIN')">
+          	<li role="presentation">
+          		<a href="<c:url value="/users" />" >Users</a>
           	</li>
           </sec:authorize>
          	 <li role="presentation">

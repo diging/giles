@@ -1,6 +1,7 @@
 package edu.asu.giles.users;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
 public class User implements Serializable {
@@ -78,6 +79,9 @@ public class User implements Serializable {
     }
 
     public List<String> getRoles() {
+        if (roles == null) {
+            roles = new ArrayList<String>();
+        }
         return roles;
     }
 
