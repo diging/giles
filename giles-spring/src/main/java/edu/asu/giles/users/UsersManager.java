@@ -1,18 +1,9 @@
 package edu.asu.giles.users;
 
-import java.io.IOException;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
-
-import javax.annotation.PostConstruct;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.core.env.AbstractEnvironment;
-import org.springframework.core.env.Environment;
-import org.springframework.core.io.support.ResourcePropertySource;
 import org.springframework.stereotype.Service;
 
 /**
@@ -21,47 +12,11 @@ import org.springframework.stereotype.Service;
  * @author Julia Damerow
  * 
  */
-@PropertySource(value = "classpath:/user.properties")
 @Service
 public class UsersManager implements IUserManager {
 
     @Autowired
     private UserDatabaseClient client;
-
-    private Map<String, String> admins;
-
-    @Autowired
-    private Environment env;
-
-    @PostConstruct
-    public void init() throws IOException {
-        admins = new HashMap<String, String>();
-        for (Iterator it = ((AbstractEnvironment) env).getPropertySources()
-                .iterator(); it.hasNext();) {
-            Object source = (Object) it.next();
-            if (source instanceof ResourcePropertySource) {
-                ResourcePropertySource propertySource = (ResourcePropertySource) source;
-                String[] names = ((ResourcePropertySource) propertySource)
-                        .getPropertyNames();
-                for (String name : names) {
-                    admins.put(name, env.getProperty(name).split(",")[0].trim());
-                }
-            }
-        }
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see edu.asu.conceptpower.users.IUserManager#setAdmins(java.util.Map)
-     */
-    @Override
-    public void setAdmins(Map<String, String> admins) {
-        if (admins != null)
-            this.admins = admins;
-        else
-            admins = new HashMap<String, String>();
-    }
 
     /*
      * (non-Javadoc)
@@ -157,4 +112,29 @@ public class UsersManager implements IUserManager {
         client.update(user);
     }
 
+    @Override
+    public void approveUserAccount(String username) {
+        User user = findUser(username);
+        user.setAccountStatus(AccountStatus.APPROVED);
+        if (!user.getRoles().contains(GilesRole.ROLE_USER.name())) {
+            user.getRoles().add(GilesRole.ROLE_USER.name());
+        }
+        client.update(user);
+    }
+    
+    @Override
+    public void revokeUserAccount(String username) {
+        User user = findUser(username);
+        user.setAccountStatus(AccountStatus.REVOKED);
+        user.setRoles(new ArrayList<String>());
+        client.update(user);
+    }
+    
+    @Override
+    public void addRoleToUser(String username, GilesRole role) {
+        User user = findUser(username);
+        user.getRoles().add(role.name());
+        client.update(user);
+    }
+    
 }

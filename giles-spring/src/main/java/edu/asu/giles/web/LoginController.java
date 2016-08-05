@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
 
 @Controller
@@ -19,6 +20,9 @@ public class LoginController {
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private IUserManager userManager;
 
     @RequestMapping(value = "/")
     public String login(Principal principal, Model model) {
@@ -36,9 +40,15 @@ public class LoginController {
         if (username != null) {
             List<IUpload> uploads = filesManager.getUploadsOfUser(username);
             model.addAttribute("uploads", uploads);
+            model.addAttribute("user", userManager.findUser(username));
         }
 
         return "login";
+    }
+    
+    @RequestMapping("/403")
+    public String accessForbidden() {
+        return "403";
     }
 
 }

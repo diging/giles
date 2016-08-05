@@ -22,6 +22,7 @@ import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.exceptions.AspectMisconfigurationException;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.users.AccountStatus;
 import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
 
@@ -149,6 +150,11 @@ public class SecurityAspect {
         if (foundUser == null) {
             return new ResponseEntity<>(
                     "{ \"error\": \"The user doesn't seem to have a Giles account.\" } ",
+                    HttpStatus.FORBIDDEN);
+        }
+        if (foundUser.getAccountStatus() != AccountStatus.APPROVED) {
+            return new ResponseEntity<>(
+                    "{ \"error\": \"The user account you are using has not been approved. Please contact a Giles administrator.\" } ",
                     HttpStatus.FORBIDDEN);
         }
 
