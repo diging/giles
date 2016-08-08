@@ -18,6 +18,7 @@ public class Document implements IDocument {
     private transient List<IFile> files;
     private DocumentType documentType;
     private int pageCount;
+    private List<String> textFileIds;
 
     /*
      * (non-Javadoc)
@@ -161,5 +162,15 @@ public class Document implements IDocument {
     @Override
     public void setPageCount(int pageCount) {
         this.pageCount = pageCount;
+    }
+
+    @Override
+    public List<String> getTextFileIds() {
+        return textFileIds;
+    }
+
+    @Override
+    public void setTextFileIds(List<String> textFileIds) {
+        this.textFileIds = textFileIds;
     }
 }

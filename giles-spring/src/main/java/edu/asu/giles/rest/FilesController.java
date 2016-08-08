@@ -85,6 +85,21 @@ public class FilesController {
                 fileNode.put("size", file.getSize());
                 paths.add(fileNode);
             }
+            
+            ArrayNode textPaths = docNode.putArray("textFiles");
+            for (String fileId : doc.getTextFileIds()) {
+                IFile textFile = filesManager.getFile(fileId);
+                if (textFile != null) {
+                    ObjectNode fileNode = mapper.createObjectNode();
+                    fileNode.put("filename", textFile.getFilename());
+                    fileNode.put("id", textFile.getId());
+                    fileNode.put("path", filesManager.getFileUrl(textFile));
+                    fileNode.put("content-type", textFile.getContentType());
+                    fileNode.put("size", textFile.getSize());
+                    textPaths.add(fileNode);
+                }
+                
+            }
         }
 
         StringWriter sw = new StringWriter();
@@ -105,7 +120,8 @@ public class FilesController {
             @PathVariable String fileId,
             @RequestParam(defaultValue="") String accessToken, 
             User user,
-            HttpServletResponse response) {
+            HttpServletResponse response,
+            HttpServletRequest request) {
 
         IFile file = filesManager.getFile(fileId);
         if (file == null) {

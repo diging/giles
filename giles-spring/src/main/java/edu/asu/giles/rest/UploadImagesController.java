@@ -95,8 +95,6 @@ public class UploadImagesController {
 
             Map<String, StorageStatus> fileMap = docFileStatues.collect(Collectors.toMap(s -> s.getFile().getId(), s -> s));
             for (IFile file : filesManager.getFilesOfDocument(doc)) {
-                
-            
                 ObjectNode fileNode = mapper.createObjectNode();
                 fileNode.put("filename", file.getFilename());
                 fileNode.put("id", file.getId());
@@ -106,6 +104,19 @@ public class UploadImagesController {
                 fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
                 paths.add(fileNode);
             }
+            
+            ArrayNode textFiles = docNode.putArray("textFiles");
+            for (IFile file : filesManager.getTextFilesOfDocument(doc)) {
+                ObjectNode fileNode = mapper.createObjectNode();
+                fileNode.put("filename", file.getFilename());
+                fileNode.put("id", file.getId());
+                fileNode.put("path", filesManager.getFileUrl(file));
+                fileNode.put("content-type", file.getContentType());
+                fileNode.put("size", file.getSize());
+                fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
+                textFiles.add(fileNode);
+            }
+            
         }
 
         StringWriter sw = new StringWriter();

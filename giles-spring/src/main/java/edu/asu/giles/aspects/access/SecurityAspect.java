@@ -95,11 +95,11 @@ public class SecurityAspect {
 
         IFile file = filesManager.getFile(fileId);
         if (file == null) {
-            return "notFound";
+            return new ResponseEntity<String>(HttpStatus.NOT_FOUND);
         }
 
         if (!file.getUsername().equals(user.getUsername())) {
-            return "forbidden";
+            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         }
 
         return joinPoint.proceed();

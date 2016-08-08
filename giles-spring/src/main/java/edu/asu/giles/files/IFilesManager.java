@@ -1,5 +1,6 @@
 package edu.asu.giles.files;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -48,5 +49,7 @@ public interface IFilesManager {
     public abstract String getRelativePathOfFile(IFile file);
 
     public abstract byte[] getFileContent(IFile file);
+
+    public abstract List<IFile> getTextFilesOfDocument(IDocument doc);
 
 }

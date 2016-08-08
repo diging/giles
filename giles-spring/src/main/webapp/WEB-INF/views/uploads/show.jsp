@@ -22,10 +22,10 @@
     </ul>
      
     </div>
-    <c:if test="${not empty doc.files}">
+    <c:if test="${not empty doc.firstImage}">
     <div class="pull-right">
-    <a href="<c:url value="/files/${doc.files[0].id}" />" >
-    <img src="<c:url value="/files/${doc.files[0].id}/img?dh=70" />" >
+    <a href="<c:url value="/files/${doc.firstImage.id}" />" >
+    <img src="<c:url value="/files/${doc.firstImage.id}/img?dh=70" />" >
     </a> 
     </div>
     </c:if>

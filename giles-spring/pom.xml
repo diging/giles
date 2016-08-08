@@ -28,6 +28,7 @@
 		<digilib.url></digilib.url>
 		<digilibBaseDir></digilibBaseDir>
 		<pdfBaseDir></pdfBaseDir>
+		<textBaseDir></textBaseDir>
 		<pdf.conversion.dpi>600</pdf.conversion.dpi>
 		<pdf.conversion.type>RGB</pdf.conversion.type>
 		<pdf.conversion.format>tiff</pdf.conversion.format>

@@ -51,6 +51,12 @@ public class ViewUploadController {
                 bean.setMetadataLink(metadataService.getFileLink(file));
                 docBean.getFiles().add(bean);
             }
+            for (String fileId : doc.getTextFileIds()) {
+                IFile file = filesManager.getFile(fileId);
+                FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
+                bean.setMetadataLink(metadataService.getFileLink(file));
+                docBean.getFiles().add(bean);
+            }
         }
         
         model.addAttribute("upload", upload);
