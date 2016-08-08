@@ -1,7 +1,9 @@
 package edu.asu.giles.web;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -66,7 +68,12 @@ public class ViewImageController {
 
         IFile file = filesManager.getFile(fileId);
         parameterBuffer.append("fn=");
-        parameterBuffer.append(filesManager.getRelativePathOfFile(file));
+        try {
+            parameterBuffer.append(URLEncoder.encode(filesManager.getRelativePathOfFile(file), "UTF-8"));
+        } catch (UnsupportedEncodingException e1) {
+            logger.error("Could not encode path.", e1);
+            parameterBuffer.append(filesManager.getRelativePathOfFile(file));
+        }
 
         try {
             digilibConnector.getDigilibImage(parameterBuffer.toString(),

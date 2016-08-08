@@ -20,5 +20,13 @@ Uploaded on ${file.uploadDate}.
 </p>
 
 <p>
+<c:choose>
+<c:when test="${file.contentType == 'application/pdf' or file.contentType == 'text/plain'}">
+<a href="<c:url value="/files/${file.id}/content" />">Download ${file.filename}</a>
+</c:when>
+<c:otherwise>
 <img src="<c:url value="/files/${file.id}/img?dw=600" /> ">
+</c:otherwise>
+</c:choose>
+
 </p>
