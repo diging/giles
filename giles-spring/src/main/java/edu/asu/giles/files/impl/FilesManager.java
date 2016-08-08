@@ -233,5 +233,14 @@ public class FilesManager implements IFilesManager {
 
         return files;
     }
+    
+    @Override
+    public List<IFile> getTextFilesOfDocument(IDocument doc) {
+        List<String> fileIds = doc.getTextFileIds();
+        
+        List<IFile> files = new ArrayList<>();
+        fileIds.forEach(id -> files.add(getFile(id)));
+        return files;
+    }
 
 }
