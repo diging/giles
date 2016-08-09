@@ -1,15 +1,12 @@
 package edu.asu.giles.service.handlers;
 
 import java.awt.image.BufferedImage;
-import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -21,13 +18,6 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
-import org.apache.tika.exception.TikaException;
-import org.apache.tika.metadata.Metadata;
-import org.apache.tika.parser.ParseContext;
-import org.apache.tika.parser.ocr.TesseractOCRConfig;
-import org.apache.tika.parser.ocr.TesseractOCRParser;
-import org.apache.tika.sax.BodyContentHandler;
-import org.apache.tika.sax.ToXMLContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,7 +26,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
-import org.xml.sax.SAXException;
 
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
@@ -45,6 +34,7 @@ import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
+import edu.asu.giles.service.ocr.impl.IOCRService;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -87,6 +77,9 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
 
     @Autowired
     private IFilesDatabaseClient filesDbClient;
+    
+    @Autowired
+    private IOCRService ocrService;
 
     @PostConstruct
     public void init() {
@@ -131,24 +124,7 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                 success &= imageFile != null;
                 
                 if (imageFile != null) {
-                    TesseractOCRParser ocrParser = new TesseractOCRParser();
-                    TesseractOCRConfig config = new TesseractOCRConfig();
-                    config.setTesseractPath("/usr/local/Cellar/tesseract/3.04.01_2/bin/");
-                    config.setTessdataPath("/usr/local/Cellar/tesseract/3.04.01_2/share/");
-                    ParseContext parseContext = new ParseContext();
-                    parseContext.set(TesseractOCRConfig.class, config);
-                    
-                    Metadata metadata = new Metadata();
-                    
-                    BodyContentHandler handler = new BodyContentHandler();
-                    
-                    String imageFolderPath = storageManager.getAndCreateStoragePath(username, imageFile.getUploadId(), imageFile.getDocumentId());
-                    try (InputStream stream = new FileInputStream(new File(imageFolderPath + File.separator + imageFile.getFilename()))) {
-                        ocrParser.parse(stream, handler, metadata, parseContext);
-                        logger.info(handler.toString());
-                    } catch (SAXException | TikaException e) {
-                        logger.error("Error during ocr.", e);
-                    }
+                    doOcr(imageFile, username, document);                    
                 }
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
@@ -210,6 +186,47 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
             return null;
         }
         return textStorageManager.getFileFolderPath(username, document.getUploadId(), document.getDocumentId());
+    }
+    
+    private IFile doOcr(IFile imageFile, String username, IDocument document) {
+        String imageFolderPath = storageManager.getAndCreateStoragePath(username, imageFile.getUploadId(), imageFile.getDocumentId());
+        String extractedText = ocrService.ocrImage(imageFolderPath + File.separator + imageFile.getFilename()); 
+        if (extractedText != null) {
+            String docFolder = textStorageManager.getAndCreateStoragePath(username, document.getUploadId(), document.getDocumentId());
+            String filename = imageFile.getFilename() + ".txt";
+            String filePath = docFolder + File.separator + filename;
+            File fileObject = new File(filePath);
+            try {
+                fileObject.createNewFile();
+            } catch (IOException e) {
+                logger.error("Could not create file.", e);
+                return null;
+            }
+            
+            try {
+                FileWriter writer = new FileWriter(fileObject);
+                BufferedWriter bfWriter = new BufferedWriter(writer);
+                bfWriter.write(extractedText);
+                bfWriter.close();
+                writer.close();            
+            } catch (IOException e) {
+                logger.error("Could not write text to file.", e);
+                return null;
+            }
+            
+            IFile textFile = imageFile.clone();
+            textFile.setFilepath(docFolder + File.separator + filename);
+            textFile.setFilename(filename);
+            textFile.setId(filesDbClient.generateId());
+            textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
+            textFile.setSize(fileObject.length());
+            filesDbClient.saveFile(textFile);
+            
+            document.getTextFileIds().add(textFile.getId());
+            
+            return textFile;
+        }
+        return null;
     }
 
     private IFile saveImage(String username, IFile file,

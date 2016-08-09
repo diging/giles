@@ -32,6 +32,8 @@
 		<pdf.conversion.dpi>600</pdf.conversion.dpi>
 		<pdf.conversion.type>RGB</pdf.conversion.type>
 		<pdf.conversion.format>tiff</pdf.conversion.format>
+		<tesseract.bin></tesseract.bin>
+		<tesseract.data></tesseract.data>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
