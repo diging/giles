@@ -1,12 +1,15 @@
 package edu.asu.giles.service.handlers;
 
 import java.awt.image.BufferedImage;
+import java.io.BufferedInputStream;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,6 +21,13 @@ import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
 import org.apache.pdfbox.text.PDFTextStripper;
 import org.apache.pdfbox.tools.imageio.ImageIOUtil;
+import org.apache.tika.exception.TikaException;
+import org.apache.tika.metadata.Metadata;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.ocr.TesseractOCRConfig;
+import org.apache.tika.parser.ocr.TesseractOCRParser;
+import org.apache.tika.sax.BodyContentHandler;
+import org.apache.tika.sax.ToXMLContentHandler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +36,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.xml.sax.SAXException;
 
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
@@ -116,7 +127,29 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                 BufferedImage image = renderer.renderImageWithDPI(i,
                         Float.parseFloat(dpi), ImageType.valueOf(type));
                 String fileName = file.getFilename() + "." + i + "." + format;
-                success &= saveImage(username, file, document, dirFolder, image, fileName);
+                IFile imageFile = saveImage(username, file, document, dirFolder, image, fileName);
+                success &= imageFile != null;
+                
+                if (imageFile != null) {
+                    TesseractOCRParser ocrParser = new TesseractOCRParser();
+                    TesseractOCRConfig config = new TesseractOCRConfig();
+                    config.setTesseractPath("/usr/local/Cellar/tesseract/3.04.01_2/bin/");
+                    config.setTessdataPath("/usr/local/Cellar/tesseract/3.04.01_2/share/");
+                    ParseContext parseContext = new ParseContext();
+                    parseContext.set(TesseractOCRConfig.class, config);
+                    
+                    Metadata metadata = new Metadata();
+                    
+                    BodyContentHandler handler = new BodyContentHandler();
+                    
+                    String imageFolderPath = storageManager.getAndCreateStoragePath(username, imageFile.getUploadId(), imageFile.getDocumentId());
+                    try (InputStream stream = new FileInputStream(new File(imageFolderPath + File.separator + imageFile.getFilename()))) {
+                        ocrParser.parse(stream, handler, metadata, parseContext);
+                        logger.info(handler.toString());
+                    } catch (SAXException | TikaException e) {
+                        logger.error("Error during ocr.", e);
+                    }
+                }
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
                 success = false;
@@ -179,13 +212,16 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
         return textStorageManager.getFileFolderPath(username, document.getUploadId(), document.getDocumentId());
     }
 
-    private boolean saveImage(String username, IFile file,
+    private IFile saveImage(String username, IFile file,
             IDocument document, String dirFolder, BufferedImage image, String fileName) throws IOException, FileNotFoundException {
         String filePath = dirFolder + File.separator + fileName;
         File fileObject = new File(filePath);
         OutputStream output = new FileOutputStream(fileObject);
         boolean success = ImageIOUtil.writeImage(image, format, output,
                 new Integer(dpi));
+        if (!success) {
+            return null;
+        }
 
         IFile imageFile = file.clone();
         String docFoler = storageManager.getFileFolderPath(username, file.getUploadId(), file.getDocumentId());
@@ -198,7 +234,7 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
         document.getFileIds().add(imageFile.getId());
 
         filesDbClient.saveFile(imageFile);
-        return success;
+        return imageFile;
     }
 
     @Override
