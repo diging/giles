@@ -15,6 +15,7 @@ public class File implements IFile {
     private String contentType;
     private long size;
     private String filepath; 
+    private String derivedFrom;
 
     public File() {
     }
@@ -165,6 +166,16 @@ public class File implements IFile {
     public void setFilepath(String filepath) {
         this.filepath = filepath;
     }
+    
+    @Override
+    public String getDerivedFrom() {
+        return derivedFrom;
+    }
+
+    @Override
+    public void setDerivedFrom(String derivedFrom) {
+        this.derivedFrom = derivedFrom;
+    }
 
     @Override
     public IFile clone() {
@@ -180,4 +191,6 @@ public class File implements IFile {
         file.setUsername(username);
         return file;
     }
+
+    
 }
