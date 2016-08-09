@@ -16,7 +16,7 @@
 	<mvc:annotation-driven />
 	<context:component-scan base-package="edu.asu.giles" />
 	
-	<task:executor id="tesseractExecutor" pool-size="2"  />
+	<task:executor id="tesseractExecutor" pool-size="${ocr.worker.count}"  />
 	<task:annotation-driven executor="tesseractExecutor"/>	
 	
 	<import resource="spring-security.xml" />

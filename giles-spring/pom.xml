@@ -34,6 +34,7 @@
 		<pdf.conversion.format>tiff</pdf.conversion.format>
 		<tesseract.bin></tesseract.bin>
 		<tesseract.data></tesseract.data>
+		<ocr.worker.count>2</ocr.worker.count>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
