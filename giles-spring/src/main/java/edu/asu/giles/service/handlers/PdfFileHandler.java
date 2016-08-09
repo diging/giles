@@ -10,6 +10,8 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
@@ -34,7 +36,7 @@ import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
-import edu.asu.giles.service.ocr.impl.IOCRService;
+import edu.asu.giles.service.ocr.IOCRService;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -190,7 +192,26 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
     
     private IFile doOcr(IFile imageFile, String username, IDocument document) {
         String imageFolderPath = storageManager.getAndCreateStoragePath(username, imageFile.getUploadId(), imageFile.getDocumentId());
-        String extractedText = ocrService.ocrImage(imageFolderPath + File.separator + imageFile.getFilename()); 
+        Future<String> ocrResult = ocrService.ocrImage(imageFolderPath + File.separator + imageFile.getFilename()); 
+       
+        String extractedText = null;
+        while (true) {
+            if (ocrResult.isDone()) {
+                try {
+                    extractedText = ocrResult.get();
+                } catch (InterruptedException | ExecutionException e) {
+                    logger.error("Exception getting result.", e);
+                }
+                break;
+            } else {
+                try {
+                    Thread.sleep(500);
+                } catch (InterruptedException e) {
+                    logger.error("Thread couldn't sleep.", e);
+                }
+            }
+        }
+        
         if (extractedText != null) {
             String docFolder = textStorageManager.getAndCreateStoragePath(username, document.getUploadId(), document.getDocumentId());
             String filename = imageFile.getFilename() + ".txt";

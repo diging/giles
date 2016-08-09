@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
@@ -17,8 +18,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
+import org.springframework.scheduling.annotation.Async;
+import org.springframework.scheduling.annotation.AsyncResult;
 import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
+
+import edu.asu.giles.service.ocr.IOCRService;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -51,16 +56,18 @@ public class TikaTesseractOCRService implements IOCRService {
      * @see edu.asu.giles.service.ocr.impl.IOCRService#ocrImage(java.lang.String)
      */
     @Override
-    public String ocrImage(String imageFile) {
+    @Async
+    public Future<String> ocrImage(String imageFile) {
+        logger.info("(" + Thread.currentThread().getId() + ") OCR using Tesseract on: " + imageFile);
         Metadata metadata = new Metadata();
         BodyContentHandler handler = new BodyContentHandler();
         
         try (InputStream stream = new FileInputStream(new File(imageFile))) {
             ocrParser.parse(stream, handler, metadata, parseContext);
-            return handler.toString();
+            return new AsyncResult<String>(handler.toString());
         } catch (SAXException | TikaException | IOException e) {
             logger.error("Error during ocr.", e);
-            return null;
+            return new AsyncResult<String>(null);
         }
     }
 }
