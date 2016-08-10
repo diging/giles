@@ -12,32 +12,32 @@
 	
 	<!-- Application Loggers -->
 	<logger name="edu.asu.giles">
-		<level value="debug" />
+		<level value="${log.level}" />
 	</logger>
 	
 	<logger name="org.apache.tika">
-		<level value="debug" />
+		<level value="${log.level}" />
 	</logger>
 	
 	<logger name="org.springframework.scheduling">
-		<level value="debug" />
+		<level value="${log.level}" />
 	</logger>
 	
 	<!-- 3rdparty Loggers -->
 	<logger name="org.springframework.core">
-		<level value="debug" />
+		<level value="${log.level}" />
 	</logger>
 	
 	<logger name="org.springframework.beans">
-		<level value="debug" />
+		<level value="${log.level}" />
 	</logger>
 	
 	<logger name="org.springframework.context">
-		<level value="info" />
+		<level value="${log.level}" />
 	</logger>
 
 	<logger name="org.springframework.web">
-		<level value="debug" />
+		<level value="${log.level}" />
 	</logger>
 
 	<!-- Root Logger -->
