@@ -32,6 +32,10 @@
 		<pdf.conversion.dpi>600</pdf.conversion.dpi>
 		<pdf.conversion.type>RGB</pdf.conversion.type>
 		<pdf.conversion.format>tiff</pdf.conversion.format>
+		<tesseract.bin></tesseract.bin>
+		<tesseract.data></tesseract.data>
+		<ocr.worker.count>2</ocr.worker.count>
+		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
@@ -39,6 +43,7 @@
 		<deploy.path.prod>giles</deploy.path.prod>
 		<pullrequest></pullrequest>
 		<buildNumber></buildNumber>
+		<log.level>debug</log.level>
 	</properties>
 
 	<dependencies>
@@ -154,11 +159,6 @@
 			<version>${spring-security-version}</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-template</artifactId>
 			<version>3.0.1</version>
@@ -183,6 +183,14 @@
 			<artifactId>tiles-jsp</artifactId>
 			<version>3.0.1</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.social</groupId>
@@ -289,6 +297,18 @@
 			<groupId>com.github.jai-imageio</groupId>
 			<artifactId>jai-imageio-core</artifactId>
 			<version>1.3.1</version>
+		</dependency>
+
+		<!-- tessaract/tika -->
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>1.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers</artifactId>
+			<version>1.13</version>
 		</dependency>
 
 	</dependencies>

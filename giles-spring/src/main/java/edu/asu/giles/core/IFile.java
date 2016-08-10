@@ -44,4 +44,8 @@ public interface IFile {
 
     public abstract IFile clone();
 
+    public abstract void setDerivedFrom(String derivedFrom);
+
+    public abstract String getDerivedFrom();
+
 }

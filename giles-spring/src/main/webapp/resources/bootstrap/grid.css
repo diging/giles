@@ -26,6 +26,11 @@ hr {
     bottom: 0px;
 }
 
+.breadcrumb {
+	background-color: white;
+	border: solid 1px #efefef;
+}
+
 a.appName {
 	color: #000;
 }

@@ -101,6 +101,10 @@ public class ViewImageController {
         FilePageBean fileBean = fileMappingService.convertToT2(file, new FilePageBean());
         fileBean.setMetadataLink(metadataService.getFileLink(file));
         model.addAttribute("file", fileBean);
+        
+        if (file.getDerivedFrom() != null) {
+            model.addAttribute("derivedFrom", filesManager.getFile(file.getDerivedFrom()));
+        }
 
         return "files/file";
     }

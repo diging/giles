@@ -18,6 +18,7 @@ public class FilePageBean implements IFile {
     private long size;
     private String filepath; 
     private String metadataLink;
+    private String derivedFrom;
     
     public String getUploadId() {
         return uploadId;
@@ -85,8 +86,15 @@ public class FilePageBean implements IFile {
     public void setMetadataLink(String metadataLink) {
         this.metadataLink = metadataLink;
     }
+    public void setDerivedFrom(String derivedFrom) {
+        this.derivedFrom = derivedFrom;
+    }
+    public String getDerivedFrom() {
+        return derivedFrom;
+    }
    
     public IFile clone() {
         throw new NotImplementedException("Not yet implemented.");
     }
+    
 }

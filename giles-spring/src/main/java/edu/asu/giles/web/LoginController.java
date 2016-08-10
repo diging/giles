@@ -3,6 +3,11 @@ package edu.asu.giles.web;
 import java.security.Principal;
 import java.util.List;
 
+import org.apache.tika.Tika;
+import org.apache.tika.mime.MediaType;
+import org.apache.tika.parser.CompositeParser;
+import org.apache.tika.parser.ParseContext;
+import org.apache.tika.parser.Parser;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -42,7 +47,7 @@ public class LoginController {
             model.addAttribute("uploads", uploads);
             model.addAttribute("user", userManager.findUser(username));
         }
-
+        
         return "login";
     }
     
