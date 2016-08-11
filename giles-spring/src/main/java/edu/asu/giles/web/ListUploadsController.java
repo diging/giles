@@ -31,7 +31,7 @@ public class ListUploadsController {
     private IFilesManager filesManager;
     
     @RequestMapping(value = "/uploads", method = RequestMethod.GET)
-    public String showUploads(Principal principal, Model model, @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = IUploadDatabaseClient.ASCENDING + "") String sortDir) throws GilesMappingException {
+    public String showUploads(Principal principal, Model model, @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = IUploadDatabaseClient.DESCENDING + "") String sortDir) throws GilesMappingException {
         String username = null;
         if (principal instanceof UsernamePasswordAuthenticationToken) {
             UsernamePasswordAuthenticationToken token = (UsernamePasswordAuthenticationToken) principal;
@@ -44,11 +44,12 @@ public class ListUploadsController {
         
         int pageInt = new Integer(page);
         int pageCount = 1;
+        int sortDirInt = new Integer(sortDir);
         
         if (username != null) {
             pageCount = filesManager.getUploadsOfUserPageCount(username);
             
-            List<IUpload> uploads = filesManager.getUploadsOfUser(username, pageInt, -1, "createdDate", new Integer(sortDir));
+            List<IUpload> uploads = filesManager.getUploadsOfUser(username, pageInt, -1, "createdDate", sortDirInt);
             List<UploadPageBean> mappedUploads = new ArrayList<UploadPageBean>();
             
             if (uploads != null) {
@@ -81,6 +82,8 @@ public class ListUploadsController {
             pageInt = pageCount;
         }
         model.addAttribute("page", pageInt);
+        model.addAttribute("sortDir", sortDir);
+        model.addAttribute("oppSortDir", sortDirInt == IUploadDatabaseClient.ASCENDING ? IUploadDatabaseClient.DESCENDING : IUploadDatabaseClient.ASCENDING);
         return "uploads";
     }
 }

@@ -9,7 +9,7 @@ You have ${totalUploads} uploads.
 <table class="table table-striped">
 	<thead>
 	<tr>
-		<th width="20%">Uploaded on</th>
+		<th width="20%">Uploaded on &nbsp;&nbsp;<a href="<c:url value="/uploads?page=${page}&sortDir=${oppSortDir}" />"><i class="fa fa-sort" aria-hidden="true"></i></a></th>
 		<th width="15%">Upload Id</th>
 		<th># of Documents</th>
 		<th>Uploaded Files</th>
@@ -35,15 +35,15 @@ You have ${totalUploads} uploads.
 <nav aria-label="Page navigation">
   <ul class="pagination">
     <li <c:if test="${page == 1}">class="disabled"</c:if>>
-      <a <c:if test="${page > 1}">href="<c:url value="/uploads?page=${page - 1}" />"</c:if> aria-label="Previous">
+      <a <c:if test="${page > 1}">href="<c:url value="/uploads?page=${page - 1}&sortDir=${sortDir}" />"</c:if> aria-label="Previous">
         <span aria-hidden="true">&laquo;</span>
       </a>
     </li>
 <c:forEach begin="1" end="${count}" var="val">
-    <li <c:if test="${val == page}">class="active"</c:if>><a href="<c:url value="/uploads?page=${val}" />"><c:out value="${val}"/></a></li>
+    <li <c:if test="${val == page}">class="active"</c:if>><a href="<c:url value="/uploads?page=${val}&sortDir=${sortDir}" />"><c:out value="${val}"/></a></li>
 </c:forEach>
     <li <c:if test="${page == count}">class="disabled"</c:if>>
-      <a <c:if test="${page < count}">href="<c:url value="/uploads?page=${page + 1}" />"</c:if> aria-label="Next">
+      <a <c:if test="${page < count}">href="<c:url value="/uploads?page=${page + 1}&sortDir=${sortDir}" />"</c:if> aria-label="Next">
         <span aria-hidden="true">&raquo;</span>
       </a>
     </li>
