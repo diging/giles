@@ -41,6 +41,13 @@
   		<button style="padding: 0px;" class="btn-link" type="submit" title="Make user admin"><i class="fa fa-key" aria-hidden="true"></i></button>
   		</form>
   		</c:if>
+  		
+  		<c:if test="${user.accountStatus == 'APPROVED' and user.roles.contains('ROLE_ADMIN')}">
+  		<form class="pull-right" action="<c:url value="/users/user/${user.username}/role/remove" />" method="POST">
+  		<input type="hidden" name="role" value="ROLE_ADMIN" />
+  		<button style="padding: 0px;" class="btn-link" type="submit" title="Revoke admin rights"><i class="fa fa-user" aria-hidden="true"></i></button>
+  		</form>
+  		</c:if>
   	</td>
   </tr>
   </c:forEach>

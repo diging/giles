@@ -41,4 +41,15 @@ public class AccountController {
         userManager.addRoleToUser(username, gilesRole);
         return "redirect:/users";
     }
+    
+    @RequestMapping(value = "/users/user/{username}/role/remove", method = RequestMethod.POST)
+    public String removeRoleFromUser(@PathVariable String username, @RequestParam("role") String role, Principal principal) {
+        GilesRole gilesRole = GilesRole.valueOf(role);
+        if (gilesRole == null) {
+            return "error/noSuchRole";
+        }
+        
+        userManager.removeRoleFromUser(username, gilesRole);
+        return "redirect:/users";
+    }
 }

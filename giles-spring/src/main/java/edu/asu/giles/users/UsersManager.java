@@ -137,4 +137,11 @@ public class UsersManager implements IUserManager {
         client.update(user);
     }
     
+    @Override
+    public void removeRoleFromUser(String username, GilesRole role) {
+        User user = findUser(username);
+        user.getRoles().remove(role.name());
+        client.update(user);
+    }
+    
 }

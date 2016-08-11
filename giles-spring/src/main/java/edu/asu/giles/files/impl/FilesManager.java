@@ -205,6 +205,7 @@ public class FilesManager implements IFilesManager {
             page = 1;
         }
         int pageCount = getUploadsOfUserPageCount(username);
+        pageCount = pageCount > 0 ? pageCount : 1;
         if (page > pageCount) {
             page = pageCount;
         }
