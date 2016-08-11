@@ -133,9 +133,9 @@ public class UploadDatabaseClient extends DatabaseClient implements
 
         List<IUpload> allResults = query.execute(); // getUploadsForUser(username);
         int startIndex = (page - 1) * pageSize;
-        int endIndex = startIndex + pageSize - 1;
-        if (endIndex > allResults.size() - 1) {
-            endIndex = allResults.size() - 1;
+        int endIndex = startIndex + pageSize;
+        if (endIndex > allResults.size()) {
+            endIndex = allResults.size();
         }
         return allResults.subList(startIndex, endIndex);
     }
