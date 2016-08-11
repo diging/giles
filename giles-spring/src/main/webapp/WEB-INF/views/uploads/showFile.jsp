@@ -22,7 +22,7 @@
 
 </p>
 
-<p>Uploaded on ${file.uploadDate}.</p>
+<p>Uploaded on <span class="date">${file.uploadDate}</span>.</p>
 
 <c:if test="${not empty derivedFrom}">
 

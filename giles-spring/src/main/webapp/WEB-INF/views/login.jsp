@@ -1,6 +1,6 @@
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <%@ taglib prefix="sec" uri="http://www.springframework.org/security/tags" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 
 
@@ -70,10 +70,16 @@ Your account has been revoked. Please contact a Giles administrator.
 <c:forEach items="${uploads}" var="upload">
   <a href="<c:url value="/uploads/${upload.id}" />" class="list-group-item">
     <h4 class="list-group-item-heading">Upload #${upload.id}</h4>
-    <p class="list-group-item-text">Uploaded on ${upload.createdDate}.</p>
+    <p class="list-group-item-text">
+    	Uploaded on <span class="date">${upload.createdDate}</span>.
+    	${upload.nrOfDocuments} uploaded document<c:if test="${upload.nrOfDocuments>1}">s</c:if>.
+    </p>
   </a>
  </c:forEach>
 </div>
-
+<div>
+<a class="btn btn-primary" href="<c:url value="/uploads" />">See all uploads</a>
+</div>
 </sec:authorize>
+
 

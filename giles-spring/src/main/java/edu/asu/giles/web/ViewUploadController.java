@@ -45,17 +45,20 @@ public class ViewUploadController {
             DocumentPageBean docBean = docMappingService.convertToT2(doc, new DocumentPageBean());
             mappedDocs.add(docBean);
             docBean.setFiles(new ArrayList<>());
+            docBean.setTextFiles(new ArrayList<>());
             
             for (IFile file : doc.getFiles()) {
                 FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
                 bean.setMetadataLink(metadataService.getFileLink(file));
                 docBean.getFiles().add(bean);
             }
-            for (String fileId : doc.getTextFileIds()) {
-                IFile file = filesManager.getFile(fileId);
-                FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
-                bean.setMetadataLink(metadataService.getFileLink(file));
-                docBean.getFiles().add(bean);
+            if (doc.getTextFileIds() != null) {
+                for (String fileId : doc.getTextFileIds()) {
+                    IFile file = filesManager.getFile(fileId);
+                    FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
+                    bean.setMetadataLink(metadataService.getFileLink(file));
+                    docBean.getTextFiles().add(bean);
+                }
             }
         }
         

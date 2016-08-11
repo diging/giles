@@ -40,11 +40,11 @@
     
     <script src="//ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
  	<script src="<c:url value="/resources/bootstrap/js/bootstrap.min.js" />"></script>
-	
+	<script src="<c:url value="/resources/bootstrap/js/main.js" />"></script>
   </head>
 
   <body>
-    <div class="container" style="padding-bottom: 100px;">
+    <div class="container" style="padding-bottom: 150px;">
 
       <div class="page-header">
       <nav>
@@ -61,6 +61,9 @@
           <sec:authorize access="hasRole('ROLE_USER')">
           	<li role="presentation">
           		<a href="<c:url value="/" />" >Dashboard</a>
+          	</li>
+          	<li role="presentation">
+          	    <a href="<c:url value="/uploads" />" >Your Uploads</a>
           	</li>
           	<li role="presentation">
           		<a href="<c:url value="/files/upload" />">Upload Files</a>
