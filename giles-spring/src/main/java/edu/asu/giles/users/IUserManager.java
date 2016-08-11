@@ -35,4 +35,6 @@ public interface IUserManager {
 
     public void addRoleToUser(String username, GilesRole role);
 
+    public abstract void removeRoleFromUser(String username, GilesRole role);
+
 }
