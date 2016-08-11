@@ -344,6 +344,7 @@
 			<properties>
 				<admin.pw>${admin.password}</admin.pw>
 				<deploy.path>${deploy.path.prod}</deploy.path>
+				<log.level>info</log.level>
 			</properties>
 		</profile>
 	</profiles>
