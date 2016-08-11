@@ -15,6 +15,7 @@ import java.util.concurrent.Future;
 
 import javax.annotation.PostConstruct;
 
+import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
 import org.apache.pdfbox.rendering.PDFRenderer;
@@ -40,7 +41,8 @@ import edu.asu.giles.service.ocr.IOCRService;
 
 @PropertySource("classpath:/config.properties")
 @Service
-public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHandler {
+public class PdfFileHandler extends AbstractFileHandler implements
+        IFileTypeHandler {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String TRUE = "true";
@@ -53,19 +55,19 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
 
     @Value("${pdf_to_image_format}")
     private String format;
-    
+
     @Value("${giles_url}")
     private String gilesUrl;
-    
+
     @Value("${giles_file_endpoint}")
     private String pdfEndpoint;
-    
+
     @Value("${giles_file_content_suffix}")
     private String contentSuffix;
-    
+
     @Value("${pdf_extract_text}")
     private String extractText;
-    
+
     @Value("${ocr_images_from_pdfs}")
     private String doOcrOnImages;
 
@@ -76,14 +78,14 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
     @Autowired
     @Qualifier("pdfStorageManager")
     private IFileStorageManager pdfStorageManager;
-    
+
     @Autowired
     @Qualifier("textStorageManager")
     private IFileStorageManager textStorageManager;
 
     @Autowired
     private IFilesDatabaseClient filesDbClient;
-    
+
     @Autowired
     private IOCRService ocrService;
 
@@ -105,8 +107,7 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
 
     @Override
     public boolean processFile(String username, IFile file, IDocument document,
-            IUpload upload, byte[] content)
-            throws GilesFileStorageException {
+            IUpload upload, byte[] content) throws GilesFileStorageException {
         PDDocument pdfDocument;
         try {
             pdfDocument = PDDocument.load(content);
@@ -127,23 +128,24 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                 BufferedImage image = renderer.renderImageWithDPI(i,
                         Float.parseFloat(dpi), ImageType.valueOf(type));
                 String fileName = file.getFilename() + "." + i + "." + format;
-                IFile imageFile = saveImage(username, file, document, dirFolder, image, fileName);
+                IFile imageFile = saveImage(username, file, document,
+                        dirFolder, image, fileName);
                 success &= imageFile != null;
-                
+
                 if (imageFile != null && doOcrOnImages.equalsIgnoreCase(TRUE)) {
-                    doOcr(imageFile, username, document);                    
+                    doOcr(imageFile, username, document);
                 }
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
                 success = false;
             }
         }
-        
+
         if (extractText.equalsIgnoreCase(TRUE)) {
-           String fileName = file.getFilename() + ".txt";
-           extractText(pdfDocument, username, file, document, fileName);
+            String fileName = file.getFilename() + ".txt";
+            extractText(pdfDocument, username, file, document, fileName);
         }
-        
+
         try {
             pdfDocument.close();
         } catch (IOException e) {
@@ -156,9 +158,11 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
 
         return success;
     }
-    
-    private IFile extractText(PDDocument pdfDocument, String username, IFile file, IDocument document, String filename) {
-        String docFolder = textStorageManager.getAndCreateStoragePath(username, document.getUploadId(), document.getDocumentId());
+
+    private IFile extractText(PDDocument pdfDocument, String username,
+            IFile file, IDocument document, String filename) {
+        String docFolder = textStorageManager.getAndCreateStoragePath(username,
+                document.getUploadId(), document.getDocumentId());
         String filePath = docFolder + File.separator + filename;
         File fileObject = new File(filePath);
         try {
@@ -167,37 +171,51 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
             logger.error("Could not create file.", e);
             return null;
         }
-        
+
         try {
             FileWriter writer = new FileWriter(fileObject);
             BufferedWriter bfWriter = new BufferedWriter(writer);
             PDFTextStripper stripper = new PDFTextStripper();
             stripper.writeText(pdfDocument, bfWriter);
             bfWriter.close();
-            writer.close();            
+            writer.close();
         } catch (IOException e) {
             logger.error("Could not extract text.", e);
             return null;
         }
         
+        String contents = null;
+        try {
+            contents = FileUtils.readFileToString(fileObject);
+        } catch (IOException e) {
+            logger.error("Could not get contents.", e);
+        }
+
+        if (contents == null || contents.trim().isEmpty()) {
+            fileObject.delete();
+            return null;
+        }
+
         IFile textFile = file.clone();
         textFile.setFilepath(docFolder + File.separator + filename);
         textFile.setFilename(filename);
         textFile.setId(filesDbClient.generateId());
         textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
         textFile.setDerivedFrom(file.getDerivedFrom());
-        
+
         textFile.setSize(fileObject.length());
         filesDbClient.saveFile(textFile);
-        
+
         document.getTextFileIds().add(textFile.getId());
         return textFile;
     }
-    
+
     private IFile doOcr(IFile imageFile, String username, IDocument document) {
-        String imageFolderPath = storageManager.getAndCreateStoragePath(username, imageFile.getUploadId(), imageFile.getDocumentId());
-        Future<String> ocrResult = ocrService.ocrImage(imageFolderPath + File.separator + imageFile.getFilename()); 
-       
+        String imageFolderPath = storageManager.getAndCreateStoragePath(
+                username, imageFile.getUploadId(), imageFile.getDocumentId());
+        Future<String> ocrResult = ocrService.ocrImage(imageFolderPath
+                + File.separator + imageFile.getFilename());
+
         String extractedText = null;
         while (true) {
             if (ocrResult.isDone()) {
@@ -215,48 +233,51 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
                 }
             }
         }
-        
-        if (extractedText != null) {
-            String docFolder = textStorageManager.getAndCreateStoragePath(username, document.getUploadId(), document.getDocumentId());
-            String filename = imageFile.getFilename() + ".txt";
-            String filePath = docFolder + File.separator + filename;
-            File fileObject = new File(filePath);
-            try {
-                fileObject.createNewFile();
-            } catch (IOException e) {
-                logger.error("Could not create file.", e);
-                return null;
-            }
-            
-            try {
-                FileWriter writer = new FileWriter(fileObject);
-                BufferedWriter bfWriter = new BufferedWriter(writer);
-                bfWriter.write(extractedText);
-                bfWriter.close();
-                writer.close();            
-            } catch (IOException e) {
-                logger.error("Could not write text to file.", e);
-                return null;
-            }
-            
-            IFile textFile = imageFile.clone();
-            textFile.setFilepath(docFolder + File.separator + filename);
-            textFile.setFilename(filename);
-            textFile.setId(filesDbClient.generateId());
-            textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
-            textFile.setSize(fileObject.length());
-            textFile.setDerivedFrom(imageFile.getId());
-            filesDbClient.saveFile(textFile);
-            
-            document.getTextFileIds().add(textFile.getId());
-            
-            return textFile;
+
+        if (extractedText == null || extractedText.isEmpty()) {
+            return null;
         }
-        return null;
+
+        String docFolder = textStorageManager.getAndCreateStoragePath(username,
+                document.getUploadId(), document.getDocumentId());
+        String filename = imageFile.getFilename() + ".txt";
+        String filePath = docFolder + File.separator + filename;
+        File fileObject = new File(filePath);
+        try {
+            fileObject.createNewFile();
+        } catch (IOException e) {
+            logger.error("Could not create file.", e);
+            return null;
+        }
+
+        try {
+            FileWriter writer = new FileWriter(fileObject);
+            BufferedWriter bfWriter = new BufferedWriter(writer);
+            bfWriter.write(extractedText);
+            bfWriter.close();
+            writer.close();
+        } catch (IOException e) {
+            logger.error("Could not write text to file.", e);
+            return null;
+        }
+
+        IFile textFile = imageFile.clone();
+        textFile.setFilepath(docFolder + File.separator + filename);
+        textFile.setFilename(filename);
+        textFile.setId(filesDbClient.generateId());
+        textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
+        textFile.setSize(fileObject.length());
+        textFile.setDerivedFrom(imageFile.getId());
+        filesDbClient.saveFile(textFile);
+
+        document.getTextFileIds().add(textFile.getId());
+
+        return textFile;
     }
 
-    private IFile saveImage(String username, IFile file,
-            IDocument document, String dirFolder, BufferedImage image, String fileName) throws IOException, FileNotFoundException {
+    private IFile saveImage(String username, IFile file, IDocument document,
+            String dirFolder, BufferedImage image, String fileName)
+            throws IOException, FileNotFoundException {
         String filePath = dirFolder + File.separator + fileName;
         File fileObject = new File(filePath);
         OutputStream output = new FileOutputStream(fileObject);
@@ -267,7 +288,8 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
         }
 
         IFile imageFile = file.clone();
-        String docFoler = storageManager.getFileFolderPath(username, file.getUploadId(), file.getDocumentId());
+        String docFoler = storageManager.getFileFolderPath(username,
+                file.getUploadId(), file.getDocumentId());
         imageFile.setFilepath(docFoler + File.separator + fileName);
         imageFile.setFilename(fileName);
         imageFile.setId(filesDbClient.generateId());
@@ -297,6 +319,5 @@ public class PdfFileHandler extends AbstractFileHandler implements IFileTypeHand
     protected IFileStorageManager getStorageManager() {
         return pdfStorageManager;
     }
-
 
 }
