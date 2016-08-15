@@ -82,7 +82,7 @@
 	</div>
 	
 	<div class="form-group">
-		<label for="pdfToImageType">Type of Extracted Images from PDF</label> ${systemConfigPage.pdfToImageType}
+		<label for="pdfToImageType">Type of Extracted Images from PDF</label> 
 		<form:select
 			class="form-control" id="pdfToImageType" items="${imageTypeOptions}"
 			path="pdfToImageType" >
@@ -90,6 +90,15 @@
 		<small><form:errors class="error" path="pdfToImageType"></form:errors></small>
 		<p></p>
 	</div>
+	
+	<div class="form-group">
+		<label for="pdfToImageFormat">Image Format of extracted Images</label>
+		<form:input
+			type="text" class="form-control" id="pdfToImageFormat"
+			placehodler="Image format" path="pdfToImageFormat" value="${pdfToImageFormat}"></form:input>
+		<small><form:errors class="error" path="pdfToImageFormat"></form:errors></small>
+	</div>
+	
 
 <div class="page-header">
 	<h3>Tesseract Integration</h3>

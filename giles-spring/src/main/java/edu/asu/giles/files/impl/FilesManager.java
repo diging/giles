@@ -9,7 +9,6 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +26,7 @@ import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
 import edu.asu.giles.service.IFileHandlerRegistry;
 import edu.asu.giles.service.IFileTypeHandler;
+import edu.asu.giles.service.properties.IPropertiesManager;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -34,8 +34,8 @@ public class FilesManager implements IFilesManager {
 
     private Logger logger = LoggerFactory.getLogger(FilesManager.class);
 
-    @Value("${default_page_size}")
-    private Integer defaultPageSize;
+    @Autowired
+    private IPropertiesManager propertyManager;
 
     @Autowired
     private IFilesDatabaseClient databaseClient;
@@ -198,6 +198,7 @@ public class FilesManager implements IFilesManager {
 
     @Override
     public List<IUpload> getUploadsOfUser(String username, int page, int pageSize, String sortBy, int sortDirection) {
+        int defaultPageSize = new Integer(propertyManager.getProperty(IPropertiesManager.DEFAULT_PAGE_SIZE));
         if (pageSize == -1) {
             pageSize = defaultPageSize;
         }
@@ -220,6 +221,7 @@ public class FilesManager implements IFilesManager {
     
     @Override
     public int getUploadsOfUserPageCount(String username) {
+        int defaultPageSize = new Integer(propertyManager.getProperty(IPropertiesManager.DEFAULT_PAGE_SIZE));
         int totalUploads = getUploadsOfUserCount(username);
         return (int) Math.ceil(new Double(totalUploads) / new Double(defaultPageSize));
     }

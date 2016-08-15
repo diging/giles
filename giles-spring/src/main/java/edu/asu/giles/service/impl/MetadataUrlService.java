@@ -1,11 +1,12 @@
 package edu.asu.giles.service.impl;
 
-import org.springframework.beans.factory.annotation.Value;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.service.IMetadataUrlService;
+import edu.asu.giles.service.properties.IPropertiesManager;
 
 /**
  * Class that generate callback urls to Jars (or potentially any other
@@ -22,21 +23,15 @@ import edu.asu.giles.service.IMetadataUrlService;
 @Service
 public class MetadataUrlService implements IMetadataUrlService {
     
-    @Value("${jars_url}")
-    private String jarsUrl;
-    
-    @Value("${jars_file_url}")
-    private String jarsFileUrl;
-    
-    @Value("${giles_url}")
-    private String gilesUrl;
+    @Autowired
+    private IPropertiesManager propertyManager;
     
     /* (non-Javadoc)
      * @see edu.asu.giles.service.impl.IMetadataUrlService#getUploadCallback()
      */
     @Override
     public String getUploadCallback() {
-        return jarsUrl;
+        return propertyManager.getProperty(IPropertiesManager.JARS_URL);
     }
     
     /* (non-Javadoc)
@@ -44,6 +39,10 @@ public class MetadataUrlService implements IMetadataUrlService {
      */
     @Override
     public String getFileLink(IFile file) {
+        String jarsUrl = propertyManager.getProperty(IPropertiesManager.JARS_URL);
+        String jarsFileUrl = propertyManager.getProperty(IPropertiesManager.JARS_FILE_URL);
+        String gilesUrl = propertyManager.getProperty(IPropertiesManager.GILES_URL);
+        
         return jarsUrl + jarsFileUrl.replace("{giles}", gilesUrl).replace("{fileId}", file.getId());
     }
 }

@@ -3,7 +3,6 @@ package edu.asu.giles.config;
 import javax.sql.DataSource;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
@@ -20,6 +19,7 @@ import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.github.connect.GitHubConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
+import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.users.IUserManager;
 
 @Configuration
@@ -32,16 +32,15 @@ public class SocialContext implements SocialConfigurer {
 
     @Autowired
     private IUserManager userManager;
-
-    @Value("${github_client_id}")
-    private String githubClientId;
-
-    @Value("${github_secret}")
-    private String githubSecret;
+    
+    @Autowired
+    private IPropertiesManager propertyManager;
 
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig,
             Environment env) {
+        String githubClientId = propertyManager.getProperty(IPropertiesManager.GITHUB_CLIENT_ID);
+        String githubSecret = propertyManager.getProperty(IPropertiesManager.GITHUB_SECRET);
         cfConfig.addConnectionFactory(new GitHubConnectionFactory(
                 githubClientId, githubSecret));
     }

@@ -73,7 +73,8 @@ public class EditPropertiesController {
         page.setPdfToImageDpi(propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_DPI));
         page.setPdfToImageType(propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_TYPE));
         page.setTesseractBinFolder(propertyManager.getProperty(IPropertiesManager.TESSERACT_BIN_FOLDER));
-        page.setTesseractDataFolder(propertyManager.getProperty(IPropertiesManager.TESSERACT_DATA_FOLDER));    
+        page.setTesseractDataFolder(propertyManager.getProperty(IPropertiesManager.TESSERACT_DATA_FOLDER));
+        page.setPdfToImageFormat(propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_FORMAT));
         
         List<String> imageTypes = new ArrayList<String>();
         imageTypes.add(ImageType.ARGB.toString());
@@ -109,6 +110,7 @@ public class EditPropertiesController {
         propertiesMap.put(IPropertiesManager.OCR_IMAGES_FROM_PDFS, new Boolean(systemConfigPage.isOcrImagesFromPdfs()).toString());
         propertiesMap.put(IPropertiesManager.JARS_URL, systemConfigPage.getJarsUrl());
         propertiesMap.put(IPropertiesManager.JARS_FILE_URL, systemConfigPage.getJarsFileUrl());
+        propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_FORMAT, systemConfigPage.getPdfToImageFormat());
         
         try {
             propertyManager.updateProperties(propertiesMap);

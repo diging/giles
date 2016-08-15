@@ -8,6 +8,7 @@ public class SystemConfigPage {
     private String gilesUrl;
     private String pdfToImageDpi;
     private String pdfToImageType;
+    private String pdfToImageFormat;
     private boolean pdfExtractText;
     private String jarsUrl;
     private String jarsFileUrl;
@@ -93,5 +94,11 @@ public class SystemConfigPage {
     }
     public void setDefaultPageSize(int defaultPageSize) {
         this.defaultPageSize = defaultPageSize;
+    }
+    public String getPdfToImageFormat() {
+        return pdfToImageFormat;
+    }
+    public void setPdfToImageFormat(String pdfToImageFormat) {
+        this.pdfToImageFormat = pdfToImageFormat;
     }
 }

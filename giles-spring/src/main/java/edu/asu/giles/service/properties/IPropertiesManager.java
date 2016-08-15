@@ -13,12 +13,16 @@ public interface IPropertiesManager {
     public final static String PDF_TO_IMAGE_DPI = "pdf_to_image_dpi";
     public final static String PDF_TO_IMAGE_TYPE = "pdf_to_image_type";
     public final static String PDF_EXTRACT_TEXT = "pdf_extract_text";
+    public final static String PDF_TO_IMAGE_FORMAT = "pdf_to_image_format";
     public final static String JARS_URL = "jars_url";
     public final static String JARS_FILE_URL = "jars_file_url";
-    public final static String TESSERACT_BIN_FOLDER = "tesseract_bin_foler";
+    public final static String TESSERACT_BIN_FOLDER = "tesseract_bin_folder";
     public final static String TESSERACT_DATA_FOLDER = "tesseract_data_folder";
     public final static String DEFAULT_PAGE_SIZE = "default_page_size";
     public final static String OCR_IMAGES_FROM_PDFS = "ocr_images_from_pdfs";
+    public final static String GILES_DIGILIB_ENDPOINT = "giles_digilib_endpoint";
+    public final static String GILES_FILE_ENDPOINT = "giles_file_endpoint";
+    public final static String GILES_FILE_CONTENT_SUFFIX = "giles_file_content_suffix";
  
 
     public abstract void setProperty(String key, String value) throws GilesPropertiesStorageException;
