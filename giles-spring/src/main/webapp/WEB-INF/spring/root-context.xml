@@ -34,6 +34,12 @@
 		<property name="baseDirectory" value="${textBaseDir}" />
 	</bean>
 	
+	<bean id="messageSource"
+		class="org.springframework.context.support.ReloadableResourceBundleMessageSource">
+		<property name="basename" value="classpath:locale/messages" />
+		<property name="fallbackToSystemLocale" value="false" />
+	</bean>
+	
 	<aop:aspectj-autoproxy proxy-target-class="true" />
 	
 </beans>

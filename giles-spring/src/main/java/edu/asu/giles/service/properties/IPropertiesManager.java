@@ -13,7 +13,7 @@ public interface IPropertiesManager {
     public final static String PDF_TO_IMAGE_DPI = "pdf_to_image_dpi";
     public final static String PDF_TO_IMAGE_TYPE = "pdf_to_image_type";
     public final static String PDF_EXTRACT_TEXT = "pdf_extract_text";
-    public final static String JAR_URL = "jars_url";
+    public final static String JARS_URL = "jars_url";
     public final static String JARS_FILE_URL = "jars_file_url";
     public final static String TESSERACT_BIN_FOLDER = "tesseract_bin_foler";
     public final static String TESSERACT_DATA_FOLDER = "tesseract_data_folder";
