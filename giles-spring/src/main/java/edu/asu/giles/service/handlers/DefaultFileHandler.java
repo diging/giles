@@ -21,6 +21,7 @@ import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
+import edu.asu.giles.service.properties.IPropertiesManager;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -32,12 +33,8 @@ public class DefaultFileHandler extends AbstractFileHandler implements IFileType
     @Qualifier("fileStorageManager")
     private IFileStorageManager storageManager;
     
-    @Value("${giles_url}")
-    private String gilesUrl;
-    
-    @Value("${giles_digilib_endpoint}")
-    private String gilesDigilibEndpoint;
-
+    @Autowired
+    private IPropertiesManager propertyManager;
     
     @Autowired
     private IFilesDatabaseClient databaseClient;
@@ -66,6 +63,8 @@ public class DefaultFileHandler extends AbstractFileHandler implements IFileType
     @Override
     public String getFileUrl(IFile file) {
         String relativePath = getRelativePathOfFile(file);
+        String gilesUrl = propertyManager.getProperty(IPropertiesManager.GILES_URL);
+        String gilesDigilibEndpoint = propertyManager.getProperty(IPropertiesManager.GILES_DIGILIB_ENDPOINT);
         
         try {
             return gilesUrl + gilesDigilibEndpoint + "?fn=" + URLEncoder.encode(relativePath, "UTF-8");

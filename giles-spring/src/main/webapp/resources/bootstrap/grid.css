@@ -59,5 +59,8 @@ a.appName:hover {
 	.pagination>.active>span, .pagination>.active>span:focus, .pagination>.active>span:hover
 	{
 	z-index: 0;
-}
+	}
+
+.error {
+	color: darkred;
 }

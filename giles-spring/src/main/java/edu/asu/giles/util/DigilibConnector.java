@@ -12,22 +12,24 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Service;
 
-@PropertySource("classpath:/config.properties")
+import edu.asu.giles.service.properties.IPropertiesManager;
+
 @Service
 public class DigilibConnector {
 
     private Logger logger = LoggerFactory.getLogger(DigilibConnector.class);
 
-    @Value("${digilib_scaler_url}")
-    private String digilibUrl;
+    @Autowired
+    private IPropertiesManager propertyManager;
 
     public Map<String, List<String>> getDigilibImage(String parameters,
             HttpServletResponse response) throws IOException {
+        String digilibUrl = propertyManager.getProperty(IPropertiesManager.DIGILIB_SCALER_URL);
+        
         URL url = new URL(digilibUrl + "?" + parameters);
         logger.debug("Getting: " + url.toString());
 

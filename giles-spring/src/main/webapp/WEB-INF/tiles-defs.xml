@@ -53,6 +53,11 @@
 		<put-attribute name="content" value="/WEB-INF/views/users/users.jsp" />
 	</definition>
 	
+	<!--  admin -->
+	<definition name="admin/system/config" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/system_config.jsp" />
+	</definition>
+	
 	<!--  user errors -->
 	<definition name="error/noSuchRole" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/error/noSuchRole.jsp" />

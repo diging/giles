@@ -38,6 +38,7 @@ import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
 import edu.asu.giles.service.ocr.IOCRService;
+import edu.asu.giles.service.properties.IPropertiesManager;
 
 @PropertySource("classpath:/config.properties")
 @Service
@@ -46,30 +47,6 @@ public class PdfFileHandler extends AbstractFileHandler implements
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
     private final String TRUE = "true";
-
-    @Value("${pdf_to_image_dpi}")
-    private String dpi;
-
-    @Value("${pdf_to_image_type}")
-    private String type;
-
-    @Value("${pdf_to_image_format}")
-    private String format;
-
-    @Value("${giles_url}")
-    private String gilesUrl;
-
-    @Value("${giles_file_endpoint}")
-    private String pdfEndpoint;
-
-    @Value("${giles_file_content_suffix}")
-    private String contentSuffix;
-
-    @Value("${pdf_extract_text}")
-    private String extractText;
-
-    @Value("${ocr_images_from_pdfs}")
-    private String doOcrOnImages;
 
     @Autowired
     @Qualifier("fileStorageManager")
@@ -88,15 +65,9 @@ public class PdfFileHandler extends AbstractFileHandler implements
 
     @Autowired
     private IOCRService ocrService;
-
-    @PostConstruct
-    public void init() {
-        dpi = dpi.trim();
-        type = type.trim();
-        format = format.trim();
-        extractText = extractText.trim();
-        doOcrOnImages = doOcrOnImages.trim();
-    }
+    
+    @Autowired
+    private IPropertiesManager propertyManager;
 
     @Override
     public List<String> getHandledFileTypes() {
@@ -108,6 +79,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
     @Override
     public boolean processFile(String username, IFile file, IDocument document,
             IUpload upload, byte[] content) throws GilesFileStorageException {
+        String dpi = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_DPI).trim();
+        String type = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_TYPE).trim();
+        String format = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_FORMAT).trim();
+        String doOcrOnImages = propertyManager.getProperty(IPropertiesManager.OCR_IMAGES_FROM_PDFS).trim();
+        String extractText = propertyManager.getProperty(IPropertiesManager.PDF_EXTRACT_TEXT).trim();
+        
         PDDocument pdfDocument;
         try {
             pdfDocument = PDDocument.load(content);
@@ -278,6 +255,10 @@ public class PdfFileHandler extends AbstractFileHandler implements
     private IFile saveImage(String username, IFile file, IDocument document,
             String dirFolder, BufferedImage image, String fileName)
             throws IOException, FileNotFoundException {
+        String dpi = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_DPI).trim();
+        String type = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_TYPE).trim();
+        String format = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_FORMAT).trim();
+        
         String filePath = dirFolder + File.separator + fileName;
         File fileObject = new File(filePath);
         OutputStream output = new FileOutputStream(fileObject);
@@ -312,6 +293,10 @@ public class PdfFileHandler extends AbstractFileHandler implements
 
     @Override
     public String getFileUrl(IFile file) {
+        String gilesUrl = propertyManager.getProperty(IPropertiesManager.GILES_URL).trim();
+        String pdfEndpoint = propertyManager.getProperty(IPropertiesManager.GILES_FILE_ENDPOINT).trim();
+        String contentSuffix = propertyManager.getProperty(IPropertiesManager.GILES_FILE_CONTENT_SUFFIX).trim();
+        
         return gilesUrl + pdfEndpoint + file.getId() + contentSuffix;
     }
 

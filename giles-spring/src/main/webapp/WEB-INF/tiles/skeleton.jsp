@@ -73,6 +73,9 @@
           	<li role="presentation">
           		<a href="<c:url value="/users" />" >Users</a>
           	</li>
+          	<li role="presentation">
+          		<a href="<c:url value="/admin/system/config" />" >System Config</a>
+          	</li>
           </sec:authorize>
           <sec:authorize access="isAuthenticated()">
          	 <li role="presentation">
