@@ -98,8 +98,14 @@ public class EditPropertiesController {
         }
         
         Map<String, String> propertiesMap = new HashMap<String, String>();
-        propertiesMap.put(IPropertiesManager.GITHUB_CLIENT_ID, systemConfigPage.getGithubClientId());
-        propertiesMap.put(IPropertiesManager.GITHUB_SECRET, systemConfigPage.getGithubSecret());
+        // if new client id has been updated, property needs to be updated
+        if (!systemConfigPage.getGithubClientId().endsWith("*")) {
+            propertiesMap.put(IPropertiesManager.GITHUB_CLIENT_ID, systemConfigPage.getGithubClientId());
+        }
+        // if github secret has been updated, update property
+        if (!systemConfigPage.getGithubSecret().endsWith("*")) {
+            propertiesMap.put(IPropertiesManager.GITHUB_SECRET, systemConfigPage.getGithubSecret());
+        }
         propertiesMap.put(IPropertiesManager.DIGILIB_SCALER_URL, systemConfigPage.getDigilibScalerUrl());
         propertiesMap.put(IPropertiesManager.GILES_URL, systemConfigPage.getGilesUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_DPI, systemConfigPage.getPdfToImageDpi());
