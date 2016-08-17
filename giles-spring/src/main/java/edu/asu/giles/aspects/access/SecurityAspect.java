@@ -37,6 +37,10 @@ public class SecurityAspect {
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private GitHubTemplateFactory templateFactory;
+    
 
     @Around("within(edu.asu.giles.web..*) && @annotation(noCheck)")
     public Object doNotCheckUserAccess(ProceedingJoinPoint joinPoint,
@@ -142,7 +146,7 @@ public class SecurityAspect {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        GitHubTemplate template = new GitHubTemplate(token);
+        GitHubTemplate template = templateFactory.createTemplate(token);
         GitHubUserProfile profile = template.userOperations().getUserProfile();
         User foundUser = userManager.findUser(profile.getUsername());
         logger.debug("Authorizing: " + profile.getUsername());
