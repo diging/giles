@@ -148,8 +148,8 @@ public class SecurityAspect {
 
         GitHubTemplate template = templateFactory.createTemplate(token);
         GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = userManager.findUser(profile.getUsername());
-        logger.debug("Authorizing: " + profile.getUsername());
+        User foundUser = userManager.findUser(profile.getLogin());
+        logger.debug("Authorizing: " + profile.getLogin());
 
         if (foundUser == null) {
             return new ResponseEntity<>(
@@ -164,6 +164,17 @@ public class SecurityAspect {
 
         fillUser(foundUser, user);
 
+        return joinPoint.proceed();
+    }
+    
+    @Around("within(edu.asu.giles.web..*) && @annotation(check)")
+    public Object checkAccount(ProceedingJoinPoint joinPoint, AccountCheck check) throws Throwable {
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
+        User user = (User) auth.getPrincipal();
+        if (user.getAccountStatus() != AccountStatus.APPROVED) {
+            return "forbidden";
+        }
         return joinPoint.proceed();
     }
 

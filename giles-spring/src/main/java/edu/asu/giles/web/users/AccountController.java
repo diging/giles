@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import edu.asu.giles.users.GilesRole;
 import edu.asu.giles.users.IUserManager;
@@ -50,6 +51,16 @@ public class AccountController {
         }
         
         userManager.removeRoleFromUser(username, gilesRole);
+        return "redirect:/users";
+    }
+    
+    @RequestMapping(value = "/users/user/{username}/remove", method = RequestMethod.POST)
+    public String deleteUser(@PathVariable String username, RedirectAttributes redirectAttrs) {
+        userManager.deleteUser(username);
+        
+        redirectAttrs.addFlashAttribute("show_alert", true);
+        redirectAttrs.addFlashAttribute("alert_type", "info");
+        redirectAttrs.addFlashAttribute("alert_msg", "User successfully deleted.");
         return "redirect:/users";
     }
 }

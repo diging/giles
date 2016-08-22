@@ -9,6 +9,7 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
+import org.mockito.AdditionalMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -21,6 +22,10 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.social.github.api.GitHubUserProfile;
 import org.springframework.social.github.api.UserOperations;
 import org.springframework.social.github.api.impl.GitHubTemplate;
+import org.springframework.web.client.RestClientException;
+import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
+
+import com.google.common.net.HttpHeaders;
 
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
@@ -47,11 +52,17 @@ public class SecurityAspectTest {
     
     @Mock private GitHubTemplate template;
     
+    @Mock private GitHubTemplate unauthorizedTemplate;
+    
     @Mock private UserOperations userOperations;
     
+    @Mock private HttpServletRequest request;
     
     @InjectMocks
     private SecurityAspect aspectToTest;
+    
+    private final String ACCESS_TOKEN = "ACCESS_TOKEN";
+    private final String INVALID_ACCESS_TOKEN = "INVALID_ACCESS_TOKEN";
     
     
     @Before
@@ -154,7 +165,7 @@ public class SecurityAspectTest {
         setUpGitHubMocking("test");
         
         User user = new User();
-        prepareMethodCalls("123", "token", user);
+        prepareMethodCalls(ACCESS_TOKEN, "token", user);
         GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
         
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
@@ -165,11 +176,54 @@ public class SecurityAspectTest {
     }
     
     @Test
+    public void test_checkUserAccess_tokenInHeader_success() throws Throwable {
+        Mockito.when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("token " + ACCESS_TOKEN);
+        setUpGitHubMocking("test");
+        
+        User user = new User();
+        prepareMethodCalls("", "token", user);
+        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        
+        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
+        
+        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Assert.assertEquals("proceed", returnObj);
+        Assert.assertEquals("test", user.getUsername());
+    }
+    
+    @Test(expected=RestClientException.class)
+    public void test_checkUserAccess_invalidToken() throws Throwable {
+        setUpGitHubMocking("test");
+        
+        User user = new User();
+        prepareMethodCalls(INVALID_ACCESS_TOKEN, "token", user);
+        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        
+        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
+        
+        aspectToTest.checkUserAccess(joinPoint, check);
+    }
+    
+    @Test(expected=RestClientException.class)
+    public void test_checkUserAccess_tokenInHeader_invalidToken() throws Throwable {
+        Mockito.when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("token " + INVALID_ACCESS_TOKEN);
+        setUpGitHubMocking("test");
+        
+        User user = new User();
+        prepareMethodCalls("", "token", user);
+        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        
+        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
+        
+        aspectToTest.checkUserAccess(joinPoint, check);
+    }
+    
+    @Test
     public void test_checkUserAccess_added() throws Throwable {
         setUpGitHubMocking("test2");
         
         User user = new User();
-        prepareMethodCalls("123", "token", user);
+        prepareMethodCalls(ACCESS_TOKEN, "token", user);
         GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
@@ -182,7 +236,7 @@ public class SecurityAspectTest {
         setUpGitHubMocking("test3");
         
         User user = new User();
-        prepareMethodCalls("123", "token", user);
+        prepareMethodCalls(ACCESS_TOKEN, "token", user);
         GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
@@ -195,7 +249,7 @@ public class SecurityAspectTest {
         setUpGitHubMocking("test4");
         
         User user = new User();
-        prepareMethodCalls("123", "token", user);
+        prepareMethodCalls(ACCESS_TOKEN, "token", user);
         GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
@@ -218,29 +272,34 @@ public class SecurityAspectTest {
     }
 
     private void setUpGitHubMocking(String username) {
-        Mockito.when(templateFactory.createTemplate("123")).thenReturn(template);
+        Mockito.when(templateFactory.createTemplate(ACCESS_TOKEN)).thenReturn(template);
+        Mockito.when(templateFactory.createTemplate(AdditionalMatchers.not(Mockito.eq(ACCESS_TOKEN)))).thenReturn(unauthorizedTemplate);
         Mockito.when(template.userOperations()).thenReturn(userOperations);
         Mockito.when(userOperations.getUserProfile()).thenReturn(profile);
-        Mockito.when(profile.getUsername()).thenReturn(username);
+        Mockito.when(unauthorizedTemplate.userOperations()).thenThrow(new RestClientException(HttpStatus.UNAUTHORIZED.toString()));
+        Mockito.when(profile.getLogin()).thenReturn(username);
     }
     
     private void prepareMethodCalls(String paraValue, String paraName, User user) {
         
-        Object[] args = new Object[2];
+        Object[] args = new Object[3];
         args[0] = paraValue;
         args[1] = user;
+        args[2] = request;
         
         Mockito.when(joinPoint.getArgs()).thenReturn(args);
         Mockito.when(joinPoint.getSignature()).thenReturn(sig);
         
-        String[] argNames = new String[2];
+        String[] argNames = new String[3];
         argNames[0] = paraName;
         argNames[1] = "user";
+        argNames[2] = "request";
         Mockito.when(sig.getParameterNames()).thenReturn(argNames);
         
-        Class<?>[] paraTypes = new Class<?>[2];
+        Class<?>[] paraTypes = new Class<?>[3];
         paraTypes[0] = String.class;
         paraTypes[1] = User.class;
+        paraTypes[2] = StandardMultipartHttpServletRequest.class;
         Mockito.when(sig.getParameterTypes()).thenReturn(paraTypes);
     }
     

@@ -19,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.giles.aspects.access.AccountCheck;
 import edu.asu.giles.aspects.access.FileAccessCheck;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.exceptions.GilesMappingException;
@@ -43,7 +44,7 @@ public class ViewImageController {
     @Autowired
     private IMetadataUrlService metadataService;
     
-
+    @AccountCheck
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}/img")
     public ResponseEntity<String> viewImage(
@@ -91,6 +92,7 @@ public class ViewImageController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
+    @AccountCheck
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}")
     public String showImagePage(Model model,

@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import edu.asu.giles.aspects.access.AccountCheck;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
@@ -30,6 +31,7 @@ public class ListUploadsController {
     @Autowired
     private IFilesManager filesManager;
     
+    @AccountCheck
     @RequestMapping(value = "/uploads", method = RequestMethod.GET)
     public String showUploads(Principal principal, Model model, @RequestParam(defaultValue = "1") String page, @RequestParam(defaultValue = IUploadDatabaseClient.DESCENDING + "") String sortDir) throws GilesMappingException {
         String username = null;
