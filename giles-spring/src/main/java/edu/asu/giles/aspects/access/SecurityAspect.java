@@ -166,6 +166,17 @@ public class SecurityAspect {
 
         return joinPoint.proceed();
     }
+    
+    @Around("within(edu.asu.giles.web..*) && @annotation(check)")
+    public Object checkAccount(ProceedingJoinPoint joinPoint, AccountCheck check) throws Throwable {
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
+        User user = (User) auth.getPrincipal();
+        if (user.getAccountStatus() != AccountStatus.APPROVED) {
+            return "forbidden";
+        }
+        return joinPoint.proceed();
+    }
 
     private void fillUser(User filled, User toBeFilled) {
         toBeFilled.setAdmin(filled.getIsAdmin());

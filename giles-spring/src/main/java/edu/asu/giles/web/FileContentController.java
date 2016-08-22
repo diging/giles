@@ -15,8 +15,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.giles.aspects.access.AccountCheck;
 import edu.asu.giles.aspects.access.FileAccessCheck;
-import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.files.IFilesManager;
 
@@ -28,6 +28,7 @@ public class FileContentController {
     @Autowired
     private IFilesManager filesManager;
 
+    @AccountCheck
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}/content")
     public ResponseEntity<String> getFile(
