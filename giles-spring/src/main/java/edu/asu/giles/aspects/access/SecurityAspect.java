@@ -148,8 +148,8 @@ public class SecurityAspect {
 
         GitHubTemplate template = templateFactory.createTemplate(token);
         GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = userManager.findUser(profile.getUsername());
-        logger.debug("Authorizing: " + profile.getUsername());
+        User foundUser = userManager.findUser(profile.getLogin());
+        logger.debug("Authorizing: " + profile.getLogin());
 
         if (foundUser == null) {
             return new ResponseEntity<>(

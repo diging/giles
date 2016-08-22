@@ -277,7 +277,7 @@ public class SecurityAspectTest {
         Mockito.when(template.userOperations()).thenReturn(userOperations);
         Mockito.when(userOperations.getUserProfile()).thenReturn(profile);
         Mockito.when(unauthorizedTemplate.userOperations()).thenThrow(new RestClientException(HttpStatus.UNAUTHORIZED.toString()));
-        Mockito.when(profile.getUsername()).thenReturn(username);
+        Mockito.when(profile.getLogin()).thenReturn(username);
     }
     
     private void prepareMethodCalls(String paraValue, String paraName, User user) {
