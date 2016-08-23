@@ -16,6 +16,7 @@ import org.slf4j.Logger;
 import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 
+import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.core.impl.Upload;
@@ -30,8 +31,10 @@ public class DocumentDatabaseClientTest {
     @Mock private DatabaseManager databaseManager;
     
     @Mock private ObjectSet<Object> objectSetForDoc1;
+    @Mock private ObjectSet<Object> objectSetEmpty;
     
     @Mock private Iterator<Object> mockedIterator;
+    @Mock private Iterator<Object> mockedIteratorEmpty;
     
     @InjectMocks private DocumentDatabaseClient docDatabaseClientToTest;
     
@@ -47,6 +50,7 @@ public class DocumentDatabaseClientTest {
         IDocument doc1 = new Document();
         doc1.setId(DOC1_ID);
         doc1.setUploadId(UPLOAD1_ID);
+        doc1.setDocumentType(DocumentType.MULTI_PAGE);
         
         Mockito.when(objectSetForDoc1.size()).thenReturn(1);
         Mockito.when(objectSetForDoc1.get(0)).thenReturn(doc1);
@@ -54,6 +58,9 @@ public class DocumentDatabaseClientTest {
         Mockito.when(mockedIterator.hasNext()).thenReturn(true, false);
         Mockito.when(mockedIterator.next()).thenReturn(doc1);
         
+        Mockito.when(objectSetEmpty.size()).thenReturn(0);
+        Mockito.when(objectSetEmpty.iterator()).thenReturn(mockedIteratorEmpty);
+        Mockito.when(mockedIteratorEmpty.hasNext()).thenReturn(false);
     }
     
     @Test
@@ -84,6 +91,29 @@ public class DocumentDatabaseClientTest {
         List<IDocument> doc = docDatabaseClientToTest.getDocumentByUploadId(UPLOAD1_ID);
         Assert.assertEquals(1, doc.size());
         Assert.assertEquals(UPLOAD1_ID, doc.get(0).getUploadId());
+    }
+    
+    @Test
+    public void test_getDocumentByExample_success() {
+        IDocument doc = new Document();
+        doc.setDocumentType(DocumentType.MULTI_PAGE);
+        
+        Mockito.when(container.queryByExample(doc)).thenReturn(objectSetForDoc1);
+        
+        List<IDocument> docs = docDatabaseClientToTest.getDocumentByExample(doc);
+        Assert.assertEquals(1, docs.size());
+        Assert.assertEquals(docs.get(0).getDocumentType(), DocumentType.MULTI_PAGE);
+    }
+    
+    @Test
+    public void test_getDocumentByExample_noResults() {
+        IDocument doc = new Document();
+        doc.setDocumentType(DocumentType.MULTI_PAGE);
+        
+        Mockito.when(container.queryByExample(doc)).thenReturn(objectSetEmpty);
+        
+        List<IDocument> docs = docDatabaseClientToTest.getDocumentByExample(doc);
+        Assert.assertEquals(0, docs.size());
     }
     
     class DocumentIdArgumentMatcher extends ArgumentMatcher<Document> {
