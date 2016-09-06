@@ -20,6 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.giles.aspects.access.AccountCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.files.IFilesManager;
@@ -39,11 +40,13 @@ public class UploadController {
     @Autowired
     private FileUploadHelper uploadHelper;
 
+    @AccountCheck
     @RequestMapping(value = "/files/upload", method = RequestMethod.GET)
     public String showUploadPage(Principal principal, Model model) {
         return "files/upload";
     }
 
+    @AccountCheck
     @RequestMapping(value = "/files/upload", method = RequestMethod.POST)
     public ResponseEntity<String> uploadFiles(Principal principal,
             @RequestParam("file") MultipartFile[] files,

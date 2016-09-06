@@ -3,14 +3,14 @@
 
 <h3>Upload #${upload.id}</h3>
 
-<p>The following files were uploaded as part of this upload on ${upload.createdDate}:</p>
+<p>The following files were uploaded as part of this upload on <span class="date">${upload.createdDate}</span>:</p>
 
 <div class="list-group">
 <c:forEach items="${docs}" var="doc">
   <div class="list-group-item clearfix">
   <div class="pull-left">
     <h4 class="list-group-item-heading">Document #${doc.documentId}</h4>
-    <p class="list-group-item-text">Uploaded on ${doc.createdDate}.</p>
+    <p class="list-group-item-text">Uploaded on <span class="date">${doc.createdDate}</span>.</p>
     <ul style="list-style-type:none;">
     	<c:forEach items="${doc.files}" var="file">
     		<li><i class="fa fa-picture-o" aria-hidden="true"></i>
@@ -20,12 +20,25 @@
     		</li>
     	</c:forEach>
     </ul>
+    
+    <c:if test="${not empty doc.textFiles}">
+    The following text files were extracted from the file you uploaded:
+    <ul style="list-style-type:none;">
+    	<c:forEach items="${doc.textFiles}" var="file">
+    		<li><i class="fa fa-picture-o" aria-hidden="true"></i>
+    		 <a href="<c:url value="/files/${file.id}" />" >${file.filename}</a>
+    		 | <a href="${file.metadataLink}"><i class="fa fa-globe" aria-hidden="true"></i> view metadata
+    		</a>
+    		</li>
+    	</c:forEach>
+    </ul>
+    </c:if>
      
     </div>
-    <c:if test="${not empty doc.files}">
+    <c:if test="${not empty doc.firstImage}">
     <div class="pull-right">
-    <a href="<c:url value="/files/${doc.files[0].id}" />" >
-    <img src="<c:url value="/files/${doc.files[0].id}/img?dh=70" />" >
+    <a href="<c:url value="/files/${doc.firstImage.id}" />" >
+    <img src="<c:url value="/files/${doc.firstImage.id}/img?dh=70" />" >
     </a> 
     </div>
     </c:if>

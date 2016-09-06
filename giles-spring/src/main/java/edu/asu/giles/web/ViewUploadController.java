@@ -9,6 +9,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.giles.aspects.access.AccountCheck;
 import edu.asu.giles.aspects.access.UploadIdAccessCheck;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
@@ -30,6 +31,7 @@ public class ViewUploadController {
     @Autowired
     private IMetadataUrlService metadataService;
     
+    @AccountCheck
     @UploadIdAccessCheck
     @RequestMapping(value = "/uploads/{uploadId}")
     public String showUploadPage(@PathVariable("uploadId") String uploadId,
@@ -45,11 +47,20 @@ public class ViewUploadController {
             DocumentPageBean docBean = docMappingService.convertToT2(doc, new DocumentPageBean());
             mappedDocs.add(docBean);
             docBean.setFiles(new ArrayList<>());
+            docBean.setTextFiles(new ArrayList<>());
             
             for (IFile file : doc.getFiles()) {
                 FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
                 bean.setMetadataLink(metadataService.getFileLink(file));
                 docBean.getFiles().add(bean);
+            }
+            if (doc.getTextFileIds() != null) {
+                for (String fileId : doc.getTextFileIds()) {
+                    IFile file = filesManager.getFile(fileId);
+                    FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
+                    bean.setMetadataLink(metadataService.getFileLink(file));
+                    docBean.getTextFiles().add(bean);
+                }
             }
         }
         

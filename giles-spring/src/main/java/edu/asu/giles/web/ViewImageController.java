@@ -1,7 +1,9 @@
 package edu.asu.giles.web;
 
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
@@ -17,6 +19,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
+import edu.asu.giles.aspects.access.AccountCheck;
 import edu.asu.giles.aspects.access.FileAccessCheck;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.exceptions.GilesMappingException;
@@ -41,7 +44,7 @@ public class ViewImageController {
     @Autowired
     private IMetadataUrlService metadataService;
     
-
+    @AccountCheck
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}/img")
     public ResponseEntity<String> viewImage(
@@ -66,7 +69,12 @@ public class ViewImageController {
 
         IFile file = filesManager.getFile(fileId);
         parameterBuffer.append("fn=");
-        parameterBuffer.append(filesManager.getRelativePathOfFile(file));
+        try {
+            parameterBuffer.append(URLEncoder.encode(filesManager.getRelativePathOfFile(file), "UTF-8"));
+        } catch (UnsupportedEncodingException e1) {
+            logger.error("Could not encode path.", e1);
+            parameterBuffer.append(filesManager.getRelativePathOfFile(file));
+        }
 
         try {
             digilibConnector.getDigilibImage(parameterBuffer.toString(),
@@ -84,6 +92,7 @@ public class ViewImageController {
         return new ResponseEntity<String>(HttpStatus.OK);
     }
 
+    @AccountCheck
     @FileAccessCheck
     @RequestMapping(value = "/files/{fileId}")
     public String showImagePage(Model model,
@@ -94,6 +103,10 @@ public class ViewImageController {
         FilePageBean fileBean = fileMappingService.convertToT2(file, new FilePageBean());
         fileBean.setMetadataLink(metadataService.getFileLink(file));
         model.addAttribute("file", fileBean);
+        
+        if (file.getDerivedFrom() != null) {
+            model.addAttribute("derivedFrom", filesManager.getFile(file.getDerivedFrom()));
+        }
 
         return "files/file";
     }

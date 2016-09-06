@@ -16,6 +16,9 @@ public class DocumentPageBean {
     private transient List<IFile> files;
     private DocumentType documentType;
     private int pageCount;
+    private IFile firstImage;
+    private List<String> textFileIds;
+    private List<IFile> textFiles;
     
     public String getId() {
         return id;
@@ -70,6 +73,29 @@ public class DocumentPageBean {
     }
     public void setPageCount(int pageCount) {
         this.pageCount = pageCount;
+    }
+    public IFile getFirstImage() {
+        for (IFile file : files) {
+            if (file.getContentType().startsWith("image/")) {
+                return file;
+            }
+        }
+        return null;
+    }
+    public void setFirstImage(IFile firstImage) {
+        this.firstImage = firstImage;
+    }
+    public List<String> getTextFileIds() {
+        return textFileIds;
+    }
+    public void setTextFileIds(List<String> textFileIds) {
+        this.textFileIds = textFileIds;
+    }
+    public List<IFile> getTextFiles() {
+        return textFiles;
+    }
+    public void setTextFiles(List<IFile> textFiles) {
+        this.textFiles = textFiles;
     }
     
     

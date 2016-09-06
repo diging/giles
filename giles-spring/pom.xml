@@ -11,7 +11,7 @@
 		<org.springframework-version>4.3.1.RELEASE</org.springframework-version>
 		<spring-security-version>4.1.1.RELEASE</spring-security-version>
 		<spring-social.version>1.1.4.RELEASE</spring-social.version>
-		<spring-social-github.version>1.0.0.M4</spring-social-github.version>
+		<spring-social-github.version>1.0.0.BUILD-SNAPSHOT</spring-social-github.version>
 		<org.slf4j-version>1.7.5</org.slf4j-version>
 
 		<!-- application properties -->
@@ -28,9 +28,14 @@
 		<digilib.url></digilib.url>
 		<digilibBaseDir></digilibBaseDir>
 		<pdfBaseDir></pdfBaseDir>
+		<textBaseDir></textBaseDir>
 		<pdf.conversion.dpi>600</pdf.conversion.dpi>
 		<pdf.conversion.type>RGB</pdf.conversion.type>
 		<pdf.conversion.format>tiff</pdf.conversion.format>
+		<tesseract.bin></tesseract.bin>
+		<tesseract.data></tesseract.data>
+		<ocr.worker.count>2</ocr.worker.count>
+		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
@@ -38,6 +43,7 @@
 		<deploy.path.prod>giles</deploy.path.prod>
 		<pullrequest></pullrequest>
 		<buildNumber></buildNumber>
+		<log.level>debug</log.level>
 	</properties>
 
 	<dependencies>
@@ -153,11 +159,6 @@
 			<version>${spring-security-version}</version>
 		</dependency>
 		<dependency>
-			<groupId>commons-httpclient</groupId>
-			<artifactId>commons-httpclient</artifactId>
-			<version>3.1</version>
-		</dependency>
-		<dependency>
 			<groupId>org.apache.tiles</groupId>
 			<artifactId>tiles-template</artifactId>
 			<version>3.0.1</version>
@@ -182,6 +183,14 @@
 			<artifactId>tiles-jsp</artifactId>
 			<version>3.0.1</version>
 		</dependency>
+
+		<!-- https://mvnrepository.com/artifact/org.apache.httpcomponents/httpclient -->
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.2</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.springframework.social</groupId>
@@ -290,6 +299,28 @@
 			<version>1.3.1</version>
 		</dependency>
 
+		<!-- tessaract/tika -->
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-core</artifactId>
+			<version>1.13</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.tika</groupId>
+			<artifactId>tika-parsers</artifactId>
+			<version>1.13</version>
+		</dependency>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.8.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.mockito</groupId>
+			<artifactId>mockito-all</artifactId>
+			<version>1.8.5</version>
+		</dependency>
 	</dependencies>
 
 	<repositories>
@@ -323,6 +354,7 @@
 			<properties>
 				<admin.pw>${admin.password}</admin.pw>
 				<deploy.path>${deploy.path.prod}</deploy.path>
+				<log.level>info</log.level>
 			</properties>
 		</profile>
 	</profiles>

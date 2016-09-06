@@ -9,7 +9,7 @@
   	<th width="30%">Email</th>
   	<th></th>
   	<th width="10%">Status</th>
-  	<th width="5%"></th>
+  	<th width="10%"></th>
   </tr>
   
   <c:forEach items="${users}" var="user">
@@ -23,6 +23,10 @@
   	</td>
   	<td>${user.accountStatus}</td>
   	<td>
+  		<form class="pull-right" action="<c:url value="/users/user/${user.username}/remove" />" method="POST">
+  		<button style="padding: 0px;" class="btn-link" type="submit" title="Remove user account"><i class="fa fa-user-times" aria-hidden="true"></i></button>
+  		</form>
+  		
   		<c:if test="${user.accountStatus != 'APPROVED'}">
   		<form action="<c:url value="/users/user/${user.username}/approve" />" method="POST">
   		<button style="padding: 0px;" class="btn-link" type="submit" title="Approve user account"><i class="fa fa-thumbs-o-up" aria-hidden="true"></i></button>
@@ -39,6 +43,13 @@
   		<form class="pull-right" action="<c:url value="/users/user/${user.username}/role/add" />" method="POST">
   		<input type="hidden" name="role" value="ROLE_ADMIN" />
   		<button style="padding: 0px;" class="btn-link" type="submit" title="Make user admin"><i class="fa fa-key" aria-hidden="true"></i></button>
+  		</form>
+  		</c:if>
+  		
+  		<c:if test="${user.accountStatus == 'APPROVED' and user.roles.contains('ROLE_ADMIN')}">
+  		<form class="pull-right" action="<c:url value="/users/user/${user.username}/role/remove" />" method="POST">
+  		<input type="hidden" name="role" value="ROLE_ADMIN" />
+  		<button style="padding: 0px;" class="btn-link" type="submit" title="Revoke admin rights"><i class="fa fa-user" aria-hidden="true"></i></button>
   		</form>
   		</c:if>
   	</td>

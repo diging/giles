@@ -40,4 +40,8 @@ public interface IDocument {
 
     public abstract DocumentType getDocumentType();
 
+    public abstract void setTextFileIds(List<String> textFileIds);
+
+    public abstract List<String> getTextFileIds();
+
 }

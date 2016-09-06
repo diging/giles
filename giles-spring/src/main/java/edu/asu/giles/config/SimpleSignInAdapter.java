@@ -14,6 +14,7 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.SignInAdapter;
+import org.springframework.social.github.api.GitHubUserProfile;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import edu.asu.giles.users.AccountStatus;

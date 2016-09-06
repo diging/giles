@@ -9,6 +9,7 @@ import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
 import edu.asu.giles.core.DocumentAccess;
@@ -25,11 +26,16 @@ import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
 import edu.asu.giles.service.IFileHandlerRegistry;
 import edu.asu.giles.service.IFileTypeHandler;
+import edu.asu.giles.service.properties.IPropertiesManager;
 
+@PropertySource("classpath:/config.properties")
 @Service
 public class FilesManager implements IFilesManager {
 
     private Logger logger = LoggerFactory.getLogger(FilesManager.class);
+
+    @Autowired
+    private IPropertiesManager propertyManager;
 
     @Autowired
     private IFilesDatabaseClient databaseClient;
@@ -136,6 +142,7 @@ public class FilesManager implements IFilesManager {
         document.setAccess(access);
         document.setUploadId(uploadId);
         document.setFileIds(new ArrayList<>());
+        document.setTextFileIds(new ArrayList<>());
         document.setDocumentType(docType);
 
         return document;
@@ -190,8 +197,33 @@ public class FilesManager implements IFilesManager {
     }
 
     @Override
-    public List<IUpload> getUploadsOfUser(String username) {
-        return uploadDatabaseClient.getUploadsForUser(username);
+    public List<IUpload> getUploadsOfUser(String username, int page, int pageSize, String sortBy, int sortDirection) {
+        int defaultPageSize = new Integer(propertyManager.getProperty(IPropertiesManager.DEFAULT_PAGE_SIZE));
+        if (pageSize == -1) {
+            pageSize = defaultPageSize;
+        }
+        if (page < 1) {
+            page = 1;
+        }
+        int pageCount = getUploadsOfUserPageCount(username);
+        pageCount = pageCount > 0 ? pageCount : 1;
+        if (page > pageCount) {
+            page = pageCount;
+        }
+        return uploadDatabaseClient.getUploadsForUser(username, page, pageSize, sortBy, sortDirection);
+    }
+    
+    @Override
+    public int getUploadsOfUserCount(String username) {
+        List<IUpload> uploads = uploadDatabaseClient.getUploadsForUser(username);
+        return uploads.size();
+    }
+    
+    @Override
+    public int getUploadsOfUserPageCount(String username) {
+        int defaultPageSize = new Integer(propertyManager.getProperty(IPropertiesManager.DEFAULT_PAGE_SIZE));
+        int totalUploads = getUploadsOfUserCount(username);
+        return (int) Math.ceil(new Double(totalUploads) / new Double(defaultPageSize));
     }
 
     @Override
@@ -230,6 +262,15 @@ public class FilesManager implements IFilesManager {
         List<IFile> files = new ArrayList<>();
         fileIds.forEach(id -> files.add(getFile(id)));
 
+        return files;
+    }
+    
+    @Override
+    public List<IFile> getTextFilesOfDocument(IDocument doc) {
+        List<String> fileIds = doc.getTextFileIds();
+        
+        List<IFile> files = new ArrayList<>();
+        fileIds.forEach(id -> files.add(getFile(id)));
         return files;
     }
 
