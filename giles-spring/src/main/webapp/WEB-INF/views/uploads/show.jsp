@@ -10,6 +10,7 @@
   <div class="list-group-item clearfix">
   <div class="pull-left">
     <h4 class="list-group-item-heading">Document #${doc.documentId}</h4>
+    <a href="${doc.metadataUrl}"><i class="fa fa-globe" aria-hidden="true"></i> view metadata</a>
     <p class="list-group-item-text">Uploaded on <span class="date">${doc.createdDate}</span>.</p>
     <ul style="list-style-type:none;">
     	<c:forEach items="${doc.files}" var="file">

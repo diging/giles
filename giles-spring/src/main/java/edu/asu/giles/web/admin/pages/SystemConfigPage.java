@@ -12,6 +12,7 @@ public class SystemConfigPage {
     private boolean pdfExtractText;
     private String jarsUrl;
     private String jarsFileUrl;
+    private String metadataServiceDocUrl;
     private String tesseractBinFolder;
     private String tesseractDataFolder;
     private boolean ocrImagesFromPdfs;
@@ -100,5 +101,11 @@ public class SystemConfigPage {
     }
     public void setPdfToImageFormat(String pdfToImageFormat) {
         this.pdfToImageFormat = pdfToImageFormat;
+    }
+    public String getMetadataServiceDocUrl() {
+        return metadataServiceDocUrl;
+    }
+    public void setMetadataServiceDocUrl(String metadataServiceDocUrl) {
+        this.metadataServiceDocUrl = metadataServiceDocUrl;
     }
 }

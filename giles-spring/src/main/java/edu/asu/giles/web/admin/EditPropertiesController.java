@@ -57,6 +57,8 @@ public class EditPropertiesController {
         page.setGilesUrl(propertyManager.getProperty(IPropertiesManager.GILES_URL));
         page.setJarsFileUrl(propertyManager.getProperty(IPropertiesManager.JARS_FILE_URL));
         page.setJarsUrl(propertyManager.getProperty(IPropertiesManager.JARS_URL));
+        page.setMetadataServiceDocUrl(propertyManager.getProperty(IPropertiesManager.METADATA_SERVICE_DOC_ENDPOINT));
+        
         String ocrImagesFromPdf = propertyManager.getProperty(IPropertiesManager.OCR_IMAGES_FROM_PDFS);
         if (ocrImagesFromPdf != null) {
             page.setOcrImagesFromPdfs(ocrImagesFromPdf.equals("true"));
@@ -116,6 +118,7 @@ public class EditPropertiesController {
         propertiesMap.put(IPropertiesManager.OCR_IMAGES_FROM_PDFS, new Boolean(systemConfigPage.isOcrImagesFromPdfs()).toString());
         propertiesMap.put(IPropertiesManager.JARS_URL, systemConfigPage.getJarsUrl());
         propertiesMap.put(IPropertiesManager.JARS_FILE_URL, systemConfigPage.getJarsFileUrl());
+        propertiesMap.put(IPropertiesManager.METADATA_SERVICE_DOC_ENDPOINT, systemConfigPage.getMetadataServiceDocUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_FORMAT, systemConfigPage.getPdfToImageFormat());
         
         try {

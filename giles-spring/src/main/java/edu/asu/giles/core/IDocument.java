@@ -44,4 +44,8 @@ public interface IDocument {
 
     public abstract List<String> getTextFileIds();
 
+    public abstract void setUsername(String username);
+
+    public abstract String getUsername();
+
 }

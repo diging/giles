@@ -19,6 +19,7 @@ public class DocumentPageBean {
     private IFile firstImage;
     private List<String> textFileIds;
     private List<IFile> textFiles;
+    private String metadataUrl;
     
     public String getId() {
         return id;
@@ -96,6 +97,12 @@ public class DocumentPageBean {
     }
     public void setTextFiles(List<IFile> textFiles) {
         this.textFiles = textFiles;
+    }
+    public String getMetadataUrl() {
+        return metadataUrl;
+    }
+    public void setMetadataUrl(String metadataUrl) {
+        this.metadataUrl = metadataUrl;
     }
     
     

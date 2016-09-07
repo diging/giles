@@ -59,6 +59,18 @@
 		</p>
 		<small><form:errors class="error" path="jarsFileUrl"></form:errors></small>
 	</div>
+	<div class="form-group">
+		<label for="metadataAppDocUrl">Metadata Application Callback URL for Documents</label> 
+		<form:input
+			type="text" class="form-control" id="metadataAppDocUrl"
+			placeholder="Metadata Application Callback URL" path="metadataServiceDocUrl" value="${metadataServiceDocUrl}" ></form:input>
+		<p>
+		<small>You can use <code>{giles}</code> as a placeholder for Giles' base URL and <code>{docId}</code> 
+		to indicate that the id of the document a callback is created for should be inserted.</small>
+		</p>
+		<small><form:errors class="error" path="metadataServiceDocUrl"></form:errors></small>
+	</div>
+	
 
 <div class="page-header">
 	<h3>PDF Processing</h3>

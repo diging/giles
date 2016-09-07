@@ -66,7 +66,7 @@ public class FilesManager implements IFilesManager {
         List<StorageStatus> statuses = new ArrayList<StorageStatus>();
         IDocument document = null;
         if (docType == DocumentType.MULTI_PAGE) {
-            document = createDocument(uploadId, uploadDate, access, docType);
+            document = createDocument(uploadId, uploadDate, access, docType, username);
         }
         for (IFile file : files.keySet()) {
             byte[] content = files.get(file);
@@ -81,7 +81,7 @@ public class FilesManager implements IFilesManager {
 
             if (docType == DocumentType.SINGLE_PAGE) {
                 document = createDocument(uploadId, uploadDate,
-                        file.getAccess(), docType);
+                        file.getAccess(), docType, username);
             }
 
             file.setId(id);
@@ -133,10 +133,11 @@ public class FilesManager implements IFilesManager {
     }
 
     private IDocument createDocument(String uploadId, String uploadDate,
-            DocumentAccess access, DocumentType docType) {
+            DocumentAccess access, DocumentType docType, String username) {
         IDocument document = new Document();
         String docId = documentDatabaseClient.generateId();
         document.setDocumentId(docId);
+        document.setUsername(username);
         document.setId(docId);
         document.setCreatedDate(uploadDate);
         document.setAccess(access);

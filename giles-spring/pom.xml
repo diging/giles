@@ -37,6 +37,7 @@
 		<ocr.worker.count>2</ocr.worker.count>
 		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
+		<metadata.service.doc.url></metadata.service.doc.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
 		<deploy.path.dev>giles</deploy.path.dev>

@@ -12,6 +12,7 @@ public class Document implements IDocument {
     private String id;
     private String documentId;
     private String uploadId;
+    private String username;
     private String createdDate;
     private List<String> fileIds;
     private DocumentAccess access;
@@ -172,5 +173,15 @@ public class Document implements IDocument {
     @Override
     public void setTextFileIds(List<String> textFileIds) {
         this.textFileIds = textFileIds;
+    }
+
+    @Override
+    public String getUsername() {
+        return username;
+    }
+
+    @Override
+    public void setUsername(String username) {
+        this.username = username;
     }
 }
