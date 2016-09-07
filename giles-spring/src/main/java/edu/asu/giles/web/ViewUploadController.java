@@ -48,6 +48,7 @@ public class ViewUploadController {
             mappedDocs.add(docBean);
             docBean.setFiles(new ArrayList<>());
             docBean.setTextFiles(new ArrayList<>());
+            docBean.setMetadataUrl(metadataService.getDocumentLink(doc));
             
             for (IFile file : doc.getFiles()) {
                 FilePageBean bean = fileMappingService.convertToT2(file, new FilePageBean());
