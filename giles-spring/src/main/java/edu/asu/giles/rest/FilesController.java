@@ -22,6 +22,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.giles.aspects.access.DocumentAccessCheck;
 import edu.asu.giles.aspects.access.GitHubAccessCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
@@ -67,39 +68,9 @@ public class FilesController {
 
         for (IDocument doc : docs) {
             ObjectNode docNode = mapper.createObjectNode();
+            createDocumentJson(doc, mapper, docNode);
             root.add(docNode);
-
-            docNode.put("documentId", doc.getDocumentId());
-            docNode.put("uploadId", doc.getUploadId());
-            docNode.put("uploadedDate", doc.getCreatedDate());
-            docNode.put("access", (doc.getAccess() != null ? doc.getAccess()
-                    .toString() : DocumentAccess.PRIVATE.toString()));
-
-            ArrayNode paths = docNode.putArray("files");
-            for (IFile file : filesManager.getFilesOfDocument(doc)) {
-                ObjectNode fileNode = mapper.createObjectNode();
-                fileNode.put("filename", file.getFilename());
-                fileNode.put("id", file.getId());
-                fileNode.put("path", filesManager.getFileUrl(file));
-                fileNode.put("content-type", file.getContentType());
-                fileNode.put("size", file.getSize());
-                paths.add(fileNode);
-            }
             
-            ArrayNode textPaths = docNode.putArray("textFiles");
-            for (String fileId : doc.getTextFileIds()) {
-                IFile textFile = filesManager.getFile(fileId);
-                if (textFile != null) {
-                    ObjectNode fileNode = mapper.createObjectNode();
-                    fileNode.put("filename", textFile.getFilename());
-                    fileNode.put("id", textFile.getId());
-                    fileNode.put("path", filesManager.getFileUrl(textFile));
-                    fileNode.put("content-type", textFile.getContentType());
-                    fileNode.put("size", textFile.getSize());
-                    textPaths.add(fileNode);
-                }
-                
-            }
         }
 
         StringWriter sw = new StringWriter();
@@ -112,6 +83,68 @@ public class FilesController {
         }
 
         return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
+    }
+    
+    @DocumentAccessCheck
+    @RequestMapping(value = "rest/documents/{docId}")
+    public ResponseEntity<String> getDocument(
+            @RequestParam(defaultValue = "") String accessToken,
+            HttpServletRequest request,
+            @PathVariable("docId") String docId,
+            User user) {
+        
+        IDocument doc = filesManager.getDocument(docId);
+        
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectNode docNode = mapper.createObjectNode();
+
+        createDocumentJson(doc, mapper, docNode);
+        
+        StringWriter sw = new StringWriter();
+        try {
+            mapper.writeValue(sw, docNode);
+        } catch (IOException e) {
+            return new ResponseEntity<String>(
+                    "{\"error\": \"Could not write json result.\" }",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
+    }
+
+    private void createDocumentJson(IDocument doc, ObjectMapper mapper, ObjectNode docNode) {
+        docNode.put("documentId", doc.getDocumentId());
+        docNode.put("uploadId", doc.getUploadId());
+        docNode.put("uploadedDate", doc.getCreatedDate());
+        docNode.put("access", (doc.getAccess() != null ? doc.getAccess()
+                .toString() : DocumentAccess.PRIVATE.toString()));
+
+        ArrayNode paths = docNode.putArray("files");
+        for (IFile file : filesManager.getFilesOfDocument(doc)) {
+            ObjectNode fileNode = mapper.createObjectNode();
+            fileNode.put("filename", file.getFilename());
+            fileNode.put("id", file.getId());
+            fileNode.put("path", filesManager.getFileUrl(file));
+            fileNode.put("content-type", file.getContentType());
+            fileNode.put("size", file.getSize());
+            paths.add(fileNode);
+        }
+        
+        ArrayNode textPaths = docNode.putArray("textFiles");
+        for (String fileId : doc.getTextFileIds()) {
+            IFile textFile = filesManager.getFile(fileId);
+            if (textFile != null) {
+                ObjectNode fileNode = mapper.createObjectNode();
+                fileNode.put("filename", textFile.getFilename());
+                fileNode.put("id", textFile.getId());
+                fileNode.put("path", filesManager.getFileUrl(textFile));
+                fileNode.put("content-type", textFile.getContentType());
+                fileNode.put("size", textFile.getSize());
+                textPaths.add(fileNode);
+            }
+            
+        }
     }
 
     @GitHubAccessCheck
