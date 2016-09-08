@@ -23,6 +23,7 @@ import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
 import edu.asu.giles.aspects.access.DocumentAccessCheck;
+import edu.asu.giles.aspects.access.FileGitHubAccessCheck;
 import edu.asu.giles.aspects.access.GitHubAccessCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
@@ -147,7 +148,7 @@ public class FilesController {
         }
     }
 
-    @GitHubAccessCheck
+    @FileGitHubAccessCheck
     @RequestMapping(value = "/rest/files/{fileId}/content")
     public ResponseEntity<String> getFile(
             @PathVariable String fileId,
