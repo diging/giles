@@ -91,7 +91,7 @@
 <script>
     //# sourceURL=upload.js
     var uploadIds = [];
-    var jarsUrl = '${jars.url}/resource/create/giles/callback/';
+    var jarsUrl = '${jars.url}${metadata.upload.add}';
 
     $(function() {
         'use strict';
