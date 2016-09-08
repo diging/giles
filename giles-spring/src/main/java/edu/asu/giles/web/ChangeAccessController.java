@@ -58,6 +58,11 @@ public class ChangeAccessController {
             file.setAccess(docAccess);
             filesManager.saveFile(file);
         }
+        files = filesManager.getTextFilesOfDocument(document);
+        for (IFile file : files) {
+            file.setAccess(docAccess);
+            filesManager.saveFile(file);
+        }
 
         redirectAttrs.addAttribute("show_alert", true);
         redirectAttrs.addAttribute("alert_type", "success");
