@@ -38,6 +38,7 @@
 		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<jars.file.url>/resource/get/?uri={giles}/rest/files/{fileId}/content</jars.file.url>
+		<metadata.upload.add>/resource/create/giles/callback/</metadata.upload.add>
 		<metadata.service.doc.url></metadata.service.doc.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
