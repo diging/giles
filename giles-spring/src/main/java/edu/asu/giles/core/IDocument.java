@@ -1,5 +1,6 @@
 package edu.asu.giles.core;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public interface IDocument {
@@ -47,5 +48,17 @@ public interface IDocument {
     public abstract void setUsername(String username);
 
     public abstract String getUsername();
+
+    public abstract void setPages(List<IPage> pages);
+
+    public abstract List<IPage> getPages();
+
+    public abstract void setUploadedFile(String uploadedFile);
+
+    public abstract String getUploadedFile();
+
+    public abstract void setExtractedText(String extractedText);
+
+    public abstract String getExtractedText();
 
 }
