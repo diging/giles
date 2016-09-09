@@ -1,11 +1,13 @@
 package edu.asu.giles.core.impl;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
+import edu.asu.giles.core.IPage;
 
 public class Document implements IDocument {
 
@@ -14,12 +16,15 @@ public class Document implements IDocument {
     private String uploadId;
     private String username;
     private String createdDate;
+    private String uploadedFile;
+    private String extractedText;
     private List<String> fileIds;
     private DocumentAccess access;
     private transient List<IFile> files;
     private DocumentType documentType;
     private int pageCount;
     private List<String> textFileIds;
+    private List<IPage> pages;
 
     /*
      * (non-Javadoc)
@@ -183,5 +188,46 @@ public class Document implements IDocument {
     @Override
     public void setUsername(String username) {
         this.username = username;
+    }
+
+    /**
+     * Method to retrieve list of pages of this document.
+     * This method will never return null.
+     * @return 
+     */
+    @Override
+    public List<IPage> getPages() {
+        if (pages == null) {
+            pages = new ArrayList<IPage>();
+        }
+        return pages;
+    }
+
+    @Override
+    public void setPages(List<IPage> pages) {
+        this.pages = pages;
+    }
+
+    /**
+     * File that was originally uploaded.
+     */
+    @Override
+    public String getUploadedFile() {
+        return uploadedFile;
+    }
+
+    @Override
+    public void setUploadedFile(String uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+
+    @Override
+    public String getExtractedText() {
+        return extractedText;
+    }
+
+    @Override
+    public void setExtractedText(String extractedText) {
+        this.extractedText = extractedText;
     }
 }

@@ -32,7 +32,9 @@ import org.springframework.stereotype.Service;
 
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
+import edu.asu.giles.core.IPage;
 import edu.asu.giles.core.IUpload;
+import edu.asu.giles.core.impl.Page;
 import edu.asu.giles.exceptions.GilesFileStorageException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
@@ -102,15 +104,18 @@ public class PdfFileHandler extends AbstractFileHandler implements
         document.setPageCount(numPages);
         for (int i = 0; i < numPages; i++) {
             try {
+                IPage page = new Page();
+                page.setPageNr(i);
+                document.getPages().add(page);
                 BufferedImage image = renderer.renderImageWithDPI(i,
                         Float.parseFloat(dpi), ImageType.valueOf(type));
                 String fileName = file.getFilename() + "." + i + "." + format;
-                IFile imageFile = saveImage(username, file, document,
+                IFile imageFile = saveImage(page, username, file, document,
                         dirFolder, image, fileName);
                 success &= imageFile != null;
 
                 if (imageFile != null && doOcrOnImages.equalsIgnoreCase(TRUE)) {
-                    doOcr(imageFile, username, document);
+                    doOcr(page, imageFile, username, document);
                 }
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
@@ -184,10 +189,11 @@ public class PdfFileHandler extends AbstractFileHandler implements
         filesDbClient.saveFile(textFile);
 
         document.getTextFileIds().add(textFile.getId());
+        document.setExtractedText(textFile.getId());
         return textFile;
     }
 
-    private IFile doOcr(IFile imageFile, String username, IDocument document) {
+    private IFile doOcr(IPage page, IFile imageFile, String username, IDocument document) {
         String imageFolderPath = storageManager.getAndCreateStoragePath(
                 username, imageFile.getUploadId(), imageFile.getDocumentId());
         Future<String> ocrResult = ocrService.ocrImage(imageFolderPath
@@ -248,15 +254,15 @@ public class PdfFileHandler extends AbstractFileHandler implements
         filesDbClient.saveFile(textFile);
 
         document.getTextFileIds().add(textFile.getId());
+        page.setTextFileId(textFile.getId());
 
         return textFile;
     }
 
-    private IFile saveImage(String username, IFile file, IDocument document,
+    private IFile saveImage(IPage page, String username, IFile file, IDocument document,
             String dirFolder, BufferedImage image, String fileName)
             throws IOException, FileNotFoundException {
         String dpi = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_DPI).trim();
-        String type = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_TYPE).trim();
         String format = propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_FORMAT).trim();
         
         String filePath = dirFolder + File.separator + fileName;
@@ -279,6 +285,7 @@ public class PdfFileHandler extends AbstractFileHandler implements
         imageFile.setDerivedFrom(file.getId());
 
         document.getFileIds().add(imageFile.getId());
+        page.setImageFileId(imageFile.getId());
 
         filesDbClient.saveFile(imageFile);
         return imageFile;

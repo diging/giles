@@ -30,6 +30,7 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.rest.util.IJSONHelper;
 import edu.asu.giles.users.User;
 
 @Controller
@@ -39,6 +40,9 @@ public class FilesController {
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private IJSONHelper jsonHelper;
 
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/files/upload/{uploadId}")
@@ -69,7 +73,7 @@ public class FilesController {
 
         for (IDocument doc : docs) {
             ObjectNode docNode = mapper.createObjectNode();
-            createDocumentJson(doc, mapper, docNode);
+            jsonHelper.createDocumentJson(doc, mapper, docNode);
             root.add(docNode);
             
         }
@@ -100,7 +104,7 @@ public class FilesController {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         ObjectNode docNode = mapper.createObjectNode();
 
-        createDocumentJson(doc, mapper, docNode);
+        jsonHelper.createDocumentJson(doc, mapper, docNode);
         
         StringWriter sw = new StringWriter();
         try {
@@ -114,40 +118,7 @@ public class FilesController {
         return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
     }
 
-    private void createDocumentJson(IDocument doc, ObjectMapper mapper, ObjectNode docNode) {
-        docNode.put("documentId", doc.getDocumentId());
-        docNode.put("uploadId", doc.getUploadId());
-        docNode.put("uploadedDate", doc.getCreatedDate());
-        docNode.put("access", (doc.getAccess() != null ? doc.getAccess()
-                .toString() : DocumentAccess.PRIVATE.toString()));
-
-        ArrayNode paths = docNode.putArray("files");
-        for (IFile file : filesManager.getFilesOfDocument(doc)) {
-            ObjectNode fileNode = mapper.createObjectNode();
-            fileNode.put("filename", file.getFilename());
-            fileNode.put("id", file.getId());
-            fileNode.put("path", filesManager.getFileUrl(file));
-            fileNode.put("content-type", file.getContentType());
-            fileNode.put("size", file.getSize());
-            paths.add(fileNode);
-        }
-        
-        ArrayNode textPaths = docNode.putArray("textFiles");
-        for (String fileId : doc.getTextFileIds()) {
-            IFile textFile = filesManager.getFile(fileId);
-            if (textFile != null) {
-                ObjectNode fileNode = mapper.createObjectNode();
-                fileNode.put("filename", textFile.getFilename());
-                fileNode.put("id", textFile.getId());
-                fileNode.put("path", filesManager.getFileUrl(textFile));
-                fileNode.put("content-type", textFile.getContentType());
-                fileNode.put("size", textFile.getSize());
-                textPaths.add(fileNode);
-            }
-            
-        }
-    }
-
+    
     @FileGitHubAccessCheck
     @RequestMapping(value = "/rest/files/{fileId}/content")
     public ResponseEntity<String> getFile(

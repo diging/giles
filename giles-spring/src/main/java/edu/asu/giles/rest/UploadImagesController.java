@@ -33,6 +33,7 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
+import edu.asu.giles.rest.util.IJSONHelper;
 import edu.asu.giles.users.User;
 import edu.asu.giles.util.FileUploadHelper;
 
@@ -44,6 +45,9 @@ public class UploadImagesController {
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private IJSONHelper jsonHelper;
 
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/files/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -79,43 +83,12 @@ public class UploadImagesController {
         for (String docId : docIds) {
 
             IDocument doc = filesManager.getDocument(docId);
-
+            
+            
             ObjectNode docNode = mapper.createObjectNode();
             root.add(docNode);
 
-            docNode.put("documentId", doc.getDocumentId());
-            docNode.put("uploadId", doc.getUploadId());
-            docNode.put("uploadedDate", doc.getCreatedDate());
-            docNode.put("access", doc.getAccess().toString());
-
-            ArrayNode paths = docNode.putArray("files");
-
-            Stream<StorageStatus> docFileStatues = statuses.stream().filter(
-                    status -> status.getFile().getDocumentId().equals(docId));
-
-            Map<String, StorageStatus> fileMap = docFileStatues.collect(Collectors.toMap(s -> s.getFile().getId(), s -> s));
-            for (IFile file : filesManager.getFilesOfDocument(doc)) {
-                ObjectNode fileNode = mapper.createObjectNode();
-                fileNode.put("filename", file.getFilename());
-                fileNode.put("id", file.getId());
-                fileNode.put("path", filesManager.getFileUrl(file));
-                fileNode.put("content-type", file.getContentType());
-                fileNode.put("size", file.getSize());
-                fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
-                paths.add(fileNode);
-            }
-            
-            ArrayNode textFiles = docNode.putArray("textFiles");
-            for (IFile file : filesManager.getTextFilesOfDocument(doc)) {
-                ObjectNode fileNode = mapper.createObjectNode();
-                fileNode.put("filename", file.getFilename());
-                fileNode.put("id", file.getId());
-                fileNode.put("path", filesManager.getFileUrl(file));
-                fileNode.put("content-type", file.getContentType());
-                fileNode.put("size", file.getSize());
-                fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
-                textFiles.add(fileNode);
-            }
+            jsonHelper.createDocumentJson(doc, mapper, docNode);
             
         }
 

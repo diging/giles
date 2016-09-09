@@ -92,6 +92,7 @@ public class FilesManager implements IFilesManager {
             file.setFilepath(getRelativePathOfFile(file));
 
             document.getFileIds().add(id);
+            document.setUploadedFile(file.getId());
 
             IFileTypeHandler handler = fileHandlerRegistry.getHandler(file
                     .getContentType());
