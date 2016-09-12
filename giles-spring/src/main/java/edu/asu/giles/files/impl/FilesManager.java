@@ -170,6 +170,9 @@ public class FilesManager implements IFilesManager {
 
     @Override
     public IFile getFile(String id) {
+        if (id == null) {
+            return null;
+        }
         return databaseClient.getFileById(id);
     }
 
