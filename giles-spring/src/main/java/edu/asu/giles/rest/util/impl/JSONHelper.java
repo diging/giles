@@ -32,8 +32,10 @@ public class JSONHelper implements IJSONHelper {
                 .toString() : DocumentAccess.PRIVATE.toString()));
         IFile uploadedFile = filesManager.getFile(doc.getUploadedFile());
         
-        ObjectNode uploadedFileNode = createFileJsonObject(mapper, uploadedFile);
-        docNode.set("uploadedFile", uploadedFileNode);
+        if (uploadedFile != null) {
+            ObjectNode uploadedFileNode = createFileJsonObject(mapper, uploadedFile);
+            docNode.set("uploadedFile", uploadedFileNode);
+        }
         
         if (doc.getExtractedText() != null) {
             IFile extractedTextFile = filesManager.getFile(doc.getExtractedText());
