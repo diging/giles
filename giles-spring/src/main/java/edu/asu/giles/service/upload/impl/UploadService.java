@@ -1,5 +1,7 @@
 package edu.asu.giles.service.upload.impl;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,7 +22,10 @@ import edu.asu.giles.service.upload.IUploadService;
 @Service
 public class UploadService implements IUploadService {
     
+    private final static long MILLIS_PER_DAY = 24 * 60 * 60 * 1000L;
+
     private Map<String, Future<List<StorageStatus>>> currentUploads;
+    private Map<String, Date> expirationList;
     
     @Autowired
     private UploadThread uploadThread;
@@ -28,6 +33,7 @@ public class UploadService implements IUploadService {
     @PostConstruct
     public void init() {
         currentUploads = new HashMap<String, Future<List<StorageStatus>>>();
+        expirationList = new HashMap<>();
     }
 
     /* (non-Javadoc)
@@ -35,14 +41,38 @@ public class UploadService implements IUploadService {
      */
     @Override
     public String startUpload(DocumentAccess access, DocumentType type, MultipartFile[] files, String username) {
+        // clean out old uploads before adding new
+        cleanUp();
+        
         String uploadProgressId = generateId();
         currentUploads.put(uploadProgressId, uploadThread.runUpload(access, type, files, username));
+        expirationList.put(uploadProgressId, new Date());
         return uploadProgressId;
+    }
+    
+    public void cleanUp() {
+        List<String> remove = new ArrayList<String>();
+        for (String id : expirationList.keySet()) {
+            Date expirationDate = expirationList.get(id);
+            boolean expired = Math.abs(expirationDate.getTime() - new Date().getTime()) > MILLIS_PER_DAY;
+
+            if (expired) {
+                currentUploads.remove(expirationList.get(expirationDate));
+                remove.add(id);
+            }
+        }
+        
+        remove.forEach(id -> expirationList.remove(id));
     }
     
     @Override
     public Future<List<StorageStatus>> getUpload(String id) {
         return currentUploads.get(id);
+    }
+    
+    @Override
+    public void removeUpload(String id) {
+        currentUploads.remove(id);
     }
     
     protected String generateId() {
