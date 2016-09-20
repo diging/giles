@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.tika.Tika;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,15 +35,30 @@ public class FileUploadHelper {
         }
         for (MultipartFile f : files) {
             IFile file = new File(f.getOriginalFilename());
-            file.setContentType(f.getContentType());
-            file.setSize(f.getSize());
-            file.setAccess(access);
+           
+            byte[] bytes = null;
             try {
-                uploadedFiles.put(file, f.getBytes());
-            } catch (IOException e) {
-                logger.error("Couldn't get file content.", e);
+                bytes = f.getBytes();
+                uploadedFiles.put(file, bytes);
+            } catch (IOException e2) {
+                logger.error("Couldn't get file content.", e2);
                 uploadedFiles.put(file, null);
             }
+            
+            String contentType = null;
+            
+            if (bytes != null) {
+               Tika tika = new Tika();
+               contentType = tika.detect(bytes);
+            }
+            
+            if (contentType == null) {
+                contentType = f.getContentType();
+            }
+            
+            file.setContentType(contentType);
+            file.setSize(f.getSize());
+            file.setAccess(access);
         }
 
         return filesManager.addFiles(uploadedFiles, username, docType, access);

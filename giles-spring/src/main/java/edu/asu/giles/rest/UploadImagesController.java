@@ -13,6 +13,8 @@ import java.util.concurrent.Future;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.PathParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
@@ -46,6 +48,8 @@ import edu.asu.giles.util.FileUploadHelper;
 @PropertySource("classpath:/config.properties")
 @Controller
 public class UploadImagesController {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Value("${giles_check_upload_endpoint}")
     private String uploadEndpoint;
@@ -130,6 +134,7 @@ public class UploadImagesController {
         try {
             statuses = futureResult.get();
         } catch (InterruptedException | ExecutionException e1) {
+            logger.error("Could not get result.", e1);
             return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
@@ -153,6 +158,7 @@ public class UploadImagesController {
         try {
             mapper.writeValue(sw, root);
         } catch (IOException e) {
+            logger.error("Could not write json.", e);
             return new ResponseEntity<String>(
                     "{\"error\": \"Could not write json result.\" }",
                     HttpStatus.INTERNAL_SERVER_ERROR);
@@ -173,6 +179,7 @@ public class UploadImagesController {
         try {
             mapper.writeValue(sw, root);
         } catch (IOException e) {
+            logger.error("Could not write json.", e);
             return new ResponseEntity<String>(
                     "{\"errorMsg\": \"Could not write json result.\", \"errorCode\": \"errorCode\": \"500\" }",
                     HttpStatus.INTERNAL_SERVER_ERROR);
