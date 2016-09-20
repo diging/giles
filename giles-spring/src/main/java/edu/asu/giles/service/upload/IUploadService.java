@@ -16,4 +16,6 @@ public interface IUploadService {
 
     public abstract Future<List<StorageStatus>> getUpload(String id);
 
+    public abstract void removeUpload(String id);
+
 }
