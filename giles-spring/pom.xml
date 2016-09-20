@@ -36,6 +36,7 @@
 		<tesseract.data></tesseract.data>
 		<ocr.worker.count>2</ocr.worker.count>
 		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
+		<upload.worker.count>2</upload.worker.count>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
 		<jars.file.url>/resource/get/?uri={giles}/rest/files/{fileId}/content</jars.file.url>
 		<metadata.upload.add>/resource/create/giles/callback/</metadata.upload.add>

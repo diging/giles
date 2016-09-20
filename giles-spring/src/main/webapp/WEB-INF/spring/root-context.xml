@@ -17,7 +17,8 @@
 	<context:component-scan base-package="edu.asu.giles" />
 	
 	<task:executor id="tesseractExecutor" pool-size="${ocr.worker.count}"  />
-	<task:annotation-driven executor="tesseractExecutor"/>	
+	<task:executor id="uploadExecutor" pool-size="${upload.worker.count}"  />
+	<task:annotation-driven executor="tesseractExecutor"/>
 	
 	<import resource="spring-security.xml" />
 	<import resource="db4o-config.xml" />
