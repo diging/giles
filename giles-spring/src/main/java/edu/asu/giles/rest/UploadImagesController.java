@@ -92,7 +92,6 @@ public class UploadImagesController {
             return generateResponse(msgs, HttpStatus.BAD_REQUEST);
         }
 
-        // here
         String id = uploadService.startUpload(docAccess, documentType, files, user.getUsername());
        
         Map<String, String> msgs = new HashMap<String, String>();
