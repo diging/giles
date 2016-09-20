@@ -36,7 +36,7 @@ public abstract class DatabaseClient implements IDatabaseClient {
      * http://stackoverflow.com/questions/9543715/generating-human-readable
      * -usable-short-but-unique-ids
      * 
-     * @return 6 character id
+     * @return 12 character id
      */
     protected String generateUniqueId() {
         char[] chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz"
@@ -44,7 +44,7 @@ public abstract class DatabaseClient implements IDatabaseClient {
 
         Random random = new Random();
         StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < 6; i++) {
+        for (int i = 0; i < 12; i++) {
             builder.append(chars[random.nextInt(62)]);
         }
 
