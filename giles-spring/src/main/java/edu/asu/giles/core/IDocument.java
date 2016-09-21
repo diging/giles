@@ -53,12 +53,12 @@ public interface IDocument {
 
     public abstract List<IPage> getPages();
 
-    public abstract void setUploadedFile(String uploadedFile);
+    public abstract void setUploadedFileId(String uploadedFile);
 
-    public abstract String getUploadedFile();
+    public abstract String getUploadedFileId();
 
-    public abstract void setExtractedText(String extractedText);
+    public abstract void setExtractedTextFileId(String extractedText);
 
-    public abstract String getExtractedText();
+    public abstract String getExtractedTextFileId();
 
 }

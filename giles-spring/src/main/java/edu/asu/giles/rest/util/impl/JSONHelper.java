@@ -30,15 +30,15 @@ public class JSONHelper implements IJSONHelper {
         docNode.put("uploadedDate", doc.getCreatedDate());
         docNode.put("access", (doc.getAccess() != null ? doc.getAccess()
                 .toString() : DocumentAccess.PRIVATE.toString()));
-        IFile uploadedFile = filesManager.getFile(doc.getUploadedFile());
+        IFile uploadedFile = filesManager.getFile(doc.getUploadedFileId());
         
         if (uploadedFile != null) {
             ObjectNode uploadedFileNode = createFileJsonObject(mapper, uploadedFile);
             docNode.set("uploadedFile", uploadedFileNode);
         }
         
-        if (doc.getExtractedText() != null) {
-            IFile extractedTextFile = filesManager.getFile(doc.getExtractedText());
+        if (doc.getExtractedTextFileId() != null) {
+            IFile extractedTextFile = filesManager.getFile(doc.getExtractedTextFileId());
             docNode.set("extractedText", createFileJsonObject(mapper, extractedTextFile));
         }
         

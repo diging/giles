@@ -212,22 +212,22 @@ public class Document implements IDocument {
      * File that was originally uploaded.
      */
     @Override
-    public String getUploadedFile() {
+    public String getUploadedFileId() {
         return uploadedFile;
     }
 
     @Override
-    public void setUploadedFile(String uploadedFile) {
+    public void setUploadedFileId(String uploadedFile) {
         this.uploadedFile = uploadedFile;
     }
 
     @Override
-    public String getExtractedText() {
+    public String getExtractedTextFileId() {
         return extractedText;
     }
 
     @Override
-    public void setExtractedText(String extractedText) {
+    public void setExtractedTextFileId(String extractedText) {
         this.extractedText = extractedText;
     }
 }

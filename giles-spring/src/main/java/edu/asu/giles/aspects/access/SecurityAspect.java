@@ -80,6 +80,37 @@ public class SecurityAspect {
 
         return joinPoint.proceed();
     }
+    
+    @Around("within(edu.asu.giles.web..*) && @annotation(docCheck)")
+    public Object checkDocumentIdAccess(ProceedingJoinPoint joinPoint, DocumentIdAccessCheck docCheck) throws Throwable {
+        Object[] args = joinPoint.getArgs();
+        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
+        String[] argNames = sig.getParameterNames();
+
+        String docId = null;
+        for (int i = 0; i < argNames.length; i++) {
+            if (argNames[i].equals(docCheck.value())) {
+                docId = (String) args[i];
+            }
+        }
+        
+        Authentication auth = SecurityContextHolder.getContext()
+                .getAuthentication();
+        User user = (User) auth.getPrincipal();
+
+        IDocument doc = filesManager.getDocument(docId);
+        if (doc == null) {
+            return "notFound";
+        }
+
+        if (doc.getUsername() != null) {
+            if (!doc.getUsername().equals(user.getUsername())) {
+                return "forbidden";
+            }
+        }
+
+        return joinPoint.proceed();
+    }
 
     @Around("within(edu.asu.giles.web..*) && @annotation(fileCheck)")
     public Object checkFileAccess(ProceedingJoinPoint joinPoint,

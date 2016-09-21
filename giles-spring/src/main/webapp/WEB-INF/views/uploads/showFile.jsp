@@ -3,6 +3,8 @@
 <ol class="breadcrumb">
   <li>Upload</li>
   <li><a href="<c:url value="/uploads/${file.uploadId}" />">${file.uploadId}</a></li>
+  <li>Document</li>
+  <li><a href="<c:url value="/documents/${file.documentId}" />">${file.documentId}</a></li>
 </ol>
 
 <h1>${file.filename}</h1>
