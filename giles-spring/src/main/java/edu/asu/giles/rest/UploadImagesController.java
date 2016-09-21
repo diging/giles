@@ -106,7 +106,7 @@ public class UploadImagesController {
     }
     
     @GitHubAccessCheck
-    @RequestMapping(value = "/rest/files/upload/check/{id}/", method = RequestMethod.GET)
+    @RequestMapping(value = "/rest/files/upload/check/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> checkAndGetResults(
             @RequestParam(defaultValue = "") String accessToken,
             HttpServletRequest request,
