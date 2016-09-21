@@ -13,8 +13,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
-import javax.annotation.PostConstruct;
-
 import org.apache.commons.io.FileUtils;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.rendering.ImageType;
@@ -25,7 +23,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
@@ -189,7 +186,7 @@ public class PdfFileHandler extends AbstractFileHandler implements
         filesDbClient.saveFile(textFile);
 
         document.getTextFileIds().add(textFile.getId());
-        document.setExtractedText(textFile.getId());
+        document.setExtractedTextFileId(textFile.getId());
         return textFile;
     }
 

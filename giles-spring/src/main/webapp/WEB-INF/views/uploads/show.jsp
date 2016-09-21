@@ -9,31 +9,13 @@
 <c:forEach items="${docs}" var="doc">
   <div class="list-group-item clearfix">
   <div class="pull-left">
-    <h4 class="list-group-item-heading">Document #${doc.documentId}</h4>
+    <h4 class="list-group-item-heading"><a href="<c:url value="/documents/${doc.documentId}" />">Document #${doc.documentId}</a></h4>
     <a href="${doc.metadataUrl}"><i class="fa fa-globe" aria-hidden="true"></i> view metadata</a>
     <p class="list-group-item-text">Uploaded on <span class="date">${doc.createdDate}</span>.</p>
     <ul style="list-style-type:none;">
-    	<c:forEach items="${doc.files}" var="file">
-    		<li><i class="fa fa-picture-o" aria-hidden="true"></i>
-    		 <a href="<c:url value="/files/${file.id}" />" >${file.filename}</a>
-    		 | <a href="${file.metadataLink}"><i class="fa fa-globe" aria-hidden="true"></i> view metadata
-    </a>
-    		</li>
-    	</c:forEach>
+    	<li>Uploaded file: <a href="<c:url value="/files/${doc.uploadedFile.id}" />" >${doc.uploadedFile.filename}</a></li>
+  		<c:if test="${not empty doc.extractedTextFile}"><li>Embedded text: <a href="<c:url value="/files/${doc.extractedTextFile.id}" />" >${doc.extractedTextFile.filename}</a></li></c:if>
     </ul>
-    
-    <c:if test="${not empty doc.textFiles}">
-    The following text files were extracted from the file you uploaded:
-    <ul style="list-style-type:none;">
-    	<c:forEach items="${doc.textFiles}" var="file">
-    		<li><i class="fa fa-picture-o" aria-hidden="true"></i>
-    		 <a href="<c:url value="/files/${file.id}" />" >${file.filename}</a>
-    		 | <a href="${file.metadataLink}"><i class="fa fa-globe" aria-hidden="true"></i> view metadata
-    		</a>
-    		</li>
-    	</c:forEach>
-    </ul>
-    </c:if>
      
     </div>
     <c:if test="${not empty doc.firstImage}">

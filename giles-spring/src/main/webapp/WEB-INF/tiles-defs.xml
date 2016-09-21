@@ -36,6 +36,10 @@
 		<put-attribute name="content" value="/WEB-INF/views/uploads/all.jsp" />	
 	</definition>
 	
+	<definition name="documents/document" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/uploads/showDocument.jsp" />	
+	</definition>
+	
 	<definition name="notFound" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/notFound.jsp" />	
 	</definition>
