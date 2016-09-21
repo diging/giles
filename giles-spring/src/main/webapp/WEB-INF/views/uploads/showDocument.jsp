@@ -47,7 +47,7 @@
 <c:if test="${not empty document.firstImage}">
 <div class="pull-right">
     <a href="<c:url value="/files/${document.firstImage.id}" />" >
-    <img src="<c:url value="/files/${document.firstImage.id}/img?dh=200" />" >
+    <img src="<c:url value="/files/${document.firstImage.id}/img?dw=200" />" >
     </a> 
 </div>
 </c:if>
