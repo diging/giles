@@ -58,7 +58,7 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
             StringBuffer sb = new StringBuffer();
             sb.append("frame-ancestors ");
             
-            if (origins.length == 0) {
+            if (origins.length == 0 || (origins.length == 1 && origins[0].isEmpty())) {
                 sb.append("'none'");
             } else {
                 for (String org : origins) {

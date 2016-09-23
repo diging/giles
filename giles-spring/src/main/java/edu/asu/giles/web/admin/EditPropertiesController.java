@@ -78,6 +78,8 @@ public class EditPropertiesController {
         page.setTesseractDataFolder(propertyManager.getProperty(IPropertiesManager.TESSERACT_DATA_FOLDER));
         page.setPdfToImageFormat(propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_FORMAT));
         
+        page.setIframingAllowedHosts(propertyManager.getProperty(IPropertiesManager.ALLOW_IFRAMING_FROM));
+        
         List<String> imageTypes = new ArrayList<String>();
         imageTypes.add(ImageType.ARGB.toString());
         imageTypes.add(ImageType.BINARY.toString());
@@ -120,6 +122,7 @@ public class EditPropertiesController {
         propertiesMap.put(IPropertiesManager.JARS_FILE_URL, systemConfigPage.getJarsFileUrl());
         propertiesMap.put(IPropertiesManager.METADATA_SERVICE_DOC_ENDPOINT, systemConfigPage.getMetadataServiceDocUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_FORMAT, systemConfigPage.getPdfToImageFormat());
+        propertiesMap.put(IPropertiesManager.ALLOW_IFRAMING_FROM, systemConfigPage.getIframingAllowedHosts());
         
         try {
             propertyManager.updateProperties(propertiesMap);

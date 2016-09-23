@@ -140,6 +140,22 @@
 			placeholder="e.g. /usr/share/tesseract/" path="tesseractDataFolder" value="${tesseractDataFolder}" ></form:input>
 		<small><form:errors class="error" path="tesseractDataFolder"></form:errors></small>
 	</div>
+	
+<div class="page-header">
+	<h3>Security Settings</h3>
+</div>
+
+	<div class="form-group">
+		<label for="iframingAllowedHosts">Hosts that should be allowed to embed Giles in an iFrame</label> 
+		<form:input
+			type="text" class="form-control" id="iframingAllowedHosts"
+			placeholder="e.g. 'self', localhost, or http://yourhost.org/" path="iframingAllowedHosts" value="${iframingAllowedHosts}" ></form:input>
+		<p>
+		<small>Enter a comma-separated list of allowed hosts. You can use <code>*</code> to denote any value. If you do not provide a URL scheme or a port number, any scheme or port is matched. For example, <code>myhost.net</code> matches all request from myhost.net; <code>https://myhost.net:8080/</code> will only match requests from https and port 8080. If this field is blank, no iFraming will be allowed at all. <code>'self'</code> allows only request from the Giles host (including ULR scheme and port).
+		<br><b>Important</b>: Changing this property requires a restart of the servlet container running Giles!</small>
+		</p>
+		<small><form:errors class="error" path="iframingAllowedHosts"></form:errors></small>
+	</div>
 
 <button class="btn btn-primary btn-md pull-right" type="submit">Save Changes!</button>
 </form:form>
