@@ -52,6 +52,7 @@
           <sec:authorize access="not isAuthenticated()">
             <li role="presentation">
             	<form action="<c:url value="/signin/github" />" method="POST">
+            	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             		<button class="btn btn-link" type="submit">
             			<i class="fa fa-github" aria-hidden="true"></i> Login
             		</button>
@@ -79,8 +80,10 @@
           </sec:authorize>
           <sec:authorize access="isAuthenticated()">
          	 <li role="presentation">
-				<a href="<c:url value="/logout" />"><i class="fa fa-sign-out" aria-hidden="true"></i>
-				Logout</a>
+         	 	<form action="<c:url value="/logout" />" method="POST">
+         	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+  				<button class="btn-link" type="submit" title="Logout"><i class="fa fa-sign-out" aria-hidden="true"></i> Logout</button>
+         	 	</form>
          	 </li>
           </sec:authorize>
           </ul>
@@ -122,7 +125,8 @@
 	   	
 		<form name='f' class="form-inline pull-right" action="<c:url value="/login/authenticate" />" method="POST">
 			Admin login:
-			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
+			<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+  			<input placeholder="Username" class="form-control input-sm" type="text" id="username" name="username"/>        
 		    <input placeholder="Password" class="form-control input-sm" type="password" id="password" name="password"/>    
 		    <button type="submit" class="btn btn-default btn-sm">Log in</button>
 		</form>

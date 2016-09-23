@@ -2,20 +2,27 @@ package edu.asu.giles.rest;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.PathParam;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.PropertySource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -30,20 +37,37 @@ import edu.asu.giles.aspects.access.GitHubAccessCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
-import edu.asu.giles.core.IFile;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.impl.StorageStatus;
+import edu.asu.giles.rest.util.IJSONHelper;
+import edu.asu.giles.service.properties.IPropertiesManager;
+import edu.asu.giles.service.upload.IUploadService;
 import edu.asu.giles.users.User;
 import edu.asu.giles.util.FileUploadHelper;
 
+@PropertySource("classpath:/config.properties")
 @Controller
 public class UploadImagesController {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
+    @Value("${giles_check_upload_endpoint}")
+    private String uploadEndpoint;
+    
+    @Autowired
+    private IPropertiesManager propertyManager;
+    
     @Autowired
     private FileUploadHelper uploadHelper;
+    
+    @Autowired
+    private IUploadService uploadService;
 
     @Autowired
     private IFilesManager filesManager;
+    
+    @Autowired
+    private IJSONHelper jsonHelper;
 
     @GitHubAccessCheck
     @RequestMapping(value = "/rest/files/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -56,19 +80,64 @@ public class UploadImagesController {
 
         DocumentAccess docAccess = DocumentAccess.valueOf(access);
         if (docAccess == null) {
-            return new ResponseEntity<String>("Access type: " + access
-                    + " does not exist.", HttpStatus.BAD_REQUEST);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "Access type: " + access + " does not exist.");
+            msgs.put("errorCode", "400");
+            
+            return generateResponse(msgs, HttpStatus.BAD_REQUEST);
         }
         
         DocumentType documentType = DocumentType.valueOf(docType);
         if (documentType == null) {
-            return new ResponseEntity<String>("Document type: " + docType
-                    + " does not exist.", HttpStatus.BAD_REQUEST);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "Document type: " + docType + " does not exist.");
+            msgs.put("errorCode", "400");
+            
+            return generateResponse(msgs, HttpStatus.BAD_REQUEST);
         }
 
-        List<StorageStatus> statuses = uploadHelper.processUpload(docAccess, documentType,
-                files, user.getUsername());
-
+        String id = uploadService.startUpload(docAccess, documentType, files, user.getUsername());
+       
+        Map<String, String> msgs = new HashMap<String, String>();
+        msgs.put("id", id);
+        msgs.put("checkUrl", propertyManager.getProperty(IPropertiesManager.GILES_URL) + uploadEndpoint + id);
+        
+        return generateResponse(msgs, HttpStatus.OK);
+    }
+    
+    @GitHubAccessCheck
+    @RequestMapping(value = "/rest/files/upload/check/{id}", method = RequestMethod.GET)
+    public ResponseEntity<String> checkAndGetResults(
+            @RequestParam(defaultValue = "") String accessToken,
+            HttpServletRequest request,
+            @PathVariable String id, 
+            User user) {
+        
+        Future<List<StorageStatus>> futureResult = uploadService.getUpload(id);
+        if (futureResult == null) {
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "Upload does not exist.");
+            msgs.put("errorCode", "404");
+            
+            return generateResponse(msgs, HttpStatus.NOT_FOUND);
+        }
+        
+        if (!futureResult.isDone()) {
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("msg", "Upload in progress. Please check back later.");
+            msgs.put("msgCode", "010");
+            
+            return generateResponse(msgs, HttpStatus.ACCEPTED);
+        }
+        
+        List<StorageStatus> statuses;
+        try {
+            statuses = futureResult.get();
+        } catch (InterruptedException | ExecutionException e1) {
+            logger.error("Could not get result.", e1);
+            return new ResponseEntity<String>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
         Set<String> docIds = new HashSet<String>();
         statuses.forEach(status -> docIds.add(status.getFile().getDocumentId()));
 
@@ -76,58 +145,46 @@ public class UploadImagesController {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
         ArrayNode root = mapper.createArrayNode();
 
+        
         for (String docId : docIds) {
-
             IDocument doc = filesManager.getDocument(docId);
-
             ObjectNode docNode = mapper.createObjectNode();
             root.add(docNode);
 
-            docNode.put("documentId", doc.getDocumentId());
-            docNode.put("uploadId", doc.getUploadId());
-            docNode.put("uploadedDate", doc.getCreatedDate());
-            docNode.put("access", doc.getAccess().toString());
-
-            ArrayNode paths = docNode.putArray("files");
-
-            Stream<StorageStatus> docFileStatues = statuses.stream().filter(
-                    status -> status.getFile().getDocumentId().equals(docId));
-
-            Map<String, StorageStatus> fileMap = docFileStatues.collect(Collectors.toMap(s -> s.getFile().getId(), s -> s));
-            for (IFile file : filesManager.getFilesOfDocument(doc)) {
-                ObjectNode fileNode = mapper.createObjectNode();
-                fileNode.put("filename", file.getFilename());
-                fileNode.put("id", file.getId());
-                fileNode.put("path", filesManager.getFileUrl(file));
-                fileNode.put("content-type", file.getContentType());
-                fileNode.put("size", file.getSize());
-                fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
-                paths.add(fileNode);
-            }
-            
-            ArrayNode textFiles = docNode.putArray("textFiles");
-            for (IFile file : filesManager.getTextFilesOfDocument(doc)) {
-                ObjectNode fileNode = mapper.createObjectNode();
-                fileNode.put("filename", file.getFilename());
-                fileNode.put("id", file.getId());
-                fileNode.put("path", filesManager.getFileUrl(file));
-                fileNode.put("content-type", file.getContentType());
-                fileNode.put("size", file.getSize());
-                fileNode.put("success", fileMap.get(file.getId()) != null ? fileMap.get(file.getId()).getStatus() : StorageStatus.SUCCESS);
-                textFiles.add(fileNode);
-            }
-            
+            jsonHelper.createDocumentJson(doc, mapper, docNode);  
         }
-
+        
         StringWriter sw = new StringWriter();
         try {
             mapper.writeValue(sw, root);
         } catch (IOException e) {
+            logger.error("Could not write json.", e);
             return new ResponseEntity<String>(
                     "{\"error\": \"Could not write json result.\" }",
                     HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
         return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
+    }
+    
+    private ResponseEntity<String> generateResponse(Map<String, String> msgs, HttpStatus status) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectNode root = mapper.createObjectNode();
+        for (String key : msgs.keySet()) {
+            root.put(key, msgs.get(key));
+        }
+        
+        StringWriter sw = new StringWriter();
+        try {
+            mapper.writeValue(sw, root);
+        } catch (IOException e) {
+            logger.error("Could not write json.", e);
+            return new ResponseEntity<String>(
+                    "{\"errorMsg\": \"Could not write json result.\", \"errorCode\": \"errorCode\": \"500\" }",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<String>(sw.toString(), status);
     }
 }

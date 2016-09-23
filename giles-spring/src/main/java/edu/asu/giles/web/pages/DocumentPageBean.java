@@ -4,13 +4,18 @@ import java.util.List;
 
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
+import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
+import edu.asu.giles.core.IPage;
 
-public class DocumentPageBean {
+public class DocumentPageBean implements IDocument {
     private String id;
     private String documentId;
     private String uploadId;
+    private String username;
     private String createdDate;
+    private String uploadedFile;
+    private String extractedText;
     private List<String> fileIds;
     private DocumentAccess access;
     private transient List<IFile> files;
@@ -18,7 +23,12 @@ public class DocumentPageBean {
     private int pageCount;
     private IFile firstImage;
     private List<String> textFileIds;
+    private List<IPage> pages;
+    
     private List<IFile> textFiles;
+    private String metadataUrl;
+    private IFile uploadedFileFile;
+    private IFile extractedTextFile;
     
     public String getId() {
         return id;
@@ -80,6 +90,16 @@ public class DocumentPageBean {
                 return file;
             }
         }
+        
+        if (pages != null && !pages.isEmpty()) {
+            if (pages.get(0) instanceof PagePageBean) {
+                return ((PagePageBean)pages.get(0)).getImageFile();
+            }
+        }
+        
+        if (uploadedFileFile != null && uploadedFileFile.getContentType().startsWith("image/")) {
+            return uploadedFileFile;
+        }
         return null;
     }
     public void setFirstImage(IFile firstImage) {
@@ -97,6 +117,54 @@ public class DocumentPageBean {
     public void setTextFiles(List<IFile> textFiles) {
         this.textFiles = textFiles;
     }
-    
+    public String getMetadataUrl() {
+        return metadataUrl;
+    }
+    public void setMetadataUrl(String metadataUrl) {
+        this.metadataUrl = metadataUrl;
+    }
+    public IFile getUploadedFile() {
+        return uploadedFileFile;
+    }
+    public void setUploadedFile(IFile uploadedFile) {
+        this.uploadedFileFile = uploadedFile;
+    }
+    public void setUploadedFile(String uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+    public String getExtractedTextFileId() {
+        return extractedText;
+    }
+    public void setExtractedTextFileId(String extractedText) {
+        this.extractedText = extractedText;
+    }
+    public String getUsername() {
+        return username;
+    }
+    public void setUsername(String username) {
+        this.username = username;
+    }
+    @Override
+    public void setPages(List<IPage> pages) {
+        this.pages = pages;
+    }
+    @Override
+    public List<IPage> getPages() {
+        return pages;
+    }
+    @Override
+    public void setUploadedFileId(String uploadedFile) {
+        this.uploadedFile = uploadedFile;
+    }
+    @Override
+    public String getUploadedFileId() {
+        return uploadedFile;
+    }
+    public IFile getExtractedTextFile() {
+        return extractedTextFile;
+    }
+    public void setExtractedTextFile(IFile extractedTextFile) {
+        this.extractedTextFile = extractedTextFile;
+    }
     
 }

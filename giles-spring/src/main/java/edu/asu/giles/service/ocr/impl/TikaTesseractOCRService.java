@@ -39,7 +39,7 @@ public class TikaTesseractOCRService implements IOCRService {
      * @see edu.asu.giles.service.ocr.impl.IOCRService#ocrImage(java.lang.String)
      */
     @Override
-    @Async
+    @Async("tesseractExecutor")
     public Future<String> ocrImage(String imageFile) {
         logger.info("(" + Thread.currentThread().getId() + ") OCR using Tesseract on: " + imageFile);
        

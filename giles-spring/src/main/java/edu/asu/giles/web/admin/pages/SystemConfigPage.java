@@ -12,10 +12,12 @@ public class SystemConfigPage {
     private boolean pdfExtractText;
     private String jarsUrl;
     private String jarsFileUrl;
+    private String metadataServiceDocUrl;
     private String tesseractBinFolder;
     private String tesseractDataFolder;
     private boolean ocrImagesFromPdfs;
     private int defaultPageSize;
+    private String iframingAllowedHosts;
     
     public String getGithubClientId() {
         return githubClientId;
@@ -100,5 +102,17 @@ public class SystemConfigPage {
     }
     public void setPdfToImageFormat(String pdfToImageFormat) {
         this.pdfToImageFormat = pdfToImageFormat;
+    }
+    public String getMetadataServiceDocUrl() {
+        return metadataServiceDocUrl;
+    }
+    public void setMetadataServiceDocUrl(String metadataServiceDocUrl) {
+        this.metadataServiceDocUrl = metadataServiceDocUrl;
+    }
+    public String getIframingAllowedHosts() {
+        return iframingAllowedHosts;
+    }
+    public void setIframingAllowedHosts(String iframingAllowedHosts) {
+        this.iframingAllowedHosts = iframingAllowedHosts;
     }
 }

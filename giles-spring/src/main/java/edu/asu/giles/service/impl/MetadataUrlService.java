@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.stereotype.Service;
 
+import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.service.IMetadataUrlService;
 import edu.asu.giles.service.properties.IPropertiesManager;
@@ -44,5 +45,14 @@ public class MetadataUrlService implements IMetadataUrlService {
         String gilesUrl = propertyManager.getProperty(IPropertiesManager.GILES_URL);
         
         return jarsUrl + jarsFileUrl.replace("{giles}", gilesUrl).replace("{fileId}", file.getId());
+    }
+    
+    @Override
+    public String getDocumentLink(IDocument doc) {
+        String jarsUrl = propertyManager.getProperty(IPropertiesManager.JARS_URL);
+        String metadataUrl = propertyManager.getProperty(IPropertiesManager.METADATA_SERVICE_DOC_ENDPOINT);
+        String gilesUrl = propertyManager.getProperty(IPropertiesManager.GILES_URL);
+        
+        return jarsUrl + metadataUrl.replace("{giles}", gilesUrl).replace("{docId}", doc.getId());
     }
 }

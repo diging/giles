@@ -36,7 +36,11 @@
 		<tesseract.data></tesseract.data>
 		<ocr.worker.count>2</ocr.worker.count>
 		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
+		<upload.worker.count>2</upload.worker.count>
 		<jars.url>http://diging.asu.edu/jars</jars.url>
+		<jars.file.url>/resource/get/?uri={giles}/rest/files/{fileId}/content</jars.file.url>
+		<metadata.upload.add>/resource/create/giles/callback/</metadata.upload.add>
+		<metadata.service.doc.url></metadata.service.doc.url>
 		<tomcat.deploy.path></tomcat.deploy.path>
 		<deploy.path.test>giles-test</deploy.path.test>
 		<deploy.path.dev>giles</deploy.path.dev>
@@ -44,6 +48,7 @@
 		<pullrequest></pullrequest>
 		<buildNumber></buildNumber>
 		<log.level>debug</log.level>
+		<iframing.hostname></iframing.hostname>
 	</properties>
 
 	<dependencies>
@@ -244,6 +249,13 @@
 			<artifactId>mysql-connector-java</artifactId>
 			<version>5.1.9</version>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.postgresql/postgresql -->
+		<dependency>
+		    <groupId>org.postgresql</groupId>
+		    <artifactId>postgresql</artifactId>
+		    <version>9.4.1209</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>com.fasterxml.jackson.core</groupId>

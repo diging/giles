@@ -117,7 +117,7 @@ public class DocumentDatabaseClientTest {
         
         @Override
         public boolean matches(Object argument) {
-            if (((Document)argument).getUploadId().equals(uploadId)) {
+            if (((IDocument)argument).getUploadId().equals(uploadId)) {
                 return true;
             }
             return false;
