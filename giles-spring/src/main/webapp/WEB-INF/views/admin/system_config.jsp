@@ -5,6 +5,8 @@
 
 <form:form modelAttribute="systemConfigPage" action="${pageContext.request.contextPath}/admin/system/config" method="POST">
 
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
 <div class="page-header">
 	<h3>GitHub Integration</h3>
 </div>

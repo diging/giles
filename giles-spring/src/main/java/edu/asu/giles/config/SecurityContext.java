@@ -3,6 +3,8 @@ package edu.asu.giles.config;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -20,6 +22,7 @@ import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
+import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 
@@ -46,9 +49,20 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
-        HeadersConfigurer<HttpSecurity> config = http.csrf()
-                .disable()
-                .headers().frameOptions().sameOrigin();
+        HeadersConfigurer<HttpSecurity> config = http.antMatcher("**").csrf().requireCsrfProtectionMatcher(new RequestMatcher() {
+            
+            @Override
+            public boolean matches(HttpServletRequest arg0) {
+                // don't require CSRF for REST calls
+                if (arg0.getRequestURI().indexOf("/rest/") > -1) {
+                    return false;
+                }
+                if (arg0.getMethod() == "GET") {
+                    return false;
+                }
+                return true;
+            }
+        }).and().headers().frameOptions().sameOrigin();
         
         String iframeing = propertiesManager.getProperty(IPropertiesManager.ALLOW_IFRAMING_FROM);
         if (iframeing == null) {
