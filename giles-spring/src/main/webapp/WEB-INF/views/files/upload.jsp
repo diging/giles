@@ -14,6 +14,8 @@
 </div>
 
 <form class="form-inline">
+<input id="csrfInput" type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+  				
 	<div class="form-group">
 		<label>Make uploaded files: </label> <select class="form-control"
 			id="accessInput">
@@ -100,12 +102,13 @@
         $('#fileupload').fileupload({
             // Uncomment the following to send cross-domain cookies:
             //xhrFields: {withCredentials: true},
-            url : '<c:url value="/files/upload" />',
+            url : '<c:url value="/files/upload" />?${_csrf.parameterName}=${_csrf.token}',
             singleFileUploads : false,
             submit : function(e, data) {
                 var input = $('#accessInput');
+                var csrf = $("#csrfInput");
                 data.formData = {
-                    access : input.val()
+                    access : input.val(),
                 };
                 return true;
             },

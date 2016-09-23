@@ -56,6 +56,7 @@
       </div>
       <div class="modal-footer">
          <form class="form-inline" method="POST" id="submitMakePublicForm" action="">
+         	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
          	<input type="hidden" value="PUBLIC" name="access" />
          	<input name="uploadId" type="hidden" value="${upload.id}" />
 	       	<button type="button" class="btn btn-default" data-dismiss="modal">No, cancel.</button>
@@ -78,6 +79,7 @@
       </div>
       <div class="modal-footer">
          <form class="form-inline" method="POST" id="submitMakePrivateForm" action="">
+         	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
          	<input type="hidden" value="PRIVATE" name="access" />
          	<input name="uploadId" type="hidden" value="${upload.id}" />
 	       	<button type="button" class="btn btn-default" data-dismiss="modal">No, cancel.</button>

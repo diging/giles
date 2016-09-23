@@ -64,3 +64,9 @@ a.appName:hover {
 .error {
 	color: darkred;
 }
+
+.nav>li>form {
+    position: relative;
+    display: block;
+    padding: 6px 15px;
+}

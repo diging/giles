@@ -48,6 +48,7 @@
 		<pullrequest></pullrequest>
 		<buildNumber></buildNumber>
 		<log.level>debug</log.level>
+		<iframing.hostname></iframing.hostname>
 	</properties>
 
 	<dependencies>

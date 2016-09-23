@@ -24,6 +24,8 @@ public interface IPropertiesManager {
     public final static String GILES_FILE_ENDPOINT = "giles_file_endpoint";
     public final static String GILES_FILE_CONTENT_SUFFIX = "giles_file_content_suffix";
     public final static String METADATA_SERVICE_DOC_ENDPOINT = "metadata_service_document_url";
+    
+    public final static String ALLOW_IFRAMING_FROM = "allow_iframing_from";
  
 
     public abstract void setProperty(String key, String value) throws GilesPropertiesStorageException;
