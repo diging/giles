@@ -25,10 +25,10 @@ public class UploadThread {
     private FileUploadHelper uploadHelper;
     
     @Async("uploadExecutor")
-    public Future<List<StorageStatus>> runUpload(DocumentAccess access, DocumentType type, MultipartFile[] files, String username) {
+    public Future<List<StorageStatus>> runUpload(DocumentAccess access, DocumentType type, MultipartFile[] files, List<byte[]> fileBytes, String username) {
         logger.info("(" + Thread.currentThread().getId() + ") uploading files.");
 
-        List<StorageStatus> statuses = uploadHelper.processUpload(access, type, files, username);
+        List<StorageStatus> statuses = uploadHelper.processUpload(access, type, files, fileBytes, username);
         return new AsyncResult<List<StorageStatus>>(statuses);
     }
 }

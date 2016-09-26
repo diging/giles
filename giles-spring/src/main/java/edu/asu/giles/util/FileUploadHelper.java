@@ -27,18 +27,26 @@ public class FileUploadHelper {
     @Autowired
     private IFilesManager filesManager;
  
-    public List<StorageStatus> processUpload(DocumentAccess access, DocumentType docType, MultipartFile[] files, String username) {
+    public List<StorageStatus> processUpload(DocumentAccess access, DocumentType docType, MultipartFile[] files, List<byte[]> fileBytes, String username) {
         Map<IFile, byte[]> uploadedFiles = new HashMap<>();
         
         if (access == null) {
             access = DocumentAccess.PRIVATE;
         }
+        
+        int i = 0;
         for (MultipartFile f : files) {
             IFile file = new File(f.getOriginalFilename());
            
             byte[] bytes = null;
             try {
-                bytes = f.getBytes();
+                if(fileBytes != null && fileBytes.size() == files.length) {
+                    bytes = fileBytes.get(i);
+                } else {
+                    bytes = f.getBytes();
+                }
+                i++;
+                
                 uploadedFiles.put(file, bytes);
             } catch (IOException e2) {
                 logger.error("Couldn't get file content.", e2);

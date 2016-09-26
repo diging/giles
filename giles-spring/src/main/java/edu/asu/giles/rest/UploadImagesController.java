@@ -2,6 +2,7 @@ package edu.asu.giles.rest;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -11,7 +12,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.PathParam;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,8 +95,22 @@ public class UploadImagesController {
             
             return generateResponse(msgs, HttpStatus.BAD_REQUEST);
         }
+        
+        List<byte[]> fileBytes = new ArrayList<byte[]>();
+        for (MultipartFile file : files) {
+            try {
+                fileBytes.add(file.getBytes());
+            } catch (IOException e) {
+                logger.error("Error reading bytes.", e);
+                Map<String, String> msgs = new HashMap<String, String>();
+                msgs.put("errorMsg", "File bytes could not be read.");
+                msgs.put("errorCode", "500");
+                
+                return generateResponse(msgs, HttpStatus.INTERNAL_SERVER_ERROR);
+            }
+        }
 
-        String id = uploadService.startUpload(docAccess, documentType, files, user.getUsername());
+        String id = uploadService.startUpload(docAccess, documentType, files, fileBytes, user.getUsername());
        
         Map<String, String> msgs = new HashMap<String, String>();
         msgs.put("id", id);
