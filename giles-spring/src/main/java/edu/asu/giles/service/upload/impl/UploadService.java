@@ -40,12 +40,12 @@ public class UploadService implements IUploadService {
      * @see edu.asu.giles.service.upload.impl.IUploadService#startUpload(edu.asu.giles.core.DocumentAccess, edu.asu.giles.core.DocumentType, org.springframework.web.multipart.MultipartFile[], java.lang.String)
      */
     @Override
-    public String startUpload(DocumentAccess access, DocumentType type, MultipartFile[] files, String username) {
+    public String startUpload(DocumentAccess access, DocumentType type, MultipartFile[] files, List<byte[]> fileBytes, String username) {
         // clean out old uploads before adding new
         cleanUp();
         
         String uploadProgressId = generateId();
-        currentUploads.put(uploadProgressId, uploadThread.runUpload(access, type, files, username));
+        currentUploads.put(uploadProgressId, uploadThread.runUpload(access, type, files, fileBytes, username));
         expirationList.put(uploadProgressId, new Date());
         return uploadProgressId;
     }

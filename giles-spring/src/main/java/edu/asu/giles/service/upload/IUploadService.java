@@ -12,7 +12,7 @@ import edu.asu.giles.files.impl.StorageStatus;
 public interface IUploadService {
 
     public abstract String startUpload(DocumentAccess access, DocumentType type,
-            MultipartFile[] files, String username);
+            MultipartFile[] files, List<byte[]> fileBytes, String username);
 
     public abstract Future<List<StorageStatus>> getUpload(String id);
 
