@@ -14,8 +14,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.social.github.api.GitHubUserProfile;
-import org.springframework.social.github.api.impl.GitHubTemplate;
 import org.springframework.stereotype.Component;
 
 import edu.asu.giles.core.DocumentAccess;
@@ -40,8 +38,8 @@ public class SecurityAspect {
     @Autowired
     private IFilesManager filesManager;
     
-    @Autowired
-    private GitHubTemplateFactory templateFactory;
+//    @Autowired
+//    private GitHubTemplateFactory templateFactory;
     
 
     @Around("within(edu.asu.giles.web..*) && @annotation(noCheck)")
@@ -179,10 +177,10 @@ public class SecurityAspect {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
 
-        GitHubTemplate template = templateFactory.createTemplate(token);
-        GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = userManager.findUser(profile.getLogin());
-        logger.debug("Authorizing: " + profile.getLogin());
+//        GitHubTemplate template = templateFactory.createTemplate(token);
+//        GitHubUserProfile profile = template.userOperations().getUserProfile();
+          User foundUser = null; // userManager.findUser(profile.getLogin());
+//        logger.debug("Authorizing: " + profile.getLogin());
 
         if (foundUser == null) {
             return new ResponseEntity<>(
@@ -249,10 +247,10 @@ public class SecurityAspect {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         }
             
-        GitHubTemplate template = templateFactory.createTemplate(token);
-        GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = userManager.findUser(profile.getLogin());
-        logger.debug("Authorizing: " + profile.getLogin());
+//        GitHubTemplate template = templateFactory.createTemplate(token);
+//        GitHubUserProfile profile = template.userOperations().getUserProfile();
+        User foundUser = null; //userManager.findUser(profile.getLogin());
+//        logger.debug("Authorizing: " + profile.getLogin());
         
         if (foundUser == null) {
             return new ResponseEntity<>(
@@ -324,10 +322,10 @@ public class SecurityAspect {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         }
             
-        GitHubTemplate template = templateFactory.createTemplate(token);
-        GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = userManager.findUser(profile.getLogin());
-        logger.debug("Authorizing: " + profile.getLogin());
+//        GitHubTemplate template = templateFactory.createTemplate(token);
+//        GitHubUserProfile profile = template.userOperations().getUserProfile();
+        User foundUser = null; //userManager.findUser(profile.getLogin());
+//        logger.debug("Authorizing: " + profile.getLogin());
         
         if (foundUser == null) {
             return new ResponseEntity<>(

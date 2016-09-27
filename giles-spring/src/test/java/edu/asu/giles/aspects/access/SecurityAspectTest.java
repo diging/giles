@@ -9,7 +9,6 @@ import org.aspectj.lang.reflect.MethodSignature;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-import org.mockito.AdditionalMatchers;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
@@ -19,9 +18,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.social.github.api.GitHubUserProfile;
-import org.springframework.social.github.api.UserOperations;
-import org.springframework.social.github.api.impl.GitHubTemplate;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
@@ -46,15 +42,15 @@ public class SecurityAspectTest {
     
     @Mock private MethodSignature sig;
     
-    @Mock private GitHubTemplateFactory templateFactory;
-    
-    @Mock private GitHubUserProfile profile;
-    
-    @Mock private GitHubTemplate template;
-    
-    @Mock private GitHubTemplate unauthorizedTemplate;
-    
-    @Mock private UserOperations userOperations;
+//    @Mock private GitHubTemplateFactory templateFactory;
+//    
+//    @Mock private GitHubUserProfile profile;
+//    
+//    @Mock private GitHubTemplate template;
+//    
+//    @Mock private GitHubTemplate unauthorizedTemplate;
+//    
+//    @Mock private UserOperations userOperations;
     
     @Mock private HttpServletRequest request;
     
@@ -272,12 +268,12 @@ public class SecurityAspectTest {
     }
 
     private void setUpGitHubMocking(String username) {
-        Mockito.when(templateFactory.createTemplate(ACCESS_TOKEN)).thenReturn(template);
-        Mockito.when(templateFactory.createTemplate(AdditionalMatchers.not(Mockito.eq(ACCESS_TOKEN)))).thenReturn(unauthorizedTemplate);
-        Mockito.when(template.userOperations()).thenReturn(userOperations);
-        Mockito.when(userOperations.getUserProfile()).thenReturn(profile);
-        Mockito.when(unauthorizedTemplate.userOperations()).thenThrow(new RestClientException(HttpStatus.UNAUTHORIZED.toString()));
-        Mockito.when(profile.getLogin()).thenReturn(username);
+//        Mockito.when(templateFactory.createTemplate(ACCESS_TOKEN)).thenReturn(template);
+//        Mockito.when(templateFactory.createTemplate(AdditionalMatchers.not(Mockito.eq(ACCESS_TOKEN)))).thenReturn(unauthorizedTemplate);
+//        Mockito.when(template.userOperations()).thenReturn(userOperations);
+//        Mockito.when(userOperations.getUserProfile()).thenReturn(profile);
+//        Mockito.when(unauthorizedTemplate.userOperations()).thenThrow(new RestClientException(HttpStatus.UNAUTHORIZED.toString()));
+//        Mockito.when(profile.getLogin()).thenReturn(username);
     }
     
     private void prepareMethodCalls(String paraValue, String paraName, User user) {
