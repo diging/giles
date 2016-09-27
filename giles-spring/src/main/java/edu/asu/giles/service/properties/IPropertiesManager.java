@@ -10,6 +10,8 @@ public interface IPropertiesManager {
     public final static String GITHUB_SECRET = "github_secret";
     public final static String GOOGLE_CLIENT_ID = "google_client_id";
     public final static String GOOGLE_SECRET = "google_secret";
+    public final static String REGISTERED_APPS_CLIENT_IDS = "registered_apps_client_ids";
+    
     public final static String DIGILIB_SCALER_URL = "digilib_scaler_url";
     public final static String GILES_URL = "giles_url";
     public final static String PDF_TO_IMAGE_DPI = "pdf_to_image_dpi";

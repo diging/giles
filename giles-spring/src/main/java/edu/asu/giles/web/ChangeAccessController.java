@@ -10,7 +10,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import edu.asu.giles.aspects.access.AccountCheck;
+import edu.asu.giles.aspects.access.annotations.AccountCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;

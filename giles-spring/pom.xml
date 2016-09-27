@@ -23,6 +23,7 @@
 		<github.secret></github.secret>
 		<google.clientId></google.clientId>
 		<google.secret></google.secret>
+		<registered.apps.client.ids></registered.apps.client.ids>
 		<db_files></db_files>
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url></db.database.url>
@@ -220,16 +221,29 @@
 			<artifactId>spring-social-config</artifactId>
 			<version>${spring-social.version}</version>
 		</dependency>
-		<!-- <dependency>
-			<groupId>org.springframework.social</groupId>
-			<artifactId>spring-social-github</artifactId>
-			<version>${spring-social-github.version}</version>
-		</dependency> -->
+		<!-- <dependency> <groupId>org.springframework.social</groupId> <artifactId>spring-social-github</artifactId> 
+			<version>${spring-social-github.version}</version> </dependency> -->
 		<dependency>
 			<groupId>org.springframework.social</groupId>
 			<artifactId>spring-social-google</artifactId>
 			<version>${org.springframework.social-google-version}</version>
 		</dependency>
+
+		<!-- Google -->
+		<!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.22.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client-gson -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client-gson</artifactId>
+			<version>1.22.0</version>
+		</dependency>
+
+
 
 		<!-- Spring AOP + AspectJ -->
 		<dependency>

@@ -22,7 +22,7 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.aspects.access.annotations.TokenCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.files.IFilesManager;
@@ -41,7 +41,7 @@ public class DigilibPassthroughController {
     @Autowired
     private DigilibConnector digilibConnector;
 
-    @GitHubAccessCheck
+    @TokenCheck
     @RequestMapping(value = "/rest/digilib")
     public ResponseEntity<String> passthroughToDigilib(
             @RequestParam(defaultValue = "") String accessToken,

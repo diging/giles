@@ -23,6 +23,9 @@ import org.springframework.web.multipart.support.StandardMultipartHttpServletReq
 
 import com.google.common.net.HttpHeaders;
 
+import edu.asu.giles.aspects.access.annotations.FileAccessCheck;
+import edu.asu.giles.aspects.access.annotations.TokenCheck;
+import edu.asu.giles.aspects.access.annotations.UploadIdAccessCheck;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.File;
@@ -162,7 +165,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
         
@@ -178,7 +181,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls("", "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
         
@@ -193,7 +196,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls(INVALID_ACCESS_TOKEN, "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
         
@@ -207,7 +210,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls("", "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
         
@@ -220,7 +223,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
@@ -233,7 +236,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
@@ -246,7 +249,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
@@ -260,7 +263,7 @@ public class SecurityAspectTest {
         
         User user = new User();
         prepareMethodCalls(null, "token", user);
-        GitHubAccessCheck check = createGitHubAccessCheckAnnotation("token");
+        TokenCheck check = createGitHubAccessCheckAnnotation("token");
         Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
@@ -332,12 +335,12 @@ public class SecurityAspectTest {
         return check;
     }
     
-    private GitHubAccessCheck createGitHubAccessCheckAnnotation(String parameterName) {
-        GitHubAccessCheck check = new GitHubAccessCheck() {
+    private TokenCheck createGitHubAccessCheckAnnotation(String parameterName) {
+        TokenCheck check = new TokenCheck() {
             
             @Override
             public Class<? extends Annotation> annotationType() {
-                return GitHubAccessCheck.class;
+                return TokenCheck.class;
             }
             
             @Override

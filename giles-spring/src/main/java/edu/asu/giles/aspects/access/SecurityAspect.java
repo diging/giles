@@ -1,5 +1,11 @@
 package edu.asu.giles.aspects.access;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.security.GeneralSecurityException;
+import java.util.HashMap;
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 
 import org.aspectj.lang.ProceedingJoinPoint;
@@ -16,12 +22,28 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.node.ObjectNode;
+
+import edu.asu.giles.aspects.access.annotations.AccountCheck;
+import edu.asu.giles.aspects.access.annotations.DocumentAccessCheck;
+import edu.asu.giles.aspects.access.annotations.DocumentIdAccessCheck;
+import edu.asu.giles.aspects.access.annotations.FileAccessCheck;
+import edu.asu.giles.aspects.access.annotations.FileTokenAccessCheck;
+import edu.asu.giles.aspects.access.annotations.NoAccessCheck;
+import edu.asu.giles.aspects.access.annotations.TokenCheck;
+import edu.asu.giles.aspects.access.annotations.UploadIdAccessCheck;
+import edu.asu.giles.aspects.access.openid.google.Checker;
+import edu.asu.giles.aspects.access.openid.google.CheckerResult;
+import edu.asu.giles.aspects.access.openid.google.ValidationResult;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.exceptions.AspectMisconfigurationException;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.users.AccountStatus;
 import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
@@ -38,6 +60,9 @@ public class SecurityAspect {
     @Autowired
     private IFilesManager filesManager;
     
+    @Autowired
+    private IPropertiesManager propertiesManager;
+    
 //    @Autowired
 //    private GitHubTemplateFactory templateFactory;
     
@@ -52,16 +77,8 @@ public class SecurityAspect {
     @Around("within(edu.asu.giles.web..*) && @annotation(uploadCheck)")
     public Object checkUpoadIdAccess(ProceedingJoinPoint joinPoint,
             UploadIdAccessCheck uploadCheck) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
-        String[] argNames = sig.getParameterNames();
-
-        String uploadId = null;
-        for (int i = 0; i < argNames.length; i++) {
-            if (argNames[i].equals(uploadCheck.value())) {
-                uploadId = (String) args[i];
-            }
-        }
+        
+        String uploadId = getRequestParameter(joinPoint, uploadCheck.value());
 
         Authentication auth = SecurityContextHolder.getContext()
                 .getAuthentication();
@@ -81,16 +98,7 @@ public class SecurityAspect {
     
     @Around("within(edu.asu.giles.web..*) && @annotation(docCheck)")
     public Object checkDocumentIdAccess(ProceedingJoinPoint joinPoint, DocumentIdAccessCheck docCheck) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
-        String[] argNames = sig.getParameterNames();
-
-        String docId = null;
-        for (int i = 0; i < argNames.length; i++) {
-            if (argNames[i].equals(docCheck.value())) {
-                docId = (String) args[i];
-            }
-        }
+        String docId = getRequestParameter(joinPoint, docCheck.value());
         
         Authentication auth = SecurityContextHolder.getContext()
                 .getAuthentication();
@@ -113,17 +121,8 @@ public class SecurityAspect {
     @Around("within(edu.asu.giles.web..*) && @annotation(fileCheck)")
     public Object checkFileAccess(ProceedingJoinPoint joinPoint,
             FileAccessCheck fileCheck) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
-        String[] argNames = sig.getParameterNames();
-
-        String fileId = null;
-        for (int i = 0; i < argNames.length; i++) {
-            if (argNames[i].equals(fileCheck.value())) {
-                fileId = (String) args[i];
-            }
-        }
-
+        String fileId = getRequestParameter(joinPoint, fileCheck.value());
+        
         Authentication auth = SecurityContextHolder.getContext()
                 .getAuthentication();
         User user = (User) auth.getPrincipal();
@@ -139,95 +138,53 @@ public class SecurityAspect {
 
         return joinPoint.proceed();
     }
-
-    @Around("within(edu.asu.giles.rest..*) && @annotation(github)")
-    public Object checkUserAccess(ProceedingJoinPoint joinPoint,
-            GitHubAccessCheck github) throws Throwable {
-        logger.debug("Checking GitHub access token for REST endpoint.");
+    
+    private String getRequestParameter(ProceedingJoinPoint joinPoint,
+            String parameterName) {
         Object[] args = joinPoint.getArgs();
         MethodSignature sig = (MethodSignature) joinPoint.getSignature();
         String[] argNames = sig.getParameterNames();
-        Class<?>[] argTypes = sig.getParameterTypes();
 
-        User user = null;
-        String token = null;
+        String value = null;
         for (int i = 0; i < argNames.length; i++) {
-            // check if GitHub token is passed as parameters
-            if (argNames[i].equals(github.value())) {
-                token = (String) args[i];
-            }
-            // check if there is a request header with github token
-            if (HttpServletRequest.class.isAssignableFrom(argTypes[i])) {
-                String tokenHeader = ((HttpServletRequest)args[i]).getHeader(HttpHeaders.AUTHORIZATION);
-                if (tokenHeader != null) {
-                    token = tokenHeader.substring(6);
-                }
-            }
-            if (argTypes[i].equals(User.class)) {
-                user = (User) args[i];
+            if (argNames[i].equals(parameterName)) {
+                value = (String) args[i];
             }
         }
+        return value;
+    }
+
+    @Around("within(edu.asu.giles.rest..*) && @annotation(github)")
+    public Object checkUserAccess(ProceedingJoinPoint joinPoint,
+            TokenCheck github) throws Throwable {
+        logger.debug("Checking GitHub access token for REST endpoint.");
+        
+        UserTokenObject userTokenObj = extractUserTokenInfo(joinPoint, github.value(), null);
+        
+        User user = userTokenObj.user;
+        String token = userTokenObj.token;
 
         if (user == null) {
             throw new AspectMisconfigurationException(
                     "User object is missing in method.");
         }
 
-        if (token == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        ResponseEntity<String> authResult = checkAuthorization(user, token);
+        if (authResult != null) {
+            return authResult;
         }
-
-//        GitHubTemplate template = templateFactory.createTemplate(token);
-//        GitHubUserProfile profile = template.userOperations().getUserProfile();
-          User foundUser = null; // userManager.findUser(profile.getLogin());
-//        logger.debug("Authorizing: " + profile.getLogin());
-
-        if (foundUser == null) {
-            return new ResponseEntity<>(
-                    "{ \"error\": \"The user doesn't seem to have a Giles account.\" } ",
-                    HttpStatus.FORBIDDEN);
-        }
-        if (foundUser.getAccountStatus() != AccountStatus.APPROVED) {
-            return new ResponseEntity<>(
-                    "{ \"error\": \"The user account you are using has not been approved. Please contact a Giles administrator.\" } ",
-                    HttpStatus.FORBIDDEN);
-        }
-
-        fillUser(foundUser, user);
 
         return joinPoint.proceed();
     }
     
     @Around("within(edu.asu.giles.rest..*) && @annotation(check)")
     public Object checkDocument(ProceedingJoinPoint joinPoint, DocumentAccessCheck check) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
-        String[] argNames = sig.getParameterNames();
-        Class<?>[] argTypes = sig.getParameterTypes();
-        String docId = null;
-
-        User user = null;
-        String token = null;
-        for (int i = 0; i < argNames.length; i++) {
-            // check if GitHub token is passed as parameters
-            if (argNames[i].equals(check.github())) {
-                token = (String) args[i];
-            }
-            // check if there is a request header with github token
-            if (HttpServletRequest.class.isAssignableFrom(argTypes[i])) {
-                String tokenHeader = ((HttpServletRequest)args[i]).getHeader(HttpHeaders.AUTHORIZATION);
-                if (tokenHeader != null) {
-                    token = tokenHeader.substring(6);
-                }
-            }
-            if (argTypes[i].equals(User.class)) {
-                user = (User) args[i];
-            }
-            
-            if (argNames[i].equals(check.value())) {
-                docId = (String) args[i];
-            }
-        }
+                
+        UserTokenObject userTokenObj = extractUserTokenInfo(joinPoint, check.github(), check.value());
+        
+        User user = userTokenObj.user;
+        String token = userTokenObj.token;
+        String docId = userTokenObj.elementId;
         
         if (user == null) {
             throw new AspectMisconfigurationException(
@@ -243,28 +200,10 @@ public class SecurityAspect {
             return joinPoint.proceed();
         }
         
-        if (token == null) {
-            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
+        ResponseEntity<String> authResult = checkAuthorization(user, token);
+        if (authResult != null) {
+            return authResult;
         }
-            
-//        GitHubTemplate template = templateFactory.createTemplate(token);
-//        GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = null; //userManager.findUser(profile.getLogin());
-//        logger.debug("Authorizing: " + profile.getLogin());
-        
-        if (foundUser == null) {
-            return new ResponseEntity<>(
-                    "{ \"error\": \"The user doesn't seem to have a Giles account.\" } ",
-                    HttpStatus.FORBIDDEN);
-        }
-        if (foundUser.getAccountStatus() != AccountStatus.APPROVED) {
-            return new ResponseEntity<>(
-                    "{ \"error\": \"The user account you are using has not been approved. Please contact a Giles administrator.\" } ",
-                    HttpStatus.FORBIDDEN);
-        }
-
-        fillUser(foundUser, user);
-
 
         if (!doc.getUsername().equals(user.getUsername())) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
@@ -274,35 +213,14 @@ public class SecurityAspect {
     }
     
     @Around("within(edu.asu.giles.rest..*) && @annotation(check)")
-    public Object checkFileGitHubAccess(ProceedingJoinPoint joinPoint, FileGitHubAccessCheck check) throws Throwable {
-        Object[] args = joinPoint.getArgs();
-        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
-        String[] argNames = sig.getParameterNames();
-        Class<?>[] argTypes = sig.getParameterTypes();
-        String fileId = null;
-
-        User user = null;
-        String token = null;
-        for (int i = 0; i < argNames.length; i++) {
-            // check if GitHub token is passed as parameters
-            if (argNames[i].equals(check.github())) {
-                token = (String) args[i];
-            }
-            // check if there is a request header with github token
-            if (HttpServletRequest.class.isAssignableFrom(argTypes[i])) {
-                String tokenHeader = ((HttpServletRequest)args[i]).getHeader(HttpHeaders.AUTHORIZATION);
-                if (tokenHeader != null) {
-                    token = tokenHeader.substring(6);
-                }
-            }
-            if (argTypes[i].equals(User.class)) {
-                user = (User) args[i];
-            }
-            
-            if (argNames[i].equals(check.value())) {
-                fileId = (String) args[i];
-            }
-        }
+    public Object checkFileGitHubAccess(ProceedingJoinPoint joinPoint, FileTokenAccessCheck check) throws Throwable {
+        
+        UserTokenObject userTokenObj = extractUserTokenInfo(joinPoint, check.github(), check.value());
+        
+        User user = userTokenObj.user;
+        String token = userTokenObj.token;
+        String fileId = userTokenObj.elementId;
+        
         
         if (user == null) {
             throw new AspectMisconfigurationException(
@@ -318,15 +236,89 @@ public class SecurityAspect {
             return joinPoint.proceed();
         }
         
-        if (token == null) {
+        ResponseEntity<String> authResult = checkAuthorization(user, token);
+        if (authResult != null) {
+            return authResult;
+        }
+
+        if (!file.getUsername().equals(user.getUsername())) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
         }
-            
-//        GitHubTemplate template = templateFactory.createTemplate(token);
-//        GitHubUserProfile profile = template.userOperations().getUserProfile();
-        User foundUser = null; //userManager.findUser(profile.getLogin());
-//        logger.debug("Authorizing: " + profile.getLogin());
         
+        return joinPoint.proceed();
+    }
+    
+    private UserTokenObject extractUserTokenInfo(ProceedingJoinPoint joinPoint, String tokenParameter, String parameterName) {
+        Object[] args = joinPoint.getArgs();
+        MethodSignature sig = (MethodSignature) joinPoint.getSignature();
+        String[] argNames = sig.getParameterNames();
+        Class<?>[] argTypes = sig.getParameterTypes();
+
+        User user = null;
+        String token = null;
+        String elementId = null;
+        for (int i = 0; i < argNames.length; i++) {
+            // check if GitHub token is passed as parameters
+            if (argNames[i].equals(tokenParameter)) {
+                token = (String) args[i];
+            }
+            // check if there is a request header with github token
+            if (HttpServletRequest.class.isAssignableFrom(argTypes[i])) {
+                String tokenHeader = ((HttpServletRequest)args[i]).getHeader(HttpHeaders.AUTHORIZATION);
+                if (tokenHeader != null) {
+                    token = tokenHeader.substring(6);
+                }
+            }
+            if (argTypes[i].equals(User.class)) {
+                user = (User) args[i];
+            }
+            
+            if (parameterName != null) {
+                if (argNames[i].equals(parameterName)) {
+                    elementId = (String) args[i];
+                }
+            }
+        }
+        
+        return new UserTokenObject(user, token, elementId);
+    }
+    
+    private ResponseEntity<String> checkAuthorization(User user, String token) {
+        if (token == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        CheckerResult validationResult = null;
+        
+        try {
+            validationResult = validateToken(token);
+        } catch (GeneralSecurityException e) {
+            logger.error("Security issue with token.", e);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", e.getLocalizedMessage());
+            
+            return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
+        } catch (IOException e) {
+            logger.error("Network issue.", e);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", e.getLocalizedMessage());
+            
+            return generateResponse(msgs, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        if (validationResult == null) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+        
+        if (validationResult.getResult() != ValidationResult.VALID) {
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", validationResult.getResult().name());
+            return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
+        }
+        
+        User foundUser = userManager.findUser(validationResult.getPayload().getSubject());
+        logger.debug("Authorizing: " + validationResult.getPayload().getSubject());
+
         if (foundUser == null) {
             return new ResponseEntity<>(
                     "{ \"error\": \"The user doesn't seem to have a Giles account.\" } ",
@@ -339,13 +331,16 @@ public class SecurityAspect {
         }
 
         fillUser(foundUser, user);
-
-
-        if (!file.getUsername().equals(user.getUsername())) {
-            return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
-        }
         
-        return joinPoint.proceed();
+        return null;
+    }
+    
+    private CheckerResult validateToken(String token) throws GeneralSecurityException, IOException {
+        String clientIds = propertiesManager.getProperty(IPropertiesManager.REGISTERED_APPS_CLIENT_IDS);
+        String[] clientIdsList = clientIds.split(",");
+        Checker checker = new Checker(clientIdsList, clientIdsList);
+        
+        return checker.check(token);
     }
     
     
@@ -369,5 +364,40 @@ public class SecurityAspect {
         toBeFilled.setRoles(filled.getRoles());
         toBeFilled.setUserIdOfProvider(filled.getUserIdOfProvider());
         toBeFilled.setUsername(filled.getUsername());
+    }
+    
+    private ResponseEntity<String> generateResponse(Map<String, String> msgs, HttpStatus status) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectNode root = mapper.createObjectNode();
+        for (String key : msgs.keySet()) {
+            root.put(key, msgs.get(key));
+        }
+        
+        StringWriter sw = new StringWriter();
+        try {
+            mapper.writeValue(sw, root);
+        } catch (IOException e) {
+            logger.error("Could not write json.", e);
+            return new ResponseEntity<String>(
+                    "{\"errorMsg\": \"Could not write json result.\", \"errorCode\": \"errorCode\": \"500\" }",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<String>(sw.toString(), status);
+    }
+    
+    class UserTokenObject {
+        
+        public User user;
+        public String token;
+        public String elementId;
+        
+        public UserTokenObject(User user, String token, String elementId) {
+            super();
+            this.user = user;
+            this.token = token;
+            this.elementId = elementId;
+        }
     }
 }

@@ -9,8 +9,8 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
-import edu.asu.giles.aspects.access.AccountCheck;
-import edu.asu.giles.aspects.access.UploadIdAccessCheck;
+import edu.asu.giles.aspects.access.annotations.AccountCheck;
+import edu.asu.giles.aspects.access.annotations.UploadIdAccessCheck;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
