@@ -24,6 +24,7 @@
 		<google.clientId></google.clientId>
 		<google.secret></google.secret>
 		<registered.apps.client.ids></registered.apps.client.ids>
+		<jwt.signing.secret></jwt.signing.secret>
 		<db_files></db_files>
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url></db.database.url>
@@ -241,6 +242,13 @@
 			<groupId>com.google.api-client</groupId>
 			<artifactId>google-api-client-gson</artifactId>
 			<version>1.22.0</version>
+		</dependency>
+
+		<!-- Token generation -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.7.0</version>
 		</dependency>
 
 

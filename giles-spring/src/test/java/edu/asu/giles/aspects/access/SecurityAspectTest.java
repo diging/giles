@@ -18,13 +18,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.client.RestClientException;
 import org.springframework.web.multipart.support.StandardMultipartHttpServletRequest;
 
-import com.google.common.net.HttpHeaders;
-
 import edu.asu.giles.aspects.access.annotations.FileAccessCheck;
-import edu.asu.giles.aspects.access.annotations.TokenCheck;
 import edu.asu.giles.aspects.access.annotations.UploadIdAccessCheck;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
@@ -45,24 +41,10 @@ public class SecurityAspectTest {
     
     @Mock private MethodSignature sig;
     
-//    @Mock private GitHubTemplateFactory templateFactory;
-//    
-//    @Mock private GitHubUserProfile profile;
-//    
-//    @Mock private GitHubTemplate template;
-//    
-//    @Mock private GitHubTemplate unauthorizedTemplate;
-//    
-//    @Mock private UserOperations userOperations;
-    
     @Mock private HttpServletRequest request;
     
     @InjectMocks
     private SecurityAspect aspectToTest;
-    
-    private final String ACCESS_TOKEN = "ACCESS_TOKEN";
-    private final String INVALID_ACCESS_TOKEN = "INVALID_ACCESS_TOKEN";
-    
     
     @Before
     public void setUp() {
@@ -159,126 +141,6 @@ public class SecurityAspectTest {
         Assert.assertEquals(new ResponseEntity<String>(HttpStatus.FORBIDDEN), retObj);
     }
     
-    @Test
-    public void test_checkUserAccess_success() throws Throwable {
-        setUpGitHubMocking("test");
-        
-        User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        
-        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
-        
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
-        Assert.assertEquals("proceed", returnObj);
-        Assert.assertEquals("test", user.getUsername());
-    }
-    
-    @Test
-    public void test_checkUserAccess_tokenInHeader_success() throws Throwable {
-        Mockito.when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("token " + ACCESS_TOKEN);
-        setUpGitHubMocking("test");
-        
-        User user = new User();
-        prepareMethodCalls("", "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        
-        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
-        
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
-        Assert.assertEquals("proceed", returnObj);
-        Assert.assertEquals("test", user.getUsername());
-    }
-    
-    @Test(expected=RestClientException.class)
-    public void test_checkUserAccess_invalidToken() throws Throwable {
-        setUpGitHubMocking("test");
-        
-        User user = new User();
-        prepareMethodCalls(INVALID_ACCESS_TOKEN, "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        
-        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
-        
-        aspectToTest.checkUserAccess(joinPoint, check);
-    }
-    
-    @Test(expected=RestClientException.class)
-    public void test_checkUserAccess_tokenInHeader_invalidToken() throws Throwable {
-        Mockito.when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn("token " + INVALID_ACCESS_TOKEN);
-        setUpGitHubMocking("test");
-        
-        User user = new User();
-        prepareMethodCalls("", "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        
-        Mockito.when(joinPoint.proceed()).thenReturn("proceed");
-        
-        aspectToTest.checkUserAccess(joinPoint, check);
-    }
-    
-    @Test
-    public void test_checkUserAccess_added() throws Throwable {
-        setUpGitHubMocking("test2");
-        
-        User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
-        
-        Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
-        Assert.assertEquals(HttpStatus.FORBIDDEN, ((ResponseEntity)returnObj).getStatusCode());
-    }
-    
-    @Test
-    public void test_checkUserAccess_revoked() throws Throwable {
-        setUpGitHubMocking("test3");
-        
-        User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
-        
-        Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
-        Assert.assertEquals(HttpStatus.FORBIDDEN, ((ResponseEntity)returnObj).getStatusCode());
-    }
-    
-    @Test
-    public void test_checkUserAccess_noAccount() throws Throwable {
-        setUpGitHubMocking("test4");
-        
-        User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
-        
-        Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
-        Assert.assertEquals(HttpStatus.FORBIDDEN, ((ResponseEntity)returnObj).getStatusCode());
-    }
-    
-
-    @Test
-    public void test_checkUserAccess_noToken() throws Throwable {
-        setUpGitHubMocking("test");
-        
-        User user = new User();
-        prepareMethodCalls(null, "token", user);
-        TokenCheck check = createGitHubAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
-        
-        Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
-        Assert.assertEquals(HttpStatus.UNAUTHORIZED, ((ResponseEntity)returnObj).getStatusCode());
-    }
-
-    private void setUpGitHubMocking(String username) {
-//        Mockito.when(templateFactory.createTemplate(ACCESS_TOKEN)).thenReturn(template);
-//        Mockito.when(templateFactory.createTemplate(AdditionalMatchers.not(Mockito.eq(ACCESS_TOKEN)))).thenReturn(unauthorizedTemplate);
-//        Mockito.when(template.userOperations()).thenReturn(userOperations);
-//        Mockito.when(userOperations.getUserProfile()).thenReturn(profile);
-//        Mockito.when(unauthorizedTemplate.userOperations()).thenThrow(new RestClientException(HttpStatus.UNAUTHORIZED.toString()));
-//        Mockito.when(profile.getLogin()).thenReturn(username);
-    }
-    
     private void prepareMethodCalls(String paraValue, String paraName, User user) {
         
         Object[] args = new Object[3];
@@ -334,21 +196,5 @@ public class SecurityAspectTest {
         
         return check;
     }
-    
-    private TokenCheck createGitHubAccessCheckAnnotation(String parameterName) {
-        TokenCheck check = new TokenCheck() {
-            
-            @Override
-            public Class<? extends Annotation> annotationType() {
-                return TokenCheck.class;
-            }
-            
-            @Override
-            public String value() {
-                return parameterName;
-            }
-        };
-        
-        return check;
-    }
+
 }

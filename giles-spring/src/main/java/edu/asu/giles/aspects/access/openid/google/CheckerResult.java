@@ -1,10 +1,10 @@
 package edu.asu.giles.aspects.access.openid.google;
 
-import com.google.api.client.googleapis.auth.oauth2.GoogleIdToken;
+import edu.asu.giles.tokens.ITokenContents;
 
 public class CheckerResult {
     private ValidationResult result;
-    private GoogleIdToken.Payload payload;
+    private ITokenContents payload;
     
     public ValidationResult getResult() {
         return result;
@@ -12,10 +12,10 @@ public class CheckerResult {
     public void setResult(ValidationResult result) {
         this.result = result;
     }
-    public GoogleIdToken.Payload getPayload() {
+    public ITokenContents getPayload() {
         return payload;
     }
-    public void setPayload(GoogleIdToken.Payload payload) {
+    public void setPayload(ITokenContents payload) {
         this.payload = payload;
     }
     

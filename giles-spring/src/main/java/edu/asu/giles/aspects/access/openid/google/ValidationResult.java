@@ -4,5 +4,6 @@ public enum ValidationResult {
     AUDIENCE_MISMATCH,
     CLIENT_ID_MISMATCH,
     VALID,
-    INVALID
+    INVALID,
+    EXPIRED
 }
