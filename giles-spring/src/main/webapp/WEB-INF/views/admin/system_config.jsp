@@ -8,23 +8,17 @@
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
 <div class="page-header">
-	<h3>GitHub Integration</h3>
+	<h3>OpenId Integration</h3>
 </div>
 	<div class="form-group">
-		<label for="githubSecret">GitHub Secret</label> 
+		<label for="registeredApps">Client IDs of Authorized Applications</label> 
 		<form:input
-			type="text" class="form-control" id="githubSecret"
-			placeholder="GitHub Secret" path="githubSecret" value="${githubSecret}" ></form:input>
-		<small><form:errors class="error" path="githubSecret"></form:errors></small>
+			type="text" class="form-control" id="registeredApps"
+			placeholder="Client IDs" path="registeredApps" value="${registeredApps}" ></form:input>
+		<small><form:errors class="error" path="registeredApps"></form:errors></small>
+		<small>Comma-seperated list of client IDs of registered applications.</small>
 	</div>
-	<div class="form-group">
-		<label for="githubClientId">GitHub Client Id</label> 
-		<form:input
-			type="text" class="form-control" id="githubClientId"
-			placeholder="GitHub Client Id" path="githubClientId" value="${githubClientId}"></form:input>
-		<small><form:errors class="error" path="githubClientId"></form:errors></small>
-	</div>
-
+	
 <div class="page-header">
 	<h3>Application Integration</h3>
 </div>

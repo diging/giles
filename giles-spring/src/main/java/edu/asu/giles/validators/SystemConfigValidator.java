@@ -15,8 +15,6 @@ public class SystemConfigValidator implements Validator {
 
     @Override
     public void validate(Object arg0, Errors arg1) {
-        ValidationUtils.rejectIfEmptyOrWhitespace(arg1, "githubClientId", "github_client_id_missing");
-        ValidationUtils.rejectIfEmptyOrWhitespace(arg1, "githubSecret", "github_secret_missing");
         ValidationUtils.rejectIfEmptyOrWhitespace(arg1, "gilesUrl", "giles_url_missing");
     }
 

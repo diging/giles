@@ -2,8 +2,7 @@ package edu.asu.giles.web.admin.pages;
 
 public class SystemConfigPage {
 
-    private String githubClientId;
-    private String githubSecret;
+    private String registeredApps;
     private String digilibScalerUrl;
     private String gilesUrl;
     private String pdfToImageDpi;
@@ -19,17 +18,11 @@ public class SystemConfigPage {
     private int defaultPageSize;
     private String iframingAllowedHosts;
     
-    public String getGithubClientId() {
-        return githubClientId;
+    public String getRegisteredApps() {
+        return registeredApps;
     }
-    public void setGithubClientId(String githubClientId) {
-        this.githubClientId = githubClientId;
-    }
-    public String getGithubSecret() {
-        return githubSecret;
-    }
-    public void setGithubSecret(String githubSecret) {
-        this.githubSecret = githubSecret;
+    public void setRegisteredApps(String registeredApps) {
+        this.registeredApps = registeredApps;
     }
     public String getDigilibScalerUrl() {
         return digilibScalerUrl;
