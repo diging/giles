@@ -39,6 +39,7 @@ import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.exceptions.AspectMisconfigurationException;
+import edu.asu.giles.exceptions.InvalidTokenException;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.users.AccountStatus;
 import edu.asu.giles.users.IUserManager;
@@ -69,7 +70,7 @@ public class RestSecurityAspect {
     
     
     @Around("within(edu.asu.giles.rest..*) && @annotation(tokenCheck)")
-    public Object checkUserAccess(ProceedingJoinPoint joinPoint,
+    public Object checkOpenIdUserAccess(ProceedingJoinPoint joinPoint,
             OpenIdTokenCheck tokenCheck) throws Throwable {
         logger.debug("Checking Open Id access token for REST endpoint.");
         
@@ -91,7 +92,7 @@ public class RestSecurityAspect {
         return joinPoint.proceed();
     }
     
-    @Around("within(edu.asu.giles.rest..*) && @annotation(github)")
+    @Around("within(edu.asu.giles.rest..*) && @annotation(tokenCheck)")
     public Object checkGilesTokenAccess(ProceedingJoinPoint joinPoint,
             TokenCheck tokenCheck) throws Throwable {
         
@@ -105,7 +106,7 @@ public class RestSecurityAspect {
                     "User object is missing in method.");
         }
         
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GoogleChecker.ID);
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID);
         if (authResult != null) {
             return authResult;
         }
@@ -240,10 +241,19 @@ public class RestSecurityAspect {
             msgs.put("errorMsg", e.getLocalizedMessage());
             
             return generateResponse(msgs, HttpStatus.INTERNAL_SERVER_ERROR);
+        } catch (InvalidTokenException e) {
+            logger.error("Token is invalid.", e);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", e.getLocalizedMessage());
+            
+            return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         
         if (validationResult == null || validationResult.getPayload() == null) {
-            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "Missing or invalid token.");
+            msgs.put("errorCode", "401");
+            return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         
         if (validationResult.getResult() == ValidationResult.EXPIRED) {
@@ -256,6 +266,7 @@ public class RestSecurityAspect {
         if (validationResult.getResult() != ValidationResult.VALID) {
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", validationResult.getResult().name());
+            msgs.put("errorCode", "401");
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         

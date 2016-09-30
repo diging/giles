@@ -13,7 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
-import edu.asu.giles.aspects.access.annotations.TokenCheck;
+import edu.asu.giles.aspects.access.annotations.OpenIdTokenCheck;
 import edu.asu.giles.rest.util.IJSONHelper;
 import edu.asu.giles.tokens.ITokenService;
 import edu.asu.giles.users.User;
@@ -27,7 +27,7 @@ public class TokenController {
     @Autowired
     private IJSONHelper jsonHelper;
 
-    @TokenCheck
+    @OpenIdTokenCheck
     @RequestMapping(value = "/rest/token", method = RequestMethod.POST)
     public ResponseEntity<String> getUserToken(@RequestParam(defaultValue = "") String accessToken, 
             HttpServletRequest request, User user) {

@@ -51,17 +51,21 @@ public class TokenService implements ITokenService {
      */
     @Override
     public ITokenContents getTokenContents(String token) {
+        ITokenContents contents = new TokenContents();
+        contents.setExpired(true);
         try {
-            ITokenContents contents = new TokenContents();
             Jws<Claims> jws = Jwts.parser().setSigningKey(propertiesManager.getProperty(IPropertiesManager.SIGNING_KEY)).parseClaimsJws(token);
             Claims claims = jws.getBody();
             contents.setUsername(claims.getSubject());
             Date expirationTime = claims.getExpiration();
             contents.setExpired(expirationTime.before(new Date()));
-            return contents;
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            contents.setExpired(true); 
         } catch (SignatureException e) {
             return null;
-        }
+        } 
+        
+        return contents;
     }
     
 }

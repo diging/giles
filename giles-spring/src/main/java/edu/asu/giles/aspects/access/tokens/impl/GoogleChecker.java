@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 import edu.asu.giles.aspects.access.openid.google.Checker;
 import edu.asu.giles.aspects.access.openid.google.CheckerResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
+import edu.asu.giles.exceptions.InvalidTokenException;
 import edu.asu.giles.service.properties.IPropertiesManager;
 
 @Service
@@ -25,12 +26,16 @@ public class GoogleChecker implements IChecker {
     }
 
     @Override
-    public CheckerResult validateToken(String token) throws GeneralSecurityException, IOException {
+    public CheckerResult validateToken(String token) throws GeneralSecurityException, IOException, InvalidTokenException {
         String clientIds = propertiesManager.getProperty(IPropertiesManager.REGISTERED_APPS_CLIENT_IDS);
         String[] clientIdsList = clientIds.split(",");
         Checker checker = new Checker(clientIdsList, clientIdsList);
         
-        return checker.check(token);
+        try {
+            return checker.check(token);
+        } catch (IllegalArgumentException e) {
+            throw new InvalidTokenException("The provided token is not a valid Google OpenId token.", e);
+        }
     }
 
 }

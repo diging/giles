@@ -1,5 +1,7 @@
 package edu.asu.giles.aspects.access.tokens.impl;
 
+import io.jsonwebtoken.MalformedJwtException;
+
 import java.io.IOException;
 import java.security.GeneralSecurityException;
 
@@ -9,6 +11,7 @@ import org.springframework.stereotype.Service;
 import edu.asu.giles.aspects.access.openid.google.CheckerResult;
 import edu.asu.giles.aspects.access.openid.google.ValidationResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
+import edu.asu.giles.exceptions.InvalidTokenException;
 import edu.asu.giles.tokens.ITokenContents;
 import edu.asu.giles.tokens.ITokenService;
 
@@ -27,8 +30,14 @@ public class GilesChecker implements IChecker {
 
     @Override
     public CheckerResult validateToken(String token) throws GeneralSecurityException,
-            IOException {
-        ITokenContents contents = tokenService.getTokenContents(token);
+            IOException, InvalidTokenException {
+        ITokenContents contents;
+        
+        try {
+            contents = tokenService.getTokenContents(token);
+        } catch (MalformedJwtException | IllegalArgumentException e) {
+            throw new InvalidTokenException("The provided token is not a valid JWT token.", e);
+        }
         
         CheckerResult result = new CheckerResult();
         result.setPayload(contents);
@@ -37,7 +46,7 @@ public class GilesChecker implements IChecker {
         } else if (!contents.isExpired()) {
             result.setResult(ValidationResult.VALID);
         } else {
-            result.setResult(ValidationResult.INVALID);
+            result.setResult(ValidationResult.EXPIRED);
         }
         
         return result;

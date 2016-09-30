@@ -36,6 +36,7 @@ import edu.asu.giles.aspects.access.openid.google.ValidationResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GilesChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GoogleChecker;
+import edu.asu.giles.exceptions.InvalidTokenException;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.tokens.ITokenContents;
 import edu.asu.giles.tokens.impl.TokenContents;
@@ -116,7 +117,7 @@ public class RestSecurityAspectTest {
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
         Assert.assertEquals("proceed", returnObj);
         Assert.assertEquals("test", user.getUsername());
     }
@@ -133,7 +134,7 @@ public class RestSecurityAspectTest {
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
         Assert.assertEquals("proceed", returnObj);
         Assert.assertEquals("test", user.getUsername());
     }
@@ -148,7 +149,7 @@ public class RestSecurityAspectTest {
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED,
@@ -167,7 +168,7 @@ public class RestSecurityAspectTest {
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED,
@@ -181,7 +182,7 @@ public class RestSecurityAspectTest {
         User user = new User();
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
         OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.FORBIDDEN,
@@ -195,7 +196,7 @@ public class RestSecurityAspectTest {
         User user = new User();
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
         OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.FORBIDDEN,
@@ -210,7 +211,7 @@ public class RestSecurityAspectTest {
         prepareMethodCalls(ACCESS_TOKEN, "token", user);
         OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
 
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.FORBIDDEN,
@@ -225,7 +226,7 @@ public class RestSecurityAspectTest {
         prepareMethodCalls(null, "token", user);
         OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
 
-        Object returnObj = aspectToTest.checkUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED,
@@ -255,7 +256,7 @@ public class RestSecurityAspectTest {
         Mockito.when(sig.getParameterTypes()).thenReturn(paraTypes);
     }
 
-    private void setUpTokenMocking(String username) throws GeneralSecurityException, IOException {
+    private void setUpTokenMocking(String username) throws GeneralSecurityException, IOException, InvalidTokenException {
         CheckerResult validResult = new CheckerResult();
         validResult.setResult(ValidationResult.VALID);
         
