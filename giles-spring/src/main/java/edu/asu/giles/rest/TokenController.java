@@ -32,7 +32,7 @@ public class TokenController {
     public ResponseEntity<String> getUserToken(@RequestParam(defaultValue = "") String accessToken, 
             HttpServletRequest request, User user) {
         
-        String token = tokenService.generateToken(user.getUsername());
+        String token = tokenService.generateToken(user.getUserIdOfProvider());
         Map<String, String> resp = new HashMap<String, String>();
         resp.put("authentication", "success");
         resp.put("token", token);

@@ -40,6 +40,15 @@
 		<put-attribute name="content" value="/WEB-INF/views/uploads/showDocument.jsp" />	
 	</definition>
 	
+	<!-- profile -->
+	<definition name="profile" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/profile/profile.jsp" />	
+	</definition>
+	<definition name="profile/username/change" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/profile/changeUsername.jsp" />	
+	</definition>
+	
+	<!-- error pages -->
 	<definition name="notFound" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/notFound.jsp" />	
 	</definition>

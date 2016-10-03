@@ -34,7 +34,8 @@ public final class SimpleSignInAdapter implements SignInAdapter {
         UserProfile profile = connection.fetchUserProfile();
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        User user = userManager.findUser(profile.getUsername());
+        User user = userManager.findUserByProviderUserId(connection.getKey().getProviderUserId());
+        
         if (user == null) {
             authorities.add(new GilesGrantedAuthority(
                     GilesGrantedAuthority.ROLE_USER));

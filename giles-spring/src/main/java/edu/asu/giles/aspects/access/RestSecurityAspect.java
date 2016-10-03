@@ -270,7 +270,7 @@ public class RestSecurityAspect {
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         
-        User foundUser = userManager.findUser(validationResult.getPayload().getUsername());
+        User foundUser = userManager.findUserByProviderUserId(validationResult.getPayload().getUsername());
         logger.debug("Authorizing: " + validationResult.getPayload().getUsername());
 
         if (foundUser == null) {
