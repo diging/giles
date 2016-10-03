@@ -21,7 +21,7 @@ public class User implements Serializable {
     private List<String> roles;
     private String password;
     private AccountStatus accountStatus;
-
+    
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
@@ -112,4 +112,5 @@ public class User implements Serializable {
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
     }
+    
 }

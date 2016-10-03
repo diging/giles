@@ -1,4 +1,4 @@
-package edu.asu.giles.aspects.access;
+package edu.asu.giles.aspects.access.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -7,7 +7,6 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface FileGitHubAccessCheck {
-    String value() default "fileId";
-    String github() default "accessToken";
+public @interface UploadIdAccessCheck {
+    String value() default "uploadId";
 }

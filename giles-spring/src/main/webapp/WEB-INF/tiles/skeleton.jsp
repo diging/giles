@@ -51,10 +51,10 @@
           <ul class="nav nav-pills pull-right">
           <sec:authorize access="not isAuthenticated()">
             <li role="presentation">
-            	<form action="<c:url value="/signin/github" />" method="POST">
+            	<form action="<c:url value="/signin/google" />" method="POST">
             	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
             		<button class="btn btn-link" type="submit">
-            			<i class="fa fa-github" aria-hidden="true"></i> Login
+            			<i class="fa fa-google-plus" aria-hidden="true"></i> Login
             		</button>
             	</form>
             </li>
@@ -79,6 +79,9 @@
           	</li>
           </sec:authorize>
           <sec:authorize access="isAuthenticated()">
+          	<li role="presentation">
+          		<a href="<c:url value="/profile" />" >Profile</a>
+          	</li>
          	 <li role="presentation">
          	 	<form action="<c:url value="/logout" />" method="POST">
          	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -95,9 +98,13 @@
       
       <sec:authorize access="isAuthenticated()">
       <p class="text-right">
-      Logged in as <i class="fa fa-github" aria-hidden="true"></i> 
-         			<sec:authentication
-							property="principal.username" />
+      Logged in as <i class="fa fa-google-plus" aria-hidden="true"></i> 
+      <c:catch var="err">
+        <sec:authentication property="principal.fullname" />
+	  </c:catch>
+	  <c:if test="${not empty err}">
+	  	<sec:authentication property="principal.username" />
+	  </c:if>
 	  </p>
 	  </sec:authorize>
 

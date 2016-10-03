@@ -16,7 +16,7 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
-import org.springframework.social.github.connect.GitHubConnectionFactory;
+import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 import edu.asu.giles.service.properties.IPropertiesManager;
@@ -39,10 +39,12 @@ public class SocialContext implements SocialConfigurer {
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig,
             Environment env) {
-        String githubClientId = propertyManager.getProperty(IPropertiesManager.GITHUB_CLIENT_ID);
-        String githubSecret = propertyManager.getProperty(IPropertiesManager.GITHUB_SECRET);
-        cfConfig.addConnectionFactory(new GitHubConnectionFactory(
-                githubClientId, githubSecret));
+        String googleClientId = propertyManager.getProperty(IPropertiesManager.GOOGLE_CLIENT_ID);
+        String googleSecret = propertyManager.getProperty(IPropertiesManager.GOOGLE_SECRET);
+        GoogleConnectionFactory factory = new GoogleConnectionFactory(
+                googleClientId, googleSecret);
+        factory.setScope("email");
+        cfConfig.addConnectionFactory(factory);
     }
 
     @Override

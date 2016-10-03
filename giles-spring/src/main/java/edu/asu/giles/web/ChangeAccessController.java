@@ -10,7 +10,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
-import edu.asu.giles.aspects.access.AccountCheck;
+import edu.asu.giles.aspects.access.annotations.AccountCheck;
+import edu.asu.giles.aspects.access.annotations.DocumentIdAccessCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
@@ -23,6 +24,7 @@ public class ChangeAccessController {
     private IFilesManager filesManager;
 
     @AccountCheck
+    @DocumentIdAccessCheck("documentId")
     @RequestMapping(value = "/documents/{documentId}/access/change", method = RequestMethod.POST)
     public String changeAccess(@PathVariable("documentId") String documentId,
             @RequestParam("access") String access,

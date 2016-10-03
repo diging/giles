@@ -68,6 +68,18 @@ public class UserDatabaseClient {
 
         return null;
     }
+    
+    public User findUserByProviderUserId(String userId) {
+        User user = new User();
+        user.setUserIdOfProvider(userId);
+        ObjectSet<User> results = client.queryByExample(user);
+        
+        if (results.size() >= 1) {
+            return results.get(0);
+        }
+
+        return null;
+    }
 
     public List<User> findUsers(User exampleUser) {
         ObjectSet<User> results = client.queryByExample(exampleUser);
@@ -97,7 +109,20 @@ public class UserDatabaseClient {
     }
 
     public void update(User user) {
-        client.store(user);
+        User storedUser = findUserByProviderUserId(user.getUserIdOfProvider());
+        
+        storedUser.setAccountStatus(user.getAccountStatus());
+        storedUser.setAdmin(user.getIsAdmin());
+        storedUser.setEmail(user.getEmail());
+        storedUser.setFirstname(user.getFirstname());
+        storedUser.setLastname(user.getLastname());
+        storedUser.setPassword(user.getPassword());
+        storedUser.setProvider(user.getProvider());
+        storedUser.setRoles(user.getRoles());
+        storedUser.setUserIdOfProvider(user.getUserIdOfProvider());
+        storedUser.setUsername(user.getUsername());
+        
+        client.store(storedUser);
         client.commit();
     }
 

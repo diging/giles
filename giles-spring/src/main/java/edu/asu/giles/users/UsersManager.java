@@ -28,6 +28,11 @@ public class UsersManager implements IUserManager {
         User user = client.findUser(name);
         return user;
     }
+    
+    @Override
+    public User findUserByProviderUserId(String userId) {
+        return client.findUserByProviderUserId(userId);
+    }
 
     /*
      * (non-Javadoc)

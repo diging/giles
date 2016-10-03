@@ -19,11 +19,11 @@ To use Giles, you need to log in with your GitHub account. Don't have one? You c
 </p>
 
 
-<form action="<c:url value="/signin/github" />" method="POST">
+<form action="<c:url value="/signin/google" />" method="POST">
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
 	<button class="btn btn-primary btn-lg" type="submit">
-		<i class="fa fa-github" aria-hidden="true"></i> Login with GitHub
+		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with Google+
 	</button>
 </form>
 </sec:authorize>

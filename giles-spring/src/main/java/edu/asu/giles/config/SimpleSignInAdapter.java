@@ -14,7 +14,6 @@ import org.springframework.security.web.savedrequest.SavedRequest;
 import org.springframework.social.connect.Connection;
 import org.springframework.social.connect.UserProfile;
 import org.springframework.social.connect.web.SignInAdapter;
-import org.springframework.social.github.api.GitHubUserProfile;
 import org.springframework.web.context.request.NativeWebRequest;
 
 import edu.asu.giles.users.AccountStatus;
@@ -35,7 +34,8 @@ public final class SimpleSignInAdapter implements SignInAdapter {
         UserProfile profile = connection.fetchUserProfile();
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        User user = userManager.findUser(profile.getUsername());
+        User user = userManager.findUserByProviderUserId(connection.getKey().getProviderUserId());
+        
         if (user == null) {
             authorities.add(new GilesGrantedAuthority(
                     GilesGrantedAuthority.ROLE_USER));

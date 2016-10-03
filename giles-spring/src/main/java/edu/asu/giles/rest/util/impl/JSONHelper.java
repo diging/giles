@@ -1,9 +1,18 @@
 package edu.asu.giles.rest.util.impl;
 
+import java.io.IOException;
+import java.io.StringWriter;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
@@ -16,6 +25,8 @@ import edu.asu.giles.rest.util.IJSONHelper;
 
 @Component
 public class JSONHelper implements IJSONHelper {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
 
     @Autowired
     private IFilesManager filesManager;
@@ -57,6 +68,28 @@ public class JSONHelper implements IJSONHelper {
                 }
             }
         }
+    }
+    
+    @Override
+    public ResponseEntity<String> generateSimpleResponse(Map<String, String> msgs, HttpStatus status) {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ObjectNode root = mapper.createObjectNode();
+        for (String key : msgs.keySet()) {
+            root.put(key, msgs.get(key));
+        }
+        
+        StringWriter sw = new StringWriter();
+        try {
+            mapper.writeValue(sw, root);
+        } catch (IOException e) {
+            logger.error("Could not write json.", e);
+            return new ResponseEntity<String>(
+                    "{\"errorMsg\": \"Could not write json result.\", \"errorCode\": \"errorCode\": \"500\" }",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<String>(sw.toString(), status);
     }
 
     private ObjectNode createFileJsonObject(ObjectMapper mapper, IFile file) {
