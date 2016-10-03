@@ -103,6 +103,7 @@ public class RestSecurityAspectTest {
         revokedAccount.setAccountStatus(AccountStatus.REVOKED);
         
         Mockito.when(userManager.findUser("test")).thenReturn(user);
+        Mockito.when(userManager.findUserByProviderUserId("test")).thenReturn(user);
         Mockito.when(userManager.findUser("test2")).thenReturn(addedAccount);
         Mockito.when(userManager.findUser("test3")).thenReturn(revokedAccount);
     }
