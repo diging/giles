@@ -15,7 +15,7 @@ that are then accessible through Digilib. Metadata of uploaded images  managed w
 </p>
 
 <p>
-To use Giles, you need to log in with your GitHub account. Don't have one? You can create one <a href="http://github.com">here</a>.
+To use Giles, you need to log in with your Google+ account. Don't have one? You can create one <a target="_blank" href="https://plus.google.com/">here</a>.
 </p>
 
 
