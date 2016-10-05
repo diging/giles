@@ -18,6 +18,7 @@ import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.github.connect.GitHubConnectionFactory;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
+import org.springframework.social.mitreidconnect.connect.MitreidConnectConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 import edu.asu.giles.aspects.access.tokens.impl.GitHubChecker;
@@ -62,6 +63,11 @@ public class SocialContext implements SocialConfigurer {
         cfConfig.addConnectionFactory(githubFactory);
         identityProviderRegistry.addProvider(githubFactory.getProviderId());
         identityProviderRegistry.addProviderTokenChecker(githubFactory.getProviderId(), GitHubChecker.ID);
+        
+        String mitreidClientId = propertyManager.getProperty(IPropertiesManager.MITREID_CLIENT_ID);
+        String mitreidSecret = propertyManager.getProperty(IPropertiesManager.MITREID_SECRET);
+        MitreidConnectConnectionFactory mitreidFactory = new MitreidConnectConnectionFactory(mitreidClientId, mitreidSecret);
+        cfConfig.addConnectionFactory(mitreidFactory);
     }
 
     @Override

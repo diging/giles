@@ -26,7 +26,6 @@ To use Giles, you need to log in with your Google+ account. Don't have one? You 
 		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with Google+
 	</button>
 </form>
-</div>
 
 <div class="col-md-3">
 <form action="<c:url value="/signin/github" />" method="POST">
@@ -39,6 +38,14 @@ To use Giles, you need to log in with your Google+ account. Don't have one? You 
 </div>
 
 <div class="col-md-6"></div>
+
+<form action="<c:url value="/signin/mitreidconnect" />" method="POST">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+	<button class="btn btn-primary btn-lg" type="submit">
+		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with OpenId Connect Server
+	</button>
+</form>
 
 </sec:authorize>
 
