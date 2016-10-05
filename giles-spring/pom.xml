@@ -24,6 +24,8 @@
 		<google.clientId></google.clientId>
 		<google.secret></google.secret>
 		<registered.apps.client.ids></registered.apps.client.ids>
+		<mitreid.clientId></mitreid.clientId>
+		<mitreid.secret></mitreid.secret>
 		<jwt.signing.secret></jwt.signing.secret>
 		<db_files></db_files>
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
@@ -244,6 +246,14 @@
 			<version>1.22.0</version>
 		</dependency>
 
+
+		<!-- Mitreid OpenId Connect Server -->
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-mitreidConnect</artifactId>
+			<version>0.0.1-SNAPSHOT</version>
+		</dependency>
+		
 		<!-- Token generation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>

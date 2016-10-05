@@ -10,6 +10,9 @@ public interface IPropertiesManager {
     public final static String GITHUB_SECRET = "github_secret";
     public final static String GOOGLE_CLIENT_ID = "google_client_id";
     public final static String GOOGLE_SECRET = "google_secret";
+    public final static String MITREID_CLIENT_ID = "mitreid_client_id";
+    public final static String MITREID_SECRET = "mitreid_secret";
+    
     public final static String REGISTERED_APPS_CLIENT_IDS = "registered_apps_client_ids";
     public final static String SIGNING_KEY = "jwt_signing_secret";
     

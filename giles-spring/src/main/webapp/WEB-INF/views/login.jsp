@@ -26,6 +26,15 @@ To use Giles, you need to log in with your Google+ account. Don't have one? You 
 		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with Google+
 	</button>
 </form>
+
+<form action="<c:url value="/signin/mitreidconnect" />" method="POST">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+	<button class="btn btn-primary btn-lg" type="submit">
+		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with OpenId Connect Server
+	</button>
+</form>
+
 </sec:authorize>
 
 <sec:authorize access="isAuthenticated()">
