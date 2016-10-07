@@ -65,9 +65,6 @@ public class LoginController {
             model.addAttribute("user", userManager.findUser(username));
         }
         
-        Key key = MacProvider.generateKey();
-        System.out.println(Base64.getEncoder().encodeToString(key.getEncoded()));
-
         return "login";
     }
     
