@@ -20,6 +20,7 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.db4o.impl.DatabaseManager;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 
 public class DocumentDatabaseClientTest {
     
@@ -57,11 +58,18 @@ public class DocumentDatabaseClientTest {
     }
     
     @Test
-    public void test_saveDocument() {
+    public void test_saveDocument() throws UnstorableObjectException {
         IDocument doc = new Document();
+        doc.setId("id");
         docDatabaseClientToTest.saveDocument(doc);
         Mockito.verify(container).store(doc);
         Mockito.verify(container).commit();
+    }
+    
+    @Test(expected = UnstorableObjectException.class)
+    public void test_saveDocument_noId() throws UnstorableObjectException {
+        IDocument doc = new Document();
+        docDatabaseClientToTest.saveDocument(doc);
     }
     
     @Test

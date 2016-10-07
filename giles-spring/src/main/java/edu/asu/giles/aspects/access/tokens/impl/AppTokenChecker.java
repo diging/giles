@@ -20,7 +20,7 @@ import edu.asu.giles.tokens.ITokenService;
 @Service
 public class AppTokenChecker implements IChecker {
 
-    public final static String ID = "APP_TOKEN";
+    public final static String ID = "APP_TOKEN_GILES";
 
     @Autowired
     private ITokenService tokenService;
