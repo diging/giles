@@ -1,10 +1,15 @@
-package edu.asu.giles.files.impl;
+package edu.asu.giles.db4o.impl;
 
 import java.util.Random;
 
-import edu.asu.giles.files.IDatabaseClient;
+import com.db4o.ObjectContainer;
+import com.db4o.ObjectSet;
 
-public abstract class DatabaseClient implements IDatabaseClient {
+import edu.asu.giles.db4o.IDatabaseClient;
+import edu.asu.giles.db4o.IStorableObject;
+import edu.asu.giles.exceptions.UnstorableObjectException;
+
+public abstract class DatabaseClient<T extends IStorableObject> implements IDatabaseClient<T> {
 
     /*
      * (non-Javadoc)
@@ -23,10 +28,32 @@ public abstract class DatabaseClient implements IDatabaseClient {
         }
         return id;
     }
+    
+    protected T queryByExampleGetFirst(T example) {
+        ObjectSet<T> docs = getClient().queryByExample(example);
+        if (docs != null && docs.size() > 0) {
+            return docs.get(0);
+        }
+        return null;
+    }
+    
+    @Override
+    public T store(T element) throws UnstorableObjectException {
+        if (element.getId() == null) {
+            throw new UnstorableObjectException("The object does not have an id.");
+        }
+        
+        ObjectContainer client = getClient();
+        client.store(element);
+        client.commit();
+        return element;
+    }
 
     protected abstract String getIdPrefix();
 
     protected abstract Object getById(String id);
+    
+    protected abstract ObjectContainer getClient();
 
     /**
      * This methods generates a new 6 character long id. Note that this method

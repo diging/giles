@@ -1,7 +1,11 @@
 package edu.asu.giles.web;
 
+import io.jsonwebtoken.impl.crypto.MacProvider;
+
+import java.security.Key;
 import java.security.Principal;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -61,6 +65,9 @@ public class LoginController {
             model.addAttribute("user", userManager.findUser(username));
         }
         
+        Key key = MacProvider.generateKey();
+        System.out.println(Base64.getEncoder().encodeToString(key.getEncoded()));
+
         return "login";
     }
     

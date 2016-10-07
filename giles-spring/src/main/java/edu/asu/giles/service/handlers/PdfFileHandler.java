@@ -33,6 +33,7 @@ import edu.asu.giles.core.IPage;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.Page;
 import edu.asu.giles.exceptions.GilesFileStorageException;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
@@ -141,7 +142,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
 
         pdfStorageManager.saveFile(file.getUsername(), file.getUploadId(),
                 document.getDocumentId(), file.getFilename(), content);
-        filesDbClient.saveFile(file);
+        try {
+            filesDbClient.saveFile(file);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            success = false;
+        }
 
         return success;
     }
@@ -191,7 +197,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
         textFile.setDerivedFrom(file.getDerivedFrom());
 
         textFile.setSize(fileObject.length());
-        filesDbClient.saveFile(textFile);
+        try {
+            filesDbClient.saveFile(textFile);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            return null;
+        }
 
         document.getTextFileIds().add(textFile.getId());
         document.setExtractedTextFileId(textFile.getId());
@@ -304,7 +315,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
         textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
         textFile.setSize(fileObject.length());
         textFile.setDerivedFrom(mainFile.getId());
-        filesDbClient.saveFile(textFile);
+        try {
+            filesDbClient.saveFile(textFile);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file,", e);
+            return null;
+        }
         return textFile;
     }
 
@@ -337,7 +353,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
         document.getFileIds().add(imageFile.getId());
         page.setImageFileId(imageFile.getId());
 
-        filesDbClient.saveFile(imageFile);
+        try {
+            filesDbClient.saveFile(imageFile);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            return null;
+        }
         return imageFile;
     }
 

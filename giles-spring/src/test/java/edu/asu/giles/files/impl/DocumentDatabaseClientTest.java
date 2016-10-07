@@ -19,7 +19,7 @@ import com.db4o.ObjectSet;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.core.impl.Upload;
-import edu.asu.giles.db4o.DatabaseManager;
+import edu.asu.giles.db4o.impl.DatabaseManager;
 
 public class DocumentDatabaseClientTest {
     

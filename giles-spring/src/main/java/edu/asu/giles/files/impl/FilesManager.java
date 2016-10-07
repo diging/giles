@@ -20,6 +20,7 @@ import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.exceptions.GilesFileStorageException;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.IDocumentDatabaseClient;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.files.IFilesManager;
@@ -119,7 +120,13 @@ public class FilesManager implements IFilesManager {
         boolean atLeastOneSuccess = statuses.stream().anyMatch(
                 status -> status.getStatus() == StorageStatus.SUCCESS);
         if (atLeastOneSuccess) {
-            uploadDatabaseClient.store(upload);
+            try {
+                uploadDatabaseClient.store(upload);
+            } catch (UnstorableObjectException e) {
+                // let's silently fail because this should never happen
+                // we set the id
+                logger.error("Could not store upload.", e);
+            }
         }
 
         return statuses;
@@ -197,7 +204,7 @@ public class FilesManager implements IFilesManager {
     }
 
     @Override
-    public void saveFile(IFile file) {
+    public void saveFile(IFile file) throws UnstorableObjectException {
         databaseClient.saveFile(file);
     }
 
@@ -256,7 +263,7 @@ public class FilesManager implements IFilesManager {
     }
 
     @Override
-    public void saveDocument(IDocument document) {
+    public void saveDocument(IDocument document) throws UnstorableObjectException {
         documentDatabaseClient.saveDocument(document);
     }
 

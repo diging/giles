@@ -1,6 +1,6 @@
 package edu.asu.giles.tokens.impl;
 
-import edu.asu.giles.tokens.ITokenContents;
+import edu.asu.giles.tokens.IApiTokenContents;
 
 /**
  * Class that holds the information that was encoded in a token.
@@ -8,7 +8,7 @@ import edu.asu.giles.tokens.ITokenContents;
  * @author Julia Damerow
  *
  */
-public class TokenContents implements ITokenContents {
+public class ApiTokenContents implements IApiTokenContents {
 
     private String username;
     private boolean expired;

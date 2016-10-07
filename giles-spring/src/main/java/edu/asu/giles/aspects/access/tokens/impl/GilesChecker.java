@@ -12,7 +12,7 @@ import edu.asu.giles.aspects.access.openid.google.CheckerResult;
 import edu.asu.giles.aspects.access.openid.google.ValidationResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
 import edu.asu.giles.exceptions.InvalidTokenException;
-import edu.asu.giles.tokens.ITokenContents;
+import edu.asu.giles.tokens.IApiTokenContents;
 import edu.asu.giles.tokens.ITokenService;
 
 @Service
@@ -31,10 +31,10 @@ public class GilesChecker implements IChecker {
     @Override
     public CheckerResult validateToken(String token) throws GeneralSecurityException,
             IOException, InvalidTokenException {
-        ITokenContents contents;
+        IApiTokenContents contents;
         
         try {
-            contents = tokenService.getTokenContents(token);
+            contents = tokenService.getApiTokenContents(token);
         } catch (MalformedJwtException | IllegalArgumentException e) {
             throw new InvalidTokenException("The provided token is not a valid JWT token.", e);
         }

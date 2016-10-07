@@ -1,15 +1,11 @@
 package edu.asu.giles.config;
 
-import java.util.HashSet;
-import java.util.Set;
-
 import javax.servlet.http.HttpServletRequest;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
-import org.springframework.security.config.annotation.web.HttpSecurityBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -19,16 +15,13 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
-import org.springframework.security.web.header.writers.frameoptions.WhiteListedAllowFromStrategy;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter.XFrameOptionsMode;
 import org.springframework.security.web.util.matcher.RequestMatcher;
 import org.springframework.social.security.SocialUserDetailsService;
 import org.springframework.social.security.SpringSocialConfigurer;
 
-import EDU.purdue.cs.bloat.benchmark.Stats;
 import edu.asu.giles.service.properties.IPropertiesManager;
-import edu.asu.giles.service.properties.impl.PropertiesManager;
 import edu.asu.giles.users.LocalUserDetailsService;
 import edu.asu.giles.users.SimpleSocialUserDetailsService;
 
@@ -103,7 +96,6 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                         "/signup/**", "/user/register/**", "/resources/**",
                         "/rest/**").permitAll()
                 // The rest of the our application is protected.
-                .antMatchers("/users").hasRole("ADMIN")
                 .antMatchers("/users/**", "/admin/**").hasRole("ADMIN")
                 .anyRequest().hasRole("USER")
                 // Adds the SocialAuthenticationFilter to Spring Security's

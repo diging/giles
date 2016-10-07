@@ -7,13 +7,17 @@ import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 
 import java.util.Date;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.giles.apps.IRegisteredApp;
 import edu.asu.giles.service.properties.IPropertiesManager;
-import edu.asu.giles.tokens.ITokenContents;
+import edu.asu.giles.tokens.IApiTokenContents;
+import edu.asu.giles.tokens.IAppToken;
 import edu.asu.giles.tokens.ITokenService;
+import edu.asu.giles.users.User;
 
 /**
  * Class to create new user tokens for access to the REST api.
@@ -36,9 +40,9 @@ public class TokenService implements ITokenService {
      * @see edu.asu.giles.tokens.impl.ITokenService#generateToken(java.lang.String)
      */
     @Override
-    public String generateToken(String username) {
+    public String generateApiToken(User user) {
         String compactJws = Jwts.builder()
-                .setSubject(username)
+                .setSubject(user.getUsername())
                 .setExpiration(new Date((new Date()).getTime() + timeTillExpiration))
                 .signWith(SignatureAlgorithm.HS512, propertiesManager.getProperty(IPropertiesManager.SIGNING_KEY))
                 .compact();
@@ -50,15 +54,17 @@ public class TokenService implements ITokenService {
      * @see edu.asu.giles.tokens.impl.ITokenService#getTokenContents(java.lang.String)
      */
     @Override
-    public ITokenContents getTokenContents(String token) {
-        ITokenContents contents = new TokenContents();
+    public IApiTokenContents getApiTokenContents(String token) {
+        IApiTokenContents contents = new ApiTokenContents();
         contents.setExpired(true);
         try {
             Jws<Claims> jws = Jwts.parser().setSigningKey(propertiesManager.getProperty(IPropertiesManager.SIGNING_KEY)).parseClaimsJws(token);
-            Claims claims = jws.getBody();
+            Claims claims = jws.getBody(); 
             contents.setUsername(claims.getSubject());
             Date expirationTime = claims.getExpiration();
-            contents.setExpired(expirationTime.before(new Date()));
+            if (expirationTime != null) {
+                contents.setExpired(expirationTime.before(new Date()));
+            }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
             contents.setExpired(true); 
         } catch (SignatureException e) {
@@ -67,5 +73,44 @@ public class TokenService implements ITokenService {
         
         return contents;
     }
+
+    @Override
+    public IAppToken generateAppToken(IRegisteredApp app) {
+        String tokenId = UUID.randomUUID().toString();
+        String compactJws = Jwts.builder()
+                .setSubject(app.getName())
+                .claim("appId", app.getId())
+                .claim("tokenId", tokenId)
+                .claim("providerId", app.getProviderId())
+                .signWith(SignatureAlgorithm.HS256, propertiesManager.getProperty(IPropertiesManager.SIGNING_KEY_APPS))
+                .compact();
+        
+        IAppToken token = new AppToken();
+        token.setToken(compactJws);
+        token.setId(tokenId);
+        token.setAppId(app.getId());
+        token.setProviderId(app.getProviderId());
+        return token;
+    }
     
+    @Override
+    public IAppToken getAppTokenContents(String token) {
+        IAppToken appToken = new AppToken();
+        
+        try {
+            Jws<Claims> jws = Jwts.parser().setSigningKey(propertiesManager.getProperty(IPropertiesManager.SIGNING_KEY_APPS)).parseClaimsJws(token);
+            Claims claims = jws.getBody(); 
+            
+            appToken.setAppId(claims.get("appId", String.class));
+            appToken.setId(claims.get("tokenId", String.class));
+            appToken.setProviderId(claims.get("providerId", String.class));
+        
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return null;
+        } catch (SignatureException e) {
+            return null;
+        } 
+        
+        return appToken;
+    }
 }

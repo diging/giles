@@ -30,8 +30,8 @@ public class UsersManager implements IUserManager {
     }
     
     @Override
-    public User findUserByProviderUserId(String userId) {
-        return client.findUserByProviderUserId(userId);
+    public User findUserByProviderUserId(String userId, String provider) {
+        return client.findUserByProviderUserId(userId, provider);
     }
 
     /*

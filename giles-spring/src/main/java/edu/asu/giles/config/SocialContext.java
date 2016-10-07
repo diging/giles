@@ -16,9 +16,13 @@ import org.springframework.social.connect.ConnectionFactoryLocator;
 import org.springframework.social.connect.UsersConnectionRepository;
 import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
+import org.springframework.social.github.connect.GitHubConnectionFactory;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
+import edu.asu.giles.aspects.access.tokens.impl.GitHubChecker;
+import edu.asu.giles.aspects.access.tokens.impl.GoogleChecker;
+import edu.asu.giles.service.IIdentityProviderRegistry;
 import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.users.IUserManager;
 
@@ -35,6 +39,9 @@ public class SocialContext implements SocialConfigurer {
     
     @Autowired
     private IPropertiesManager propertyManager;
+    
+    @Autowired
+    private IIdentityProviderRegistry identityProviderRegistry;
 
     @Override
     public void addConnectionFactories(ConnectionFactoryConfigurer cfConfig,
@@ -45,6 +52,16 @@ public class SocialContext implements SocialConfigurer {
                 googleClientId, googleSecret);
         factory.setScope("email");
         cfConfig.addConnectionFactory(factory);
+        identityProviderRegistry.addProvider(factory.getProviderId());
+        identityProviderRegistry.addProviderTokenChecker(factory.getProviderId(), GoogleChecker.ID);
+        
+        String githubClientId = propertyManager.getProperty(IPropertiesManager.GITHUB_CLIENT_ID);
+        String githubSecret = propertyManager.getProperty(IPropertiesManager.GITHUB_SECRET);
+        GitHubConnectionFactory githubFactory = new GitHubConnectionFactory(
+                githubClientId, githubSecret);
+        cfConfig.addConnectionFactory(githubFactory);
+        identityProviderRegistry.addProvider(githubFactory.getProviderId());
+        identityProviderRegistry.addProviderTokenChecker(githubFactory.getProviderId(), GitHubChecker.ID);
     }
 
     @Override

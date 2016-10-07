@@ -8,6 +8,7 @@ import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.impl.StorageStatus;
 
 public interface IFilesManager {
@@ -43,13 +44,13 @@ public interface IFilesManager {
 
     public abstract IDocument getDocument(String id);
 
-    public abstract void saveDocument(IDocument document);
+    public abstract void saveDocument(IDocument document) throws UnstorableObjectException ;
 
     public abstract List<IFile> getFilesOfDocument(IDocument doc);
 
     public abstract IFile getFile(String id);
 
-    public abstract void saveFile(IFile file);
+    public abstract void saveFile(IFile file) throws UnstorableObjectException;
 
     public abstract IFile getFileByPath(String path);
 

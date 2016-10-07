@@ -12,6 +12,7 @@ public interface IPropertiesManager {
     public final static String GOOGLE_SECRET = "google_secret";
     public final static String REGISTERED_APPS_CLIENT_IDS = "registered_apps_client_ids";
     public final static String SIGNING_KEY = "jwt_signing_secret";
+    public final static String SIGNING_KEY_APPS = "jwt_signing_secret_apps";
     
     public final static String DIGILIB_SCALER_URL = "digilib_scaler_url";
     public final static String GILES_URL = "giles_url";

@@ -26,21 +26,25 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
+import edu.asu.giles.aspects.access.annotations.AppTokenCheck;
 import edu.asu.giles.aspects.access.annotations.DocumentAccessCheck;
 import edu.asu.giles.aspects.access.annotations.FileTokenAccessCheck;
-import edu.asu.giles.aspects.access.annotations.OpenIdTokenCheck;
 import edu.asu.giles.aspects.access.annotations.TokenCheck;
 import edu.asu.giles.aspects.access.openid.google.CheckerResult;
 import edu.asu.giles.aspects.access.openid.google.ValidationResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
+import edu.asu.giles.aspects.access.tokens.impl.AppTokenChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GilesChecker;
-import edu.asu.giles.aspects.access.tokens.impl.GoogleChecker;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.exceptions.AspectMisconfigurationException;
 import edu.asu.giles.exceptions.InvalidTokenException;
 import edu.asu.giles.files.IFilesManager;
+import edu.asu.giles.service.IIdentityProviderRegistry;
+import edu.asu.giles.tokens.IApiTokenContents;
+import edu.asu.giles.tokens.IAppToken;
+import edu.asu.giles.tokens.ITokenContents;
 import edu.asu.giles.users.AccountStatus;
 import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
@@ -58,6 +62,9 @@ public class RestSecurityAspect {
     private IFilesManager filesManager;
     
     @Autowired
+    private IIdentityProviderRegistry identityProviderRegistry;
+    
+    @Autowired
     private List<IChecker> checkers;
     
     private Map<String, IChecker> tokenCheckers;
@@ -70,25 +77,62 @@ public class RestSecurityAspect {
     
     
     @Around("within(edu.asu.giles.rest..*) && @annotation(tokenCheck)")
-    public Object checkOpenIdUserAccess(ProceedingJoinPoint joinPoint,
-            OpenIdTokenCheck tokenCheck) throws Throwable {
-        logger.debug("Checking Open Id access token for REST endpoint.");
+    public Object checkAppTokenAccess(ProceedingJoinPoint joinPoint,
+            AppTokenCheck tokenCheck) throws Throwable {
+        logger.debug("Checking App access token for REST endpoint.");
         
-        UserTokenObject userTokenObj = extractUserTokenInfo(joinPoint, tokenCheck.value(), null);
+        UserTokenObject userTokenObj = extractUserTokenInfo(joinPoint, tokenCheck.value(), tokenCheck.providerToken());
         
         User user = userTokenObj.user;
         String token = userTokenObj.token;
+        String providerToken = userTokenObj.parameter;
 
         if (user == null) {
             throw new AspectMisconfigurationException(
                     "User object is missing in method.");
         }
-
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GoogleChecker.ID);
+        
+        TokenHolder holder = new TokenHolder();
+        ResponseEntity<String> authResult = checkAuthorization(user, token, AppTokenChecker.ID, holder);
         if (authResult != null) {
             return authResult;
         }
-
+        
+        IAppToken appToken = ((IAppToken)holder.tokenContents);
+        String checkerId = identityProviderRegistry.getCheckerId(appToken.getProviderId());
+        if (checkerId == null) {
+            logger.warn("Token references non existing identity provider.");
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "The token you sent references an identity provider that is not registered with Giles.");
+            
+            return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
+        }
+        
+        TokenHolder apiTokenHolder = new TokenHolder();
+        ResponseEntity<String> apiTokenAuthResult = checkAuthorization(user, providerToken, checkerId, apiTokenHolder);
+        if (apiTokenAuthResult != null) {
+            return apiTokenAuthResult;
+        }
+        
+        IApiTokenContents tokenContents = (IApiTokenContents) apiTokenHolder.tokenContents;
+        User userInToken = userManager.findUserByProviderUserId(tokenContents.getUsername(), appToken.getProviderId());
+        
+        if (userInToken == null) {
+            logger.info("The user doesn't seem to have a Giles account.");
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "The user doesn't seem to have a Giles account.");
+            
+            return generateResponse(msgs, HttpStatus.FORBIDDEN);
+        }
+        if (userInToken.getAccountStatus() != AccountStatus.APPROVED) {
+            logger.info("The user account you are using has not been approved. Please contact a Giles administrator.");
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", "The user account you are using has not been approved. Please contact a Giles administrator.");
+            
+            return generateResponse(msgs, HttpStatus.FORBIDDEN);
+        }
+        
+        fillUser(userInToken, user);
         return joinPoint.proceed();
     }
     
@@ -106,10 +150,15 @@ public class RestSecurityAspect {
                     "User object is missing in method.");
         }
         
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID);
+        TokenHolder holder = new TokenHolder();
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder);
         if (authResult != null) {
             return authResult;
         }
+        
+        // because we asked for the giles checker we know what type
+        // the token contents is
+        extractUser(user, (IApiTokenContents)holder.tokenContents);
         
         return joinPoint.proceed();
     }
@@ -121,7 +170,7 @@ public class RestSecurityAspect {
         
         User user = userTokenObj.user;
         String token = userTokenObj.token;
-        String docId = userTokenObj.elementId;
+        String docId = userTokenObj.parameter;
         
         if (user == null) {
             throw new AspectMisconfigurationException(
@@ -137,10 +186,15 @@ public class RestSecurityAspect {
             return joinPoint.proceed();
         }
         
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID);
+        TokenHolder holder = new TokenHolder();
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder);
         if (authResult != null) {
             return authResult;
         }
+        
+        // because we asked for the giles checker we know what type
+        // the token contents is
+        extractUser(user, (IApiTokenContents)holder.tokenContents);
 
         if (!doc.getUsername().equals(user.getUsername())) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
@@ -156,7 +210,7 @@ public class RestSecurityAspect {
         
         User user = userTokenObj.user;
         String token = userTokenObj.token;
-        String fileId = userTokenObj.elementId;
+        String fileId = userTokenObj.parameter;
         
         
         if (user == null) {
@@ -173,10 +227,15 @@ public class RestSecurityAspect {
             return joinPoint.proceed();
         }
         
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID);
+        TokenHolder holder = new TokenHolder();
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder);
         if (authResult != null) {
             return authResult;
         }
+        
+        // because we asked for the giles checker we know what type
+        // the token contents is
+        extractUser(user, (IApiTokenContents)holder.tokenContents);
 
         if (!file.getUsername().equals(user.getUsername())) {
             return new ResponseEntity<String>(HttpStatus.FORBIDDEN);
@@ -220,7 +279,7 @@ public class RestSecurityAspect {
         return new UserTokenObject(user, token, elementId);
     }
     
-    private ResponseEntity<String> checkAuthorization(User user, String token, String provider) {
+    private ResponseEntity<String> checkAuthorization(User user, String token, String provider, TokenHolder tokenHolder) {
         if (token == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -229,22 +288,27 @@ public class RestSecurityAspect {
         
         try {
             validationResult = tokenCheckers.get(provider).validateToken(token);
+            tokenHolder.checkResult = validationResult;
+            tokenHolder.tokenContents = validationResult.getPayload();
         } catch (GeneralSecurityException e) {
             logger.error("Security issue with token.", e);
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", e.getLocalizedMessage());
+            msgs.put("provider", provider);
             
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         } catch (IOException e) {
             logger.error("Network issue.", e);
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", e.getLocalizedMessage());
+            msgs.put("provider", provider);
             
             return generateResponse(msgs, HttpStatus.INTERNAL_SERVER_ERROR);
         } catch (InvalidTokenException e) {
             logger.error("Token is invalid.", e);
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", e.getLocalizedMessage());
+            msgs.put("provider", provider);
             
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
@@ -253,6 +317,7 @@ public class RestSecurityAspect {
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", "Missing or invalid token.");
             msgs.put("errorCode", "401");
+            msgs.put("provider", provider);
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         
@@ -260,6 +325,7 @@ public class RestSecurityAspect {
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", "The sent token is expired.");
             msgs.put("errorCode", "600");
+            msgs.put("provider", provider);
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         
@@ -267,11 +333,16 @@ public class RestSecurityAspect {
             Map<String, String> msgs = new HashMap<String, String>();
             msgs.put("errorMsg", validationResult.getResult().name());
             msgs.put("errorCode", "401");
+            msgs.put("provider", provider);
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
         }
         
-        User foundUser = userManager.findUserByProviderUserId(validationResult.getPayload().getUsername());
-        logger.debug("Authorizing: " + validationResult.getPayload().getUsername());
+        return null;
+    }
+    
+    private ResponseEntity<String> extractUser(User user, IApiTokenContents tokenContents) {
+        User foundUser = userManager.findUser(tokenContents.getUsername());
+        logger.debug("Authorizing: " + tokenContents.getUsername());
 
         if (foundUser == null) {
             return new ResponseEntity<>(
@@ -285,7 +356,6 @@ public class RestSecurityAspect {
         }
 
         fillUser(foundUser, user);
-        
         return null;
     }
     
@@ -322,19 +392,25 @@ public class RestSecurityAspect {
     }
     
     
-    
-    
+    /*
+     * Helper classes just for this aspect.
+     */   
     class UserTokenObject {
         
         public User user;
         public String token;
-        public String elementId;
+        public String parameter;
         
         public UserTokenObject(User user, String token, String elementId) {
             super();
             this.user = user;
             this.token = token;
-            this.elementId = elementId;
+            this.parameter = elementId;
         }
+    }
+    
+    class TokenHolder {
+        public CheckerResult checkResult;
+        public ITokenContents tokenContents;
     }
 }

@@ -1,4 +1,4 @@
-package edu.asu.giles.db4o;
+package edu.asu.giles.db4o.impl;
 
 import java.io.Serializable;
 

@@ -27,8 +27,8 @@ import com.google.api.client.http.javanet.NetHttpTransport;
 import com.google.api.client.json.JsonFactory;
 import com.google.api.client.json.gson.GsonFactory;
 
-import edu.asu.giles.tokens.ITokenContents;
-import edu.asu.giles.tokens.impl.TokenContents;
+import edu.asu.giles.tokens.IApiTokenContents;
+import edu.asu.giles.tokens.impl.ApiTokenContents;
 
 public class Checker {
 
@@ -51,7 +51,7 @@ public class Checker {
         if (mVerifier.verify(token)) {
             CheckerResult result = new CheckerResult();
             GoogleIdToken.Payload tempPayload = token.getPayload();
-            ITokenContents contents = new TokenContents();
+            IApiTokenContents contents = new ApiTokenContents();
             contents.setUsername(tempPayload.getSubject());
             contents.setExpired(true);
             result.setPayload(contents);

@@ -71,6 +71,17 @@
 		<put-attribute name="content" value="/WEB-INF/views/admin/system_config.jsp" />
 	</definition>
 	
+	<!--  apps -->
+	<definition name="admin/apps" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/apps.jsp" />
+	</definition>
+	<definition name="admin/apps/register" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/register.jsp" />
+	</definition>
+	<definition name="admin/apps/app" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/app.jsp" />
+	</definition>
+	
 	<!--  user errors -->
 	<definition name="error/noSuchRole" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/error/noSuchRole.jsp" />

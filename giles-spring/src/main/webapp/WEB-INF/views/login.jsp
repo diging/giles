@@ -4,7 +4,7 @@
 
 
 
-<div class="jumbotron">
+<div class="jumbotron col-md-12">
 
 <sec:authorize access="isAnonymous()">
 <h1>Welcome to Giles!</h1>
@@ -18,7 +18,7 @@ that are then accessible through Digilib. Metadata of uploaded images  managed w
 To use Giles, you need to log in with your Google+ account. Don't have one? You can create one <a target="_blank" href="https://plus.google.com/">here</a>.
 </p>
 
-
+<div class="col-md-3">
 <form action="<c:url value="/signin/google" />" method="POST">
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
@@ -26,6 +26,20 @@ To use Giles, you need to log in with your Google+ account. Don't have one? You 
 		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with Google+
 	</button>
 </form>
+</div>
+
+<div class="col-md-3">
+<form action="<c:url value="/signin/github" />" method="POST">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+
+	<button class="btn btn-primary btn-lg" type="submit">
+		<i class="fa fa-github" aria-hidden="true"></i> Login with GitHub
+	</button>
+</form>
+</div>
+
+<div class="col-md-6"></div>
+
 </sec:authorize>
 
 <sec:authorize access="isAuthenticated()">
