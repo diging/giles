@@ -1,9 +1,10 @@
 package edu.asu.giles.core;
 
-import java.util.ArrayList;
 import java.util.List;
 
-public interface IDocument {
+import edu.asu.giles.db4o.IStorableObject;
+
+public interface IDocument extends IStorableObject {
 
     public abstract String getId();
 

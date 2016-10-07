@@ -14,11 +14,13 @@ import com.db4o.ObjectSet;
 
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.impl.File;
-import edu.asu.giles.db4o.DatabaseManager;
+import edu.asu.giles.db4o.impl.DatabaseClient;
+import edu.asu.giles.db4o.impl.DatabaseManager;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.IFilesDatabaseClient;
 
 @Component
-public class FilesDatabaseClient extends DatabaseClient implements
+public class FilesDatabaseClient extends DatabaseClient<IFile> implements
         IFilesDatabaseClient {
 
     private ObjectContainer client;
@@ -40,17 +42,15 @@ public class FilesDatabaseClient extends DatabaseClient implements
      * .File)
      */
     @Override
-    public IFile saveFile(IFile file) {
-        client.store(file);
-        client.commit();
-        return file;
+    public IFile saveFile(IFile file) throws UnstorableObjectException {
+       return store(file);
     }
 
     @Override
     public IFile getFileById(String id) {
         IFile file = new File();
         file.setId(id);
-        return queryByExample(file);
+        return queryByExampleGetFirst(file);
     }
 
     @Override
@@ -68,15 +68,7 @@ public class FilesDatabaseClient extends DatabaseClient implements
     @Override
     public IFile getFile(String filename) {
         IFile file = new File(filename);
-        return queryByExample(file);
-    }
-
-    private IFile queryByExample(IFile file) {
-        ObjectSet<File> files = client.queryByExample(file);
-        if (files != null && files.size() > 0) {
-            return files.get(0);
-        }
-        return null;
+        return queryByExampleGetFirst(file);
     }
 
     /*
@@ -104,6 +96,11 @@ public class FilesDatabaseClient extends DatabaseClient implements
     @Override
     protected Object getById(String id) {
         return getFileById(id);
+    }
+
+    @Override
+    protected ObjectContainer getClient() {
+        return client;
     }
 
 }

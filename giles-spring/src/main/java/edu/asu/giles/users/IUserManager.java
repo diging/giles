@@ -37,6 +37,6 @@ public interface IUserManager {
 
     public abstract void removeRoleFromUser(String username, GilesRole role);
 
-    public abstract User findUserByProviderUserId(String userId);
+    public abstract User findUserByProviderUserId(String userId, String provider);
 
 }

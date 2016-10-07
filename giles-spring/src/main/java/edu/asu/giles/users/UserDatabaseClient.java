@@ -12,7 +12,7 @@ import com.db4o.ObjectContainer;
 import com.db4o.ObjectSet;
 import com.db4o.query.Predicate;
 
-import edu.asu.giles.db4o.DatabaseManager;
+import edu.asu.giles.db4o.impl.DatabaseManager;
 
 @Component
 public class UserDatabaseClient {
@@ -69,9 +69,10 @@ public class UserDatabaseClient {
         return null;
     }
     
-    public User findUserByProviderUserId(String userId) {
+    public User findUserByProviderUserId(String userId, String provider) {
         User user = new User();
         user.setUserIdOfProvider(userId);
+        user.setProvider(provider);
         ObjectSet<User> results = client.queryByExample(user);
         
         if (results.size() >= 1) {
@@ -109,7 +110,7 @@ public class UserDatabaseClient {
     }
 
     public void update(User user) {
-        User storedUser = findUserByProviderUserId(user.getUserIdOfProvider());
+        User storedUser = findUserByProviderUserId(user.getUserIdOfProvider(), user.getProvider());
         
         storedUser.setAccountStatus(user.getAccountStatus());
         storedUser.setAdmin(user.getIsAdmin());

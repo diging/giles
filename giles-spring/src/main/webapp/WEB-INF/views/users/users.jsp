@@ -4,12 +4,14 @@
 
 <table class="table table-striped">
   <tr>
-  	<th width="25%">Username</th>
+  	<th width="20%">Username</th>
   	<th>Full Name</th>
   	<th width="30%">Email</th>
+  	<th>Provider User Id</th>
+  	<th>Provider</th>
   	<th></th>
-  	<th width="10%">Status</th>
-  	<th width="10%"></th>
+  	<th width="5%">Status</th>
+  	<th width="5%"></th>
   </tr>
   
   <c:forEach items="${users}" var="user">
@@ -17,6 +19,8 @@
   	<td>${user.username}</td>
   	<td>${user.fullname}</td>
   	<td>${user.email}</td>
+  	<td>${user.userIdOfProvider}</td>
+  	<td>${user.provider}</td>
   	<td>
   		<c:if test="${user.roles.contains('ROLE_ADMIN')}"><span class="label label-danger">Admin</span></c:if>
   		<c:if test="${user.roles.contains('ROLE_USER')}"><span class="label label-info">User</span></c:if>	

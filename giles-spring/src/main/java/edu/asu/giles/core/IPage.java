@@ -1,5 +1,6 @@
 package edu.asu.giles.core;
 
+
 public interface IPage {
 
     public abstract int getPageNr();

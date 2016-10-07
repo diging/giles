@@ -7,6 +7,8 @@ import java.lang.annotation.Target;
 
 @Retention(RetentionPolicy.RUNTIME)
 @Target(ElementType.METHOD)
-public @interface OpenIdTokenCheck {
+public @interface AppTokenCheck {
     String value() default "accessToken";
+    
+    String providerToken() default "providerToken";
 }

@@ -20,11 +20,12 @@ import com.db4o.query.Query;
 
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.Upload;
-import edu.asu.giles.db4o.DatabaseManager;
+import edu.asu.giles.db4o.impl.DatabaseClient;
+import edu.asu.giles.db4o.impl.DatabaseManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
 
 @Service
-public class UploadDatabaseClient extends DatabaseClient implements
+public class UploadDatabaseClient extends DatabaseClient<IUpload> implements
         IUploadDatabaseClient {
 
     private final Logger logger = LoggerFactory.getLogger(getClass());
@@ -44,27 +45,13 @@ public class UploadDatabaseClient extends DatabaseClient implements
      * (non-Javadoc)
      * 
      * @see
-     * edu.asu.giles.files.impl.IUploadDatabaseClient#store(edu.asu.giles.core
-     * .impl.Upload)
-     */
-    @Override
-    public IUpload store(IUpload upload) {
-        client.store(upload);
-        client.commit();
-        return upload;
-    }
-
-    /*
-     * (non-Javadoc)
-     * 
-     * @see
      * edu.asu.giles.files.impl.IUploadDatabaseClient#getUpload(java.lang.String
      * )
      */
     @Override
     public IUpload getUpload(String id) {
         IUpload upload = new Upload(id);
-        return queryByExample(upload);
+        return queryByExampleGetFirst(upload);
     }
 
     /*
@@ -140,15 +127,7 @@ public class UploadDatabaseClient extends DatabaseClient implements
         return allResults.subList(startIndex, endIndex);
     }
 
-    private IUpload queryByExample(IUpload upload) {
-        ObjectSet<Upload> uploads = client.queryByExample(upload);
-        if (uploads != null && uploads.size() > 0) {
-            return uploads.get(0);
-        }
-        return null;
-    }
-
-    private List<IUpload> getFilesByExample(IUpload upload) {
+   private List<IUpload> getFilesByExample(IUpload upload) {
         ObjectSet<Upload> uploads = client.queryByExample(upload);
         List<IUpload> results = new ArrayList<IUpload>();
         for (IUpload u : uploads) {
@@ -165,6 +144,11 @@ public class UploadDatabaseClient extends DatabaseClient implements
     @Override
     protected Object getById(String id) {
         return getUpload(id);
+    }
+
+    @Override
+    protected ObjectContainer getClient() {
+       return client;
     }
 
 }

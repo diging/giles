@@ -29,17 +29,22 @@ import org.springframework.web.multipart.support.StandardMultipartHttpServletReq
 
 import com.google.common.net.HttpHeaders;
 
-import edu.asu.giles.aspects.access.annotations.OpenIdTokenCheck;
+import edu.asu.giles.aspects.access.annotations.AppTokenCheck;
 import edu.asu.giles.aspects.access.annotations.TokenCheck;
 import edu.asu.giles.aspects.access.openid.google.CheckerResult;
 import edu.asu.giles.aspects.access.openid.google.ValidationResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
+import edu.asu.giles.aspects.access.tokens.impl.AppTokenChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GilesChecker;
+import edu.asu.giles.aspects.access.tokens.impl.GitHubChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GoogleChecker;
 import edu.asu.giles.exceptions.InvalidTokenException;
 import edu.asu.giles.files.IFilesManager;
-import edu.asu.giles.tokens.ITokenContents;
-import edu.asu.giles.tokens.impl.TokenContents;
+import edu.asu.giles.service.IIdentityProviderRegistry;
+import edu.asu.giles.tokens.IApiTokenContents;
+import edu.asu.giles.tokens.IAppToken;
+import edu.asu.giles.tokens.impl.ApiTokenContents;
+import edu.asu.giles.tokens.impl.AppToken;
 import edu.asu.giles.users.AccountStatus;
 import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
@@ -48,12 +53,17 @@ public class RestSecurityAspectTest {
 
     private final String ACCESS_TOKEN = "ACCESS_TOKEN";
     private final String INVALID_ACCESS_TOKEN = "INVALID_ACCESS_TOKEN";
+    private final String APP_TOKEN = "APP_TOKEN";
+    private final String INVALID_APP_TOKEN = "INVALID_APP_TOKEN";
 
     @Mock
     private IUserManager userManager;
 
     @Mock
     private IFilesManager filesManager;
+    
+    @Mock
+    private IIdentityProviderRegistry identityProvidersRegistry;
 
     @Mock
     private ProceedingJoinPoint joinPoint;
@@ -65,10 +75,13 @@ public class RestSecurityAspectTest {
     private HttpServletRequest request;
     
     @Mock
-    private GoogleChecker googleChecker;
+    private GitHubChecker githubChecker;
     
     @Mock
     private GilesChecker gilesChecker;
+    
+    @Mock
+    private AppTokenChecker appTokenChecker;
     
     @Spy
     private List<IChecker> checkers = new ArrayList<IChecker>();
@@ -80,11 +93,15 @@ public class RestSecurityAspectTest {
     public void setUp() {
         MockitoAnnotations.initMocks(this);
         
-        checkers.add(googleChecker);
+        checkers.add(githubChecker);
         checkers.add(gilesChecker);
+        checkers.add(appTokenChecker);
         
-        Mockito.when(googleChecker.getId()).thenReturn(GoogleChecker.ID);
+        Mockito.when(githubChecker.getId()).thenReturn(GitHubChecker.ID);
         Mockito.when(gilesChecker.getId()).thenReturn(GilesChecker.ID);
+        Mockito.when(appTokenChecker.getId()).thenReturn(AppTokenChecker.ID);
+        
+        Mockito.when(identityProvidersRegistry.getCheckerId("github")).thenReturn(GitHubChecker.ID);
         
         aspectToTest.init();   
         
@@ -103,54 +120,54 @@ public class RestSecurityAspectTest {
         revokedAccount.setAccountStatus(AccountStatus.REVOKED);
         
         Mockito.when(userManager.findUser("test")).thenReturn(user);
-        Mockito.when(userManager.findUserByProviderUserId("test")).thenReturn(user);
+        Mockito.when(userManager.findUserByProviderUserId("test", "github")).thenReturn(user);
         Mockito.when(userManager.findUser("test2")).thenReturn(addedAccount);
         Mockito.when(userManager.findUser("test3")).thenReturn(revokedAccount);
     }
 
     @Test
-    public void test_checkUserAccess_success() throws Throwable {
+    public void test_checkAppTokenAccess_success() throws Throwable {
         setUpTokenMocking("test");
 
         User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
+        prepareAppTokenMethodCalls(APP_TOKEN, "token", ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
         Assert.assertEquals("proceed", returnObj);
         Assert.assertEquals("test", user.getUsername());
     }
 
     @Test
-    public void test_checkUserAccess_tokenInHeader_success() throws Throwable {
+    public void test_checkAppTokenAccess_tokenInHeader_success() throws Throwable {
         Mockito.when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(
-                "token " + ACCESS_TOKEN);
+                "token " + APP_TOKEN);
         setUpTokenMocking("test");
 
         User user = new User();
-        prepareMethodCalls("", "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
+        prepareAppTokenMethodCalls("", "token", ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
         Assert.assertEquals("proceed", returnObj);
         Assert.assertEquals("test", user.getUsername());
     }
 
     @Test
-    public void test_checkUserAccess_invalidToken() throws Throwable {
+    public void test_checkAppTokenAccess_invalidToken() throws Throwable {
         setUpTokenMocking("test");
 
         User user = new User();
-        prepareMethodCalls(INVALID_ACCESS_TOKEN, "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
+        prepareAppTokenMethodCalls(INVALID_APP_TOKEN, "token", INVALID_ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED,
@@ -158,18 +175,18 @@ public class RestSecurityAspectTest {
     }
 
     @Test()
-    public void test_checkUserAccess_tokenInHeader_invalidToken() throws Throwable {
+    public void test_checkAppTokenAccess_tokenInHeader_invalidToken() throws Throwable {
         Mockito.when(request.getHeader(HttpHeaders.AUTHORIZATION)).thenReturn(
-                "token " + INVALID_ACCESS_TOKEN);
+                "token " + INVALID_APP_TOKEN);
         setUpTokenMocking("test");
 
         User user = new User();
-        prepareMethodCalls("", "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
+        prepareAppTokenMethodCalls("", "token", ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
 
         Mockito.when(joinPoint.proceed()).thenReturn("proceed");
 
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
         
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED,
@@ -177,13 +194,13 @@ public class RestSecurityAspectTest {
     }
 
     @Test
-    public void test_checkUserAccess_added() throws Throwable {
+    public void test_checkAppTokenAccess_added() throws Throwable {
         setUpTokenMocking("test2");
 
         User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        prepareAppTokenMethodCalls(APP_TOKEN, "token", ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.FORBIDDEN,
@@ -191,13 +208,13 @@ public class RestSecurityAspectTest {
     }
 
     @Test
-    public void test_checkUserAccess_revoked() throws Throwable {
+    public void test_checkAppTokenAccess_revoked() throws Throwable {
         setUpTokenMocking("test3");
 
         User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        prepareAppTokenMethodCalls(APP_TOKEN, "token", ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.FORBIDDEN,
@@ -205,14 +222,14 @@ public class RestSecurityAspectTest {
     }
 
     @Test
-    public void test_checkUserAccess_noAccount() throws Throwable {
+    public void test_checkAppTokenAccess_noAccount() throws Throwable {
         setUpTokenMocking("test4");
 
         User user = new User();
-        prepareMethodCalls(ACCESS_TOKEN, "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
+        prepareAppTokenMethodCalls(APP_TOKEN, "token", ACCESS_TOKEN, user);
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
 
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.FORBIDDEN,
@@ -220,14 +237,14 @@ public class RestSecurityAspectTest {
     }
 
     @Test
-    public void test_checkUserAccess_noToken() throws Throwable {
+    public void test_checkAppTokenAccess_noToken() throws Throwable {
         setUpTokenMocking("test");
 
         User user = new User();
         prepareMethodCalls(null, "token", user);
-        OpenIdTokenCheck check = createOpenIdAccessCheckAnnotation("token");
+        AppTokenCheck check = createAppTokenAccessCheckAnnotation("token");
 
-        Object returnObj = aspectToTest.checkOpenIdUserAccess(joinPoint, check);
+        Object returnObj = aspectToTest.checkAppTokenAccess(joinPoint, check);
 
         Assert.assertEquals(ResponseEntity.class, returnObj.getClass());
         Assert.assertEquals(HttpStatus.UNAUTHORIZED,
@@ -256,22 +273,62 @@ public class RestSecurityAspectTest {
         paraTypes[2] = StandardMultipartHttpServletRequest.class;
         Mockito.when(sig.getParameterTypes()).thenReturn(paraTypes);
     }
+    
+    private void prepareAppTokenMethodCalls(String paraValue, String paraName, String providerToken, User user) {
+
+        Object[] args = new Object[4];
+        args[0] = paraValue;
+        args[1] = user;
+        args[2] = request;
+        args[3] = providerToken;
+
+        Mockito.when(joinPoint.getArgs()).thenReturn(args);
+        Mockito.when(joinPoint.getSignature()).thenReturn(sig);
+
+        String[] argNames = new String[4];
+        argNames[0] = paraName;
+        argNames[1] = "user";
+        argNames[2] = "request";
+        argNames[3] = "providerToken";
+        Mockito.when(sig.getParameterNames()).thenReturn(argNames);
+
+        Class<?>[] paraTypes = new Class<?>[4];
+        paraTypes[0] = String.class;
+        paraTypes[1] = User.class;
+        paraTypes[2] = StandardMultipartHttpServletRequest.class;
+        paraTypes[3] = String.class;
+        Mockito.when(sig.getParameterTypes()).thenReturn(paraTypes);
+    }
 
     private void setUpTokenMocking(String username) throws GeneralSecurityException, IOException, InvalidTokenException {
         CheckerResult validResult = new CheckerResult();
         validResult.setResult(ValidationResult.VALID);
         
-        ITokenContents tokenContents = new TokenContents();
+        IApiTokenContents tokenContents = new ApiTokenContents();
         tokenContents.setUsername(username);
         tokenContents.setExpired(false);
         validResult.setPayload(tokenContents);
-        Mockito.when(googleChecker.validateToken(ACCESS_TOKEN)).thenReturn(validResult);
+        Mockito.when(githubChecker.validateToken(ACCESS_TOKEN)).thenReturn(validResult);
         
         CheckerResult invalidResult = new CheckerResult();
         invalidResult.setResult(ValidationResult.INVALID);
         
         invalidResult.setPayload(null);
-        Mockito.when(googleChecker.validateToken(INVALID_ACCESS_TOKEN)).thenReturn(invalidResult);
+        Mockito.when(githubChecker.validateToken(INVALID_ACCESS_TOKEN)).thenReturn(invalidResult);
+        
+        IAppToken appToken = new AppToken();
+        appToken.setAppId("appId1");
+        appToken.setProviderId("github");
+        
+        CheckerResult validAppToken = new CheckerResult();
+        validAppToken.setPayload(appToken);
+        validAppToken.setResult(ValidationResult.VALID);
+        Mockito.when(appTokenChecker.validateToken(APP_TOKEN)).thenReturn(validAppToken);
+        
+        CheckerResult invalidAppToken = new CheckerResult();
+        invalidAppToken.setPayload(null);
+        invalidAppToken.setResult(ValidationResult.INVALID);
+        Mockito.when(appTokenChecker.validateToken(INVALID_APP_TOKEN)).thenReturn(invalidAppToken);
     }
 
     private TokenCheck createTokenAccessCheckAnnotation(String parameterName) {
@@ -291,8 +348,8 @@ public class RestSecurityAspectTest {
         return check;
     }
     
-    private OpenIdTokenCheck createOpenIdAccessCheckAnnotation(String parameterName) {
-        OpenIdTokenCheck check = new OpenIdTokenCheck() {
+    private AppTokenCheck createAppTokenAccessCheckAnnotation(String parameterName) {
+        AppTokenCheck check = new AppTokenCheck() {
 
             @Override
             public Class<? extends Annotation> annotationType() {
@@ -302,6 +359,11 @@ public class RestSecurityAspectTest {
             @Override
             public String value() {
                 return parameterName;
+            }
+
+            @Override
+            public String providerToken() {
+                return "providerToken";
             }
         };
 

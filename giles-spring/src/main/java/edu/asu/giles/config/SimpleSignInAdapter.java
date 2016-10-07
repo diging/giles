@@ -2,6 +2,7 @@ package edu.asu.giles.config;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,13 +35,22 @@ public final class SimpleSignInAdapter implements SignInAdapter {
         UserProfile profile = connection.fetchUserProfile();
         List<GrantedAuthority> authorities = new ArrayList<>();
 
-        User user = userManager.findUserByProviderUserId(connection.getKey().getProviderUserId());
+        User user = userManager.findUserByProviderUserId(connection.getKey().getProviderUserId(), connection.getKey().getProviderId());
         
         if (user == null) {
             authorities.add(new GilesGrantedAuthority(
                     GilesGrantedAuthority.ROLE_USER));
             user = new User();
-            user.setUsername(profile.getUsername());
+            String username = profile.getUsername() + "_" + connection.getKey().getProviderId();
+            
+            // make sure someone else didn't change their username to this one
+            User userWithUsername = userManager.findUser(username);
+            if (userWithUsername == null) {
+                user.setUsername(username);
+            } else {
+                user.setUsername(UUID.randomUUID().toString());
+            }
+            
             user.setFirstname(profile.getFirstName());
             user.setLastname(profile.getLastName());
             user.setEmail(profile.getEmail());
