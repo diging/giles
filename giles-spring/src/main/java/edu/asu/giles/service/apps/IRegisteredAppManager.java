@@ -18,4 +18,6 @@ public interface IRegisteredAppManager {
 
     public abstract IRegisteredApp getApp(String id);
 
+    public abstract void deleteApp(String id);
+
 }

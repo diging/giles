@@ -48,6 +48,13 @@ public abstract class DatabaseClient<T extends IStorableObject> implements IData
         client.commit();
         return element;
     }
+    
+    @Override
+    public void delete(T element) {
+        ObjectContainer client = getClient();
+        client.delete(element);
+        client.commit();
+    }
 
     protected abstract String getIdPrefix();
 

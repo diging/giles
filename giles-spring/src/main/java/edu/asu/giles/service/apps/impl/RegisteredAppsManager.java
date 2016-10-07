@@ -54,6 +54,12 @@ public class RegisteredAppsManager implements IRegisteredAppManager {
     public IRegisteredApp getApp(String id) {
         return databaseClient.getAppById(id);
     }
+    
+    @Override
+    public void deleteApp(String id) {
+        IRegisteredApp app = getApp(id);
+        databaseClient.delete(app);
+    }
 
     /*
      * (non-Javadoc)

@@ -8,7 +8,8 @@
 <table class="table table-striped">
   <tr>
   	<th width="20%">App name</th>
-  	<th width="5%">App Id</th>
+  	<th width="">App Id</th>
+  	<th width="15%"></th>
   </tr>
   
   <c:forEach items="${apps}" var="app">
@@ -16,6 +17,8 @@
   	<td><a href="<c:url value="/admin/apps/${app.id}" />">${app.name}</a></td>
   	
   	<td>${app.id}</td>
+  	
+  	<td><a href="<c:url value="/admin/apps/${app.id}/delete" />"><i class="fa fa-trash-o" aria-hidden="true"></i> Delete App</a>
   </tr>
   
   </c:forEach>

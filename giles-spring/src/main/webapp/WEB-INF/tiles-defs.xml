@@ -81,6 +81,9 @@
 	<definition name="admin/apps/app" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/admin/app.jsp" />
 	</definition>
+	<definition name="admin/apps/delete" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/deleteApp.jsp" />
+	</definition>
 	
 	<!--  user errors -->
 	<definition name="error/noSuchRole" extends="base.definition">
