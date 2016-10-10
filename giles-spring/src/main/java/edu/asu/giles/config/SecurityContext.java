@@ -50,6 +50,10 @@ public class SecurityContext extends WebSecurityConfigurerAdapter {
                 if (arg0.getRequestURI().indexOf("/rest/") > -1) {
                     return false;
                 }
+                // mitreid connect server can't deal with additional parameteres
+                if (arg0.getRequestURI().indexOf("/signin/mitreid") > -1) {
+                    return false;
+                }
                 if (arg0.getMethod() == "GET") {
                     return false;
                 }

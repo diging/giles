@@ -1,5 +1,7 @@
 package edu.asu.giles.users;
 
+import edu.asu.giles.exceptions.UnstorableObjectException;
+
 
 
 public interface IUserManager {
@@ -17,7 +19,7 @@ public interface IUserManager {
 
     public abstract User[] getAllUsers();
 
-    public abstract User addUser(User user);
+    public abstract User addUser(User user) throws UnstorableObjectException;
 
     public abstract void deleteUser(String username);
 
@@ -38,5 +40,7 @@ public interface IUserManager {
     public abstract void removeRoleFromUser(String username, GilesRole role);
 
     public abstract User findUserByProviderUserId(String userId, String provider);
+
+    public abstract String getUniqueUsername(String providerId);
 
 }

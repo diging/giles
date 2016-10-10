@@ -39,6 +39,9 @@ public class SocialContext implements SocialConfigurer {
     private IUserManager userManager;
     
     @Autowired
+    private IUserHelper userHelper;
+    
+    @Autowired
     private IPropertiesManager propertyManager;
     
     @Autowired
@@ -80,7 +83,7 @@ public class SocialContext implements SocialConfigurer {
             ConnectionFactoryLocator connectionFactoryLocator) {
         JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(
                 dataSource, connectionFactoryLocator, Encryptors.noOpText());
-        repository.setConnectionSignUp(new GilesConnectionSignUp(userManager));
+        repository.setConnectionSignUp(new GilesConnectionSignUp(userManager, userHelper));
         return repository;
     }
 
@@ -90,7 +93,7 @@ public class SocialContext implements SocialConfigurer {
             UsersConnectionRepository usersConnectionRepository) {
         ProviderSignInController controller = new ProviderSignInController(
                 connectionFactoryLocator, usersConnectionRepository,
-                new SimpleSignInAdapter(userManager));
+                new SimpleSignInAdapter(userManager, userHelper));
         return controller;
     }
 }
