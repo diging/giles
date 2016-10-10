@@ -6,8 +6,11 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.SignatureException;
 
+import java.security.Key;
 import java.util.Date;
 import java.util.UUID;
+
+import javax.crypto.spec.SecretKeySpec;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +19,7 @@ import edu.asu.giles.apps.IRegisteredApp;
 import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.tokens.IApiTokenContents;
 import edu.asu.giles.tokens.IAppToken;
+import edu.asu.giles.tokens.IOpenIdToken;
 import edu.asu.giles.tokens.ITokenService;
 import edu.asu.giles.users.User;
 
@@ -112,5 +116,18 @@ public class TokenService implements ITokenService {
         } 
         
         return appToken;
+    }
+    
+    @Override
+    public IOpenIdToken getOpenIdToken(String token) {
+        try {
+            Key key = new SecretKeySpec(propertiesManager.getProperty(IPropertiesManager.MITREID_SECRET).getBytes(), "HS256");
+            Jws<Claims> jws = Jwts.parser().setSigningKey(key).parseClaimsJws(token);
+        } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            return null;
+        } catch (SignatureException e) {
+            return null;
+        } 
+        return null;
     }
 }

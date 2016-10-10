@@ -257,7 +257,7 @@
 			<artifactId>spring-social-mitreidConnect</artifactId>
 			<version>0.0.1-SNAPSHOT</version>
 		</dependency>
-		
+
 		<!-- Token generation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -265,6 +265,19 @@
 			<version>0.7.0</version>
 		</dependency>
 
+		<!-- OpenId Connect -->
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>4.26.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/oauth2-oidc-sdk -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>5.17.1</version>
+		</dependency>
 
 
 		<!-- Spring AOP + AspectJ -->

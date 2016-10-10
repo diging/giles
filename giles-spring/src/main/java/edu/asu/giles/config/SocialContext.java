@@ -23,6 +23,7 @@ import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 import edu.asu.giles.aspects.access.tokens.impl.GitHubChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GoogleChecker;
+import edu.asu.giles.aspects.access.tokens.impl.MitreidChecker;
 import edu.asu.giles.service.IIdentityProviderRegistry;
 import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.users.IUserManager;
@@ -71,6 +72,8 @@ public class SocialContext implements SocialConfigurer {
         String mitreidSecret = propertyManager.getProperty(IPropertiesManager.MITREID_SECRET);
         MitreidConnectConnectionFactory mitreidFactory = new MitreidConnectConnectionFactory(mitreidClientId, mitreidSecret);
         cfConfig.addConnectionFactory(mitreidFactory);
+        identityProviderRegistry.addProvider(mitreidFactory.getProviderId());
+        identityProviderRegistry.addProviderTokenChecker(mitreidFactory.getProviderId(), MitreidChecker.ID);
     }
 
     @Override
