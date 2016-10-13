@@ -34,6 +34,4 @@ public interface ITokenService {
 
     public abstract IAppToken getAppTokenContents(String token);
 
-    public abstract IOpenIdToken getOpenIdToken(String token);
-
 }

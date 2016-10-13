@@ -29,7 +29,7 @@ public class GilesChecker implements IChecker {
     }
 
     @Override
-    public CheckerResult validateToken(String token) throws GeneralSecurityException,
+    public CheckerResult validateToken(String token, String appId) throws GeneralSecurityException,
             IOException, InvalidTokenException {
         IApiTokenContents contents;
         

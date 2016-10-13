@@ -3,6 +3,8 @@
 
 <h1>Registered App</h1>
 
+This app uses <span class="label label-warning">${providerName}</span> for authentication.
+
 <dl>
 	<dt>App Name</dt>
 	<dd>${app.name}</dd>
@@ -11,6 +13,11 @@
 <dl>
 	<dt>App Id</dt>
 	<dd>${app.id}</dd>
+</dl>
+
+<dl>
+	<dt>Provider Client ID</dt>
+	<dd>${app.providerClientId}</dd>
 </dl>
 
 <c:if test="${not empty token}" >

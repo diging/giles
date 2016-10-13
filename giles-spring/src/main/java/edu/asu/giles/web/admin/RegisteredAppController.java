@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
 import edu.asu.giles.apps.IRegisteredApp;
+import edu.asu.giles.service.IIdentityProviderRegistry;
 import edu.asu.giles.service.apps.IRegisteredAppManager;
 
 @Controller
@@ -14,6 +15,10 @@ public class RegisteredAppController {
     
     @Autowired
     private IRegisteredAppManager appManager;
+    
+    @Autowired
+    private IIdentityProviderRegistry providerRegistry;
+    
 
     @RequestMapping(value = "/admin/apps")
     public String showRegisteredApps(Model model) {
@@ -27,6 +32,8 @@ public class RegisteredAppController {
         if (app == null) {
             return "notFound";
         }
+        
+        model.addAttribute("providerName", providerRegistry.getProviderName(app.getProviderId()));
         
         model.addAttribute("app", app);
         return "admin/apps/app";

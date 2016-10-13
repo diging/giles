@@ -57,6 +57,11 @@ public class IdentityProviderRegistry implements IIdentityProviderRegistry {
     }
     
     @Override
+    public String getProviderName(String id) {
+        return providers.get(id);
+    }
+    
+    @Override
     public String getCheckerId(String providerId) {
         return providerTokenChecker.get(providerId);
     }

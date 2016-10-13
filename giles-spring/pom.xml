@@ -26,6 +26,7 @@
 		<registered.apps.client.ids></registered.apps.client.ids>
 		<mitreid.clientId></mitreid.clientId>
 		<mitreid.secret></mitreid.secret>
+		<mitreid.server.url></mitreid.server.url>
 		<jwt.signing.secret></jwt.signing.secret>
 		<jwt.signing.secret.apps></jwt.signing.secret.apps>
 		<db_files></db_files>

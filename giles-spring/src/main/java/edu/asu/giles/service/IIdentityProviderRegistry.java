@@ -12,4 +12,6 @@ public interface IIdentityProviderRegistry {
 
     public abstract void addProviderTokenChecker(String providerId, String checkerId);
 
+    public abstract String getProviderName(String id);
+
 }

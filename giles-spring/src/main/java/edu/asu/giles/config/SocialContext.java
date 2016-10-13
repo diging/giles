@@ -70,7 +70,8 @@ public class SocialContext implements SocialConfigurer {
         
         String mitreidClientId = propertyManager.getProperty(IPropertiesManager.MITREID_CLIENT_ID);
         String mitreidSecret = propertyManager.getProperty(IPropertiesManager.MITREID_SECRET);
-        MitreidConnectConnectionFactory mitreidFactory = new MitreidConnectConnectionFactory(mitreidClientId, mitreidSecret);
+        String mitreidServer = propertyManager.getProperty(IPropertiesManager.MITREID_SERVER_URL);
+        MitreidConnectConnectionFactory mitreidFactory = new MitreidConnectConnectionFactory(mitreidClientId, mitreidSecret, mitreidServer);
         cfConfig.addConnectionFactory(mitreidFactory);
         identityProviderRegistry.addProvider(mitreidFactory.getProviderId());
         identityProviderRegistry.addProviderTokenChecker(mitreidFactory.getProviderId(), MitreidChecker.ID);

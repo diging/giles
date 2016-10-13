@@ -26,7 +26,7 @@ public class GoogleChecker implements IChecker {
     }
 
     @Override
-    public CheckerResult validateToken(String token) throws GeneralSecurityException, IOException, InvalidTokenException {
+    public CheckerResult validateToken(String token, String appId) throws GeneralSecurityException, IOException, InvalidTokenException {
         String clientIds = propertiesManager.getProperty(IPropertiesManager.REGISTERED_APPS_CLIENT_IDS);
         String[] clientIdsList = clientIds.split("\\s*,\\s*");
         Checker checker = new Checker(clientIdsList, clientIdsList);
