@@ -21,12 +21,15 @@
 		<admin.username>admin</admin.username>
 		<github.clientId></github.clientId>
 		<github.secret></github.secret>
+		<github.show.login>true</github.show.login>
 		<google.clientId></google.clientId>
 		<google.secret></google.secret>
+		<google.show.login>false</google.show.login>
 		<registered.apps.client.ids></registered.apps.client.ids>
 		<mitreid.clientId></mitreid.clientId>
 		<mitreid.secret></mitreid.secret>
 		<mitreid.server.url></mitreid.server.url>
+		<mitreid.show.login>true</mitreid.show.login>
 		<jwt.signing.secret></jwt.signing.secret>
 		<jwt.signing.secret.apps></jwt.signing.secret.apps>
 		<db_files></db_files>

@@ -1,11 +1,7 @@
 package edu.asu.giles.web;
 
-import io.jsonwebtoken.impl.crypto.MacProvider;
-
-import java.security.Key;
 import java.security.Principal;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +17,7 @@ import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.files.IUploadDatabaseClient;
 import edu.asu.giles.service.IGilesMappingService;
 import edu.asu.giles.service.impl.GilesMappingService;
+import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.users.IUserManager;
 import edu.asu.giles.users.User;
 import edu.asu.giles.web.pages.UploadPageBean;
@@ -33,6 +30,9 @@ public class LoginController {
     
     @Autowired
     private IUserManager userManager;
+    
+    @Autowired
+    private IPropertiesManager propertiesManager;
     
     @RequestMapping(value = "/")
     public String login(Principal principal, Model model) throws GilesMappingException {
@@ -64,6 +64,10 @@ public class LoginController {
             model.addAttribute("uploads", mappedUploads);
             model.addAttribute("user", userManager.findUser(username));
         }
+        
+        model.addAttribute("githubShowLogin", propertiesManager.getProperty(IPropertiesManager.GITHUB_SHOW_LOGIN).equals("true"));
+        model.addAttribute("googleShowLogin", propertiesManager.getProperty(IPropertiesManager.GOOGLE_SHOW_LOGIN).equals("true"));
+        model.addAttribute("mitreidShowLogin", propertiesManager.getProperty(IPropertiesManager.MITREID_SHOW_LOGIN).equals("true"));
         
         return "login";
     }
