@@ -12,6 +12,7 @@
 		<spring-security-version>4.1.1.RELEASE</spring-security-version>
 		<spring-social.version>1.1.4.RELEASE</spring-social.version>
 		<spring-social-github.version>1.0.0.BUILD-SNAPSHOT</spring-social-github.version>
+		<org.springframework.social-google-version>1.0.0.RELEASE</org.springframework.social-google-version>
 		<org.slf4j-version>1.7.5</org.slf4j-version>
 
 		<!-- application properties -->
@@ -20,6 +21,16 @@
 		<admin.username>admin</admin.username>
 		<github.clientId></github.clientId>
 		<github.secret></github.secret>
+		<github.show.login>true</github.show.login>
+		<google.clientId></google.clientId>
+		<google.secret></google.secret>
+		<google.show.login>false</google.show.login>
+		<mitreid.clientId></mitreid.clientId>
+		<mitreid.secret></mitreid.secret>
+		<mitreid.server.url></mitreid.server.url>
+		<mitreid.show.login>true</mitreid.show.login>
+		<jwt.signing.secret></jwt.signing.secret>
+		<jwt.signing.secret.apps></jwt.signing.secret.apps>
 		<db_files></db_files>
 		<db.driver>com.mysql.jdbc.Driver</db.driver>
 		<db.database.url></db.database.url>
@@ -222,6 +233,55 @@
 			<artifactId>spring-social-github</artifactId>
 			<version>${spring-social-github.version}</version>
 		</dependency>
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-google</artifactId>
+			<version>${org.springframework.social-google-version}</version>
+		</dependency>
+
+		<!-- Google -->
+		<!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client</artifactId>
+			<version>1.22.0</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.google.api-client/google-api-client-gson -->
+		<dependency>
+			<groupId>com.google.api-client</groupId>
+			<artifactId>google-api-client-gson</artifactId>
+			<version>1.22.0</version>
+		</dependency>
+
+
+		<!-- Mitreid OpenId Connect Server -->
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-mitreidConnect</artifactId>
+			<version>0.1</version>
+		</dependency>
+
+		<!-- Token generation -->
+		<dependency>
+			<groupId>io.jsonwebtoken</groupId>
+			<artifactId>jjwt</artifactId>
+			<version>0.7.0</version>
+		</dependency>
+
+		<!-- OpenId Connect -->
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>4.26.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/oauth2-oidc-sdk -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>5.17.1</version>
+		</dependency>
+
 
 		<!-- Spring AOP + AspectJ -->
 		<dependency>
@@ -309,12 +369,6 @@
 			<groupId>com.github.jai-imageio</groupId>
 			<artifactId>jai-imageio-core</artifactId>
 			<version>1.3.1</version>
-		</dependency>
-		<!-- decoder for images -->
-		<dependency>
-			<groupId>com.levigo.jbig2</groupId>
-			<artifactId>levigo-jbig2-imageio</artifactId>
-			<version>1.6.5</version>
 		</dependency>
 
 		<!-- tessaract/tika -->

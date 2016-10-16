@@ -1,4 +1,4 @@
-package edu.asu.giles.aspects.access;
+package edu.asu.giles.aspects.access.annotations;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;

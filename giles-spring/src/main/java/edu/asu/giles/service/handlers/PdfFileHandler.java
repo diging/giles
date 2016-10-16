@@ -33,6 +33,7 @@ import edu.asu.giles.core.IPage;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.core.impl.Page;
 import edu.asu.giles.exceptions.GilesFileStorageException;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
@@ -92,6 +93,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
         }
 
         boolean success = true;
+        
+        IFile extractedText = null;
+        if (extractText.equalsIgnoreCase(TRUE)) {
+            String fileName = file.getFilename() + ".txt";
+            extractedText = extractText(pdfDocument, username, file, document, fileName);
+        }
 
         int numPages = pdfDocument.getNumberOfPages();
         PDFRenderer renderer = new PDFRenderer(pdfDocument);
@@ -111,18 +118,20 @@ public class PdfFileHandler extends AbstractFileHandler implements
                         dirFolder, image, fileName);
                 success &= imageFile != null;
 
-                if (imageFile != null && doOcrOnImages.equalsIgnoreCase(TRUE)) {
-                    doOcr(page, imageFile, username, document);
+                if (doOcrOnImages.equalsIgnoreCase(TRUE)) {
+                    // if there is embedded text, let's use that one before OCRing
+                    if (extractedText != null) {
+                        extractPageText(page, file, pdfDocument, i, username, document);
+                    }
+                    else if (imageFile != null) {
+                        doOcr(page, imageFile, username, document);
+                    }
                 }
+                
             } catch (NumberFormatException | IOException e) {
                 logger.error("Could not render image.", e);
                 success = false;
             }
-        }
-
-        if (extractText.equalsIgnoreCase(TRUE)) {
-            String fileName = file.getFilename() + ".txt";
-            extractText(pdfDocument, username, file, document, fileName);
         }
 
         try {
@@ -133,7 +142,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
 
         pdfStorageManager.saveFile(file.getUsername(), file.getUploadId(),
                 document.getDocumentId(), file.getFilename(), content);
-        filesDbClient.saveFile(file);
+        try {
+            filesDbClient.saveFile(file);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            success = false;
+        }
 
         return success;
     }
@@ -183,10 +197,45 @@ public class PdfFileHandler extends AbstractFileHandler implements
         textFile.setDerivedFrom(file.getDerivedFrom());
 
         textFile.setSize(fileObject.length());
-        filesDbClient.saveFile(textFile);
+        try {
+            filesDbClient.saveFile(textFile);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            return null;
+        }
 
         document.getTextFileIds().add(textFile.getId());
         document.setExtractedTextFileId(textFile.getId());
+        return textFile;
+    }
+    
+    private IFile extractPageText(IPage page, IFile mainFile, PDDocument pdfDocument, int pageNr, String username, IDocument document) {
+        
+        String pageText = null;
+        
+        PDFTextStripper stripper;
+        try {
+            stripper = new PDFTextStripper();
+            // pdfbox starts counting at 1 for the text extraction
+            stripper.setStartPage(pageNr + 1);
+            stripper.setEndPage(pageNr + 1);
+            
+            pageText = stripper.getText(pdfDocument);
+        } catch (IOException e) {
+            logger.error("Could not get contents of page " + pageNr + ".", e);
+        }
+        
+        if (pageText == null) {
+            return null;
+        }
+        
+        IFile textFile = saveTextToFile(mainFile, pageNr, username, document, pageText);
+
+        if (textFile != null) {
+            document.getTextFileIds().add(textFile.getId());
+            page.setTextFileId(textFile.getId());
+        }
+
         return textFile;
     }
 
@@ -218,9 +267,27 @@ public class PdfFileHandler extends AbstractFileHandler implements
             return null;
         }
 
+        IFile textFile = saveTextToFile(imageFile, -1, username, document, extractedText);
+
+        if (textFile != null) {
+            document.getTextFileIds().add(textFile.getId());
+            page.setTextFileId(textFile.getId());
+        }
+
+        return textFile;
+    }
+    
+    private IFile saveTextToFile(IFile mainFile, int pageNr, String username,
+            IDocument document, String pageText) {
         String docFolder = textStorageManager.getAndCreateStoragePath(username,
                 document.getUploadId(), document.getDocumentId());
-        String filename = imageFile.getFilename() + ".txt";
+        
+        String filename = mainFile.getFilename();
+        if (pageNr > -1) {
+            filename = filename +  "." + pageNr;
+        }
+        filename = filename + ".txt";
+        
         String filePath = docFolder + File.separator + filename;
         File fileObject = new File(filePath);
         try {
@@ -233,7 +300,7 @@ public class PdfFileHandler extends AbstractFileHandler implements
         try {
             FileWriter writer = new FileWriter(fileObject);
             BufferedWriter bfWriter = new BufferedWriter(writer);
-            bfWriter.write(extractedText);
+            bfWriter.write(pageText);
             bfWriter.close();
             writer.close();
         } catch (IOException e) {
@@ -241,20 +308,22 @@ public class PdfFileHandler extends AbstractFileHandler implements
             return null;
         }
 
-        IFile textFile = imageFile.clone();
+        IFile textFile = mainFile.clone();
         textFile.setFilepath(docFolder + File.separator + filename);
         textFile.setFilename(filename);
         textFile.setId(filesDbClient.generateId());
         textFile.setContentType(MediaType.TEXT_PLAIN_VALUE);
         textFile.setSize(fileObject.length());
-        textFile.setDerivedFrom(imageFile.getId());
-        filesDbClient.saveFile(textFile);
-
-        document.getTextFileIds().add(textFile.getId());
-        page.setTextFileId(textFile.getId());
-
+        textFile.setDerivedFrom(mainFile.getId());
+        try {
+            filesDbClient.saveFile(textFile);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file,", e);
+            return null;
+        }
         return textFile;
     }
+
 
     private IFile saveImage(IPage page, String username, IFile file, IDocument document,
             String dirFolder, BufferedImage image, String fileName)
@@ -284,7 +353,12 @@ public class PdfFileHandler extends AbstractFileHandler implements
         document.getFileIds().add(imageFile.getId());
         page.setImageFileId(imageFile.getId());
 
-        filesDbClient.saveFile(imageFile);
+        try {
+            filesDbClient.saveFile(imageFile);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            return null;
+        }
         return imageFile;
     }
 

@@ -1,4 +1,4 @@
-package edu.asu.giles.aspects.access;
+package edu.asu.giles.aspects.access.github;
 
 import org.springframework.social.github.api.impl.GitHubTemplate;
 import org.springframework.stereotype.Service;

@@ -33,7 +33,7 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.aspects.access.annotations.TokenCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.core.IDocument;
@@ -69,7 +69,7 @@ public class UploadImagesController {
     @Autowired
     private IJSONHelper jsonHelper;
 
-    @GitHubAccessCheck
+    @TokenCheck
     @RequestMapping(value = "/rest/files/upload", method = RequestMethod.POST, consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<String> uploadImages(
             @RequestParam(defaultValue = "") String accessToken,
@@ -119,7 +119,7 @@ public class UploadImagesController {
         return generateResponse(msgs, HttpStatus.OK);
     }
     
-    @GitHubAccessCheck
+    @TokenCheck
     @RequestMapping(value = "/rest/files/upload/check/{id}", method = RequestMethod.GET)
     public ResponseEntity<String> checkAndGetResults(
             @RequestParam(defaultValue = "") String accessToken,

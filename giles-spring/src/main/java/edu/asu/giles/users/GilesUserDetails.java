@@ -24,7 +24,7 @@ class GilesUserDetails implements SocialUserDetails {
     private String password;
     private List<GilesGrantedAuthority> authorities;
     private String email;
-
+    
     public GilesUserDetails(String username, String name, String password,
             List<GilesGrantedAuthority> authorities, String email) {
         super();

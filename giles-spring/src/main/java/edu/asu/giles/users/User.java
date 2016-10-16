@@ -14,6 +14,7 @@ public class User implements Serializable {
     private String username;
     private String firstname;
     private String lastname;
+    private String name;
     private boolean isAdmin;
     private String email;
     private String provider;
@@ -21,7 +22,7 @@ public class User implements Serializable {
     private List<String> roles;
     private String password;
     private AccountStatus accountStatus;
-
+    
     public void setIsAdmin(boolean isAdmin) {
         this.isAdmin = isAdmin;
     }
@@ -94,6 +95,9 @@ public class User implements Serializable {
     }
 
     public String getFullname() {
+        if (name != null && !name.isEmpty()) {
+            return name;
+        }
         return firstname + " " + lastname;
     }
 
@@ -112,4 +116,13 @@ public class User implements Serializable {
     public void setAccountStatus(AccountStatus accountStatus) {
         this.accountStatus = accountStatus;
     }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+    
 }

@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.giles.exceptions.UnstorableObjectException;
+
 /**
  * Managing class for user management.
  * 
@@ -27,6 +29,11 @@ public class UsersManager implements IUserManager {
     public User findUser(String name) {
         User user = client.findUser(name);
         return user;
+    }
+    
+    @Override
+    public User findUserByProviderUserId(String userId, String provider) {
+        return client.findUserByProviderUserId(userId, provider);
     }
 
     /*
@@ -70,7 +77,7 @@ public class UsersManager implements IUserManager {
      * users.User)
      */
     @Override
-    public User addUser(User user) {
+    public User addUser(User user) throws UnstorableObjectException {
         client.addUser(user);
         return user;
     }
@@ -142,6 +149,19 @@ public class UsersManager implements IUserManager {
         User user = findUser(username);
         user.getRoles().remove(role.name());
         client.update(user);
+    }
+    
+    @Override
+    public String getUniqueUsername(String providerId) {
+        String id = null;
+        while (true) {
+            id = "USR" + client.generateUniqueId() + "_" + providerId;
+            Object existingFile = findUser(id);
+            if (existingFile == null) {
+                break;
+            }
+        }
+        return id;
     }
     
 }

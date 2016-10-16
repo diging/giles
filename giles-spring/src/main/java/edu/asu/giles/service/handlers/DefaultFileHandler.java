@@ -17,6 +17,7 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.IUpload;
 import edu.asu.giles.exceptions.GilesFileStorageException;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.IFileStorageManager;
 import edu.asu.giles.files.IFilesDatabaseClient;
 import edu.asu.giles.service.IFileTypeHandler;
@@ -49,7 +50,12 @@ public class DefaultFileHandler extends AbstractFileHandler implements IFileType
     @Override
     public boolean processFile(String username, IFile file, IDocument document, IUpload upload, byte[] content) throws GilesFileStorageException {
         storageManager.saveFile(username, upload.getId(), document.getDocumentId(), file.getFilename(), content);
-        databaseClient.saveFile(file);
+        try {
+            databaseClient.saveFile(file);
+        } catch (UnstorableObjectException e) {
+            logger.error("Could not store file.", e);
+            return false;
+        }
         return true;
     }
 

@@ -1,6 +1,8 @@
 package edu.asu.giles.core;
 
-public interface IFile {
+import edu.asu.giles.db4o.IStorableObject;
+
+public interface IFile extends IStorableObject {
 
     public abstract String getUploadId();
 

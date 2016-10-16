@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import edu.asu.giles.aspects.access.DocumentAccessCheck;
-import edu.asu.giles.aspects.access.FileGitHubAccessCheck;
-import edu.asu.giles.aspects.access.GitHubAccessCheck;
+import edu.asu.giles.aspects.access.annotations.DocumentAccessCheck;
+import edu.asu.giles.aspects.access.annotations.FileTokenAccessCheck;
+import edu.asu.giles.aspects.access.annotations.TokenCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
@@ -44,7 +44,7 @@ public class FilesController {
     @Autowired
     private IJSONHelper jsonHelper;
 
-    @GitHubAccessCheck
+    @TokenCheck
     @RequestMapping(value = "/rest/files/upload/{uploadId}")
     public ResponseEntity<String> getFilePathsForUpload(
             @RequestParam(defaultValue = "") String accessToken, 
@@ -119,7 +119,7 @@ public class FilesController {
     }
 
     
-    @FileGitHubAccessCheck
+    @FileTokenAccessCheck
     @RequestMapping(value = "/rest/files/{fileId}/content")
     public ResponseEntity<String> getFile(
             @PathVariable String fileId,

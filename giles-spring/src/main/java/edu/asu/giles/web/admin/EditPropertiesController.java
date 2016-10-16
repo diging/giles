@@ -41,18 +41,6 @@ public class EditPropertiesController {
     public String getConfigPage(Model model) {
         SystemConfigPage page = new SystemConfigPage();
         
-        String clientId = propertyManager.getProperty(IPropertiesManager.GITHUB_CLIENT_ID);
-        if (clientId != null && clientId.length() > 2) {
-            clientId = clientId.substring(0,2) + (new String(new char[clientId.length()-2])).replace("\0", "*");
-        }
-        page.setGithubClientId(clientId);
-        
-        String githubSecret = propertyManager.getProperty(IPropertiesManager.GITHUB_SECRET);
-        if (githubSecret != null && githubSecret.length() > 2) {
-            githubSecret = githubSecret.substring(0,2) + new String(new char[githubSecret.length()-2]).replace("\0", "*");
-        }
-        page.setGithubSecret(githubSecret);
-        
         page.setDigilibScalerUrl(propertyManager.getProperty(IPropertiesManager.DIGILIB_SCALER_URL));
         page.setGilesUrl(propertyManager.getProperty(IPropertiesManager.GILES_URL));
         page.setJarsFileUrl(propertyManager.getProperty(IPropertiesManager.JARS_FILE_URL));
@@ -80,6 +68,10 @@ public class EditPropertiesController {
         
         page.setIframingAllowedHosts(propertyManager.getProperty(IPropertiesManager.ALLOW_IFRAMING_FROM));
         
+        page.setShowGithubLogin(propertyManager.getProperty(IPropertiesManager.GITHUB_SHOW_LOGIN).equals("true"));
+        page.setShowGoogleLogin(propertyManager.getProperty(IPropertiesManager.GOOGLE_SHOW_LOGIN).equals("true"));
+        page.setShowMitreidLogin(propertyManager.getProperty(IPropertiesManager.MITREID_SHOW_LOGIN).equals("true"));
+        
         List<String> imageTypes = new ArrayList<String>();
         imageTypes.add(ImageType.ARGB.toString());
         imageTypes.add(ImageType.BINARY.toString());
@@ -102,14 +94,6 @@ public class EditPropertiesController {
         }
         
         Map<String, String> propertiesMap = new HashMap<String, String>();
-        // if new client id has been updated, property needs to be updated
-        if (!systemConfigPage.getGithubClientId().endsWith("*")) {
-            propertiesMap.put(IPropertiesManager.GITHUB_CLIENT_ID, systemConfigPage.getGithubClientId());
-        }
-        // if github secret has been updated, update property
-        if (!systemConfigPage.getGithubSecret().endsWith("*")) {
-            propertiesMap.put(IPropertiesManager.GITHUB_SECRET, systemConfigPage.getGithubSecret());
-        }
         propertiesMap.put(IPropertiesManager.DIGILIB_SCALER_URL, systemConfigPage.getDigilibScalerUrl());
         propertiesMap.put(IPropertiesManager.GILES_URL, systemConfigPage.getGilesUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_DPI, systemConfigPage.getPdfToImageDpi());
@@ -123,7 +107,9 @@ public class EditPropertiesController {
         propertiesMap.put(IPropertiesManager.METADATA_SERVICE_DOC_ENDPOINT, systemConfigPage.getMetadataServiceDocUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_FORMAT, systemConfigPage.getPdfToImageFormat());
         propertiesMap.put(IPropertiesManager.ALLOW_IFRAMING_FROM, systemConfigPage.getIframingAllowedHosts());
-        
+        propertiesMap.put(IPropertiesManager.GITHUB_SHOW_LOGIN, new Boolean(systemConfigPage.isShowGithubLogin()).toString());
+        propertiesMap.put(IPropertiesManager.GOOGLE_SHOW_LOGIN, new Boolean(systemConfigPage.isShowGoogleLogin()).toString());
+        propertiesMap.put(IPropertiesManager.MITREID_SHOW_LOGIN, new Boolean(systemConfigPage.isShowMitreidLogin()).toString());
         try {
             propertyManager.updateProperties(propertiesMap);
         } catch (GilesPropertiesStorageException e) {

@@ -14,11 +14,13 @@ import com.db4o.ObjectSet;
 
 import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.impl.Document;
-import edu.asu.giles.db4o.DatabaseManager;
+import edu.asu.giles.db4o.impl.DatabaseClient;
+import edu.asu.giles.db4o.impl.DatabaseManager;
+import edu.asu.giles.exceptions.UnstorableObjectException;
 import edu.asu.giles.files.IDocumentDatabaseClient;
 
 @Component
-public class DocumentDatabaseClient extends DatabaseClient implements
+public class DocumentDatabaseClient extends DatabaseClient<IDocument> implements
         IDocumentDatabaseClient {
 
     private ObjectContainer client;
@@ -40,10 +42,8 @@ public class DocumentDatabaseClient extends DatabaseClient implements
      * .core.IDocument)
      */
     @Override
-    public IDocument saveDocument(IDocument document) {
-        client.store(document);
-        client.commit();
-        return document;
+    public IDocument saveDocument(IDocument document) throws UnstorableObjectException {
+        return store(document);
     }
 
     /*
@@ -57,7 +57,7 @@ public class DocumentDatabaseClient extends DatabaseClient implements
     public IDocument getDocumentById(String id) {
         IDocument doc = new Document();
         doc.setId(id);
-        return queryByExample(doc);
+        return queryByExampleGetFirst(doc);
     }
 
     /*
@@ -91,12 +91,8 @@ public class DocumentDatabaseClient extends DatabaseClient implements
         return results;
     }
 
-    private IDocument queryByExample(IDocument doc) {
-        ObjectSet<IDocument> docs = client.queryByExample(doc);
-        if (docs != null && docs.size() > 0) {
-            return docs.get(0);
-        }
-        return null;
+    protected ObjectContainer getClient() {
+        return client;
     }
 
     @Override

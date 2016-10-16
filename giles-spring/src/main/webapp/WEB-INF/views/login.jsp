@@ -4,7 +4,7 @@
 
 
 
-<div class="jumbotron">
+<div class="jumbotron col-md-12">
 
 <sec:authorize access="isAnonymous()">
 <h1>Welcome to Giles!</h1>
@@ -14,11 +14,20 @@ Giles is an app that work in tandem with <a href="http://digilib.sourceforge.net
 that are then accessible through Digilib. Metadata of uploaded images  managed with Jars.
 </p>
 
-<p>
-To use Giles, you need to log in with your GitHub account. Don't have one? You can create one <a href="http://github.com">here</a>.
-</p>
+<c:if test="${googleShowLogin == true}">
+<div class="col-md-3">
+<form action="<c:url value="/signin/google" />" method="POST">
+<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
+	<button class="btn btn-primary btn-lg" type="submit">
+		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with Google+
+	</button>
+</form>
+</div>
+</c:if>
 
+<c:if test="${githubShowLogin == 'true'}">
+<div class="col-md-3">
 <form action="<c:url value="/signin/github" />" method="POST">
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
 
@@ -26,6 +35,31 @@ To use Giles, you need to log in with your GitHub account. Don't have one? You c
 		<i class="fa fa-github" aria-hidden="true"></i> Login with GitHub
 	</button>
 </form>
+</div>
+</c:if>
+
+<c:if test="${mitreidShowLogin == 'true'}">
+<div class="col-md-3">
+<form action="<c:url value="/signin/mitreidconnect" />" method="POST">
+	<button class="btn btn-primary btn-lg" type="submit">
+		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with OpenId Connect Server
+	</button>
+</form>
+</div>
+</c:if>
+
+<c:if test="${showGoogleLogin != 'true'}">
+<div class="col-md-3"></div>
+</c:if>
+<c:if test="${showGithubLogin != 'true'}">
+<div class="col-md-3"></div>
+</c:if>
+<c:if test="${showMitreidLogin != 'true'}">
+<div class="col-md-3"></div>
+</c:if>
+
+<div class="col-md-3"></div>
+
 </sec:authorize>
 
 <sec:authorize access="isAuthenticated()">

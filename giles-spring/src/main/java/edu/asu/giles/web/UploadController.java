@@ -20,7 +20,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 
-import edu.asu.giles.aspects.access.AccountCheck;
+import edu.asu.giles.aspects.access.annotations.AccountCheck;
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
 import edu.asu.giles.files.IFilesManager;

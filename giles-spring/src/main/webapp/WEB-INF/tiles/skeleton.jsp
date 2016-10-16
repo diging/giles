@@ -50,6 +50,17 @@
       <nav>
           <ul class="nav nav-pills pull-right">
           <sec:authorize access="not isAuthenticated()">
+          <c:if test="${googleShowLogin == true}">
+            <li role="presentation">
+            	<form action="<c:url value="/signin/google" />" method="POST">
+            	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
+            		<button class="btn btn-link" type="submit">
+            			<i class="fa fa-google-plus" aria-hidden="true"></i> Login
+            		</button>
+            	</form>
+           </li>
+           </c:if>
+           <c:if test="${githubShowLogin == true}">
             <li role="presentation">
             	<form action="<c:url value="/signin/github" />" method="POST">
             	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -57,7 +68,17 @@
             			<i class="fa fa-github" aria-hidden="true"></i> Login
             		</button>
             	</form>
-            </li>
+           </li>
+           </c:if>
+           <c:if test="${mitreidShowLogin == true}">
+            <li role="presentation">
+            	<form action="<c:url value="/signin/mitreidconnect" />" method="POST">
+            		<button class="btn btn-link" type="submit">
+            			<i class="fa fa-openid" aria-hidden="true"></i> Login
+            		</button>
+            	</form>
+           </li>
+           </c:if>
           </sec:authorize>
           <sec:authorize access="hasRole('ROLE_USER')">
           	<li role="presentation">
@@ -77,8 +98,14 @@
           	<li role="presentation">
           		<a href="<c:url value="/admin/system/config" />" >System Config</a>
           	</li>
+          	<li role="presentation">
+          		<a href="<c:url value="/admin/apps" />" >Apps</a>
+          	</li>
           </sec:authorize>
           <sec:authorize access="isAuthenticated()">
+          	<li role="presentation">
+          		<a href="<c:url value="/profile" />" >Profile</a>
+          	</li>
          	 <li role="presentation">
          	 	<form action="<c:url value="/logout" />" method="POST">
          	 	<input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -95,9 +122,13 @@
       
       <sec:authorize access="isAuthenticated()">
       <p class="text-right">
-      Logged in as <i class="fa fa-github" aria-hidden="true"></i> 
-         			<sec:authentication
-							property="principal.username" />
+      Logged in as 
+      <c:catch var="err">
+        <sec:authentication property="principal.fullname" />
+	  </c:catch>
+	  <c:if test="${not empty err}">
+	  	<sec:authentication property="principal.username" />
+	  </c:if>
 	  </p>
 	  </sec:authorize>
 

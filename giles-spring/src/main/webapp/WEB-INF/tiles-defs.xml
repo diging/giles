@@ -40,6 +40,15 @@
 		<put-attribute name="content" value="/WEB-INF/views/uploads/showDocument.jsp" />	
 	</definition>
 	
+	<!-- profile -->
+	<definition name="profile" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/profile/profile.jsp" />	
+	</definition>
+	<definition name="profile/username/change" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/profile/changeUsername.jsp" />	
+	</definition>
+	
+	<!-- error pages -->
 	<definition name="notFound" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/notFound.jsp" />	
 	</definition>
@@ -60,6 +69,20 @@
 	<!--  admin -->
 	<definition name="admin/system/config" extends="base.definition">
 		<put-attribute name="content" value="/WEB-INF/views/admin/system_config.jsp" />
+	</definition>
+	
+	<!--  apps -->
+	<definition name="admin/apps" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/apps.jsp" />
+	</definition>
+	<definition name="admin/apps/register" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/register.jsp" />
+	</definition>
+	<definition name="admin/apps/app" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/app.jsp" />
+	</definition>
+	<definition name="admin/apps/delete" extends="base.definition">
+		<put-attribute name="content" value="/WEB-INF/views/admin/deleteApp.jsp" />
 	</definition>
 	
 	<!--  user errors -->
