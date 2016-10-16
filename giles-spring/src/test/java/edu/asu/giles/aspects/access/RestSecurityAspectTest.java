@@ -308,7 +308,7 @@ public class RestSecurityAspectTest {
         tokenContents.setUsername(username);
         tokenContents.setExpired(false);
         validResult.setPayload(tokenContents);
-        Mockito.when(githubChecker.validateToken(ACCESS_TOKEN, null)).thenReturn(validResult);
+        Mockito.when(githubChecker.validateToken(ACCESS_TOKEN, "appId1")).thenReturn(validResult);
         
         CheckerResult invalidResult = new CheckerResult();
         invalidResult.setResult(ValidationResult.INVALID);
