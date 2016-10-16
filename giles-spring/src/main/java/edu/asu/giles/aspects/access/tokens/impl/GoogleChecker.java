@@ -6,10 +6,12 @@ import java.security.GeneralSecurityException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import edu.asu.giles.apps.IRegisteredApp;
 import edu.asu.giles.aspects.access.openid.google.Checker;
 import edu.asu.giles.aspects.access.openid.google.CheckerResult;
 import edu.asu.giles.aspects.access.tokens.IChecker;
 import edu.asu.giles.exceptions.InvalidTokenException;
+import edu.asu.giles.service.apps.IRegisteredAppManager;
 import edu.asu.giles.service.properties.IPropertiesManager;
 
 @Service
@@ -20,6 +22,9 @@ public class GoogleChecker implements IChecker {
     @Autowired
     private IPropertiesManager propertiesManager;
     
+    @Autowired
+    private IRegisteredAppManager appsManager;
+    
     @Override
     public String getId() {
         return ID;
@@ -27,8 +32,9 @@ public class GoogleChecker implements IChecker {
 
     @Override
     public CheckerResult validateToken(String token, String appId) throws GeneralSecurityException, IOException, InvalidTokenException {
-        String clientIds = propertiesManager.getProperty(IPropertiesManager.REGISTERED_APPS_CLIENT_IDS);
-        String[] clientIdsList = clientIds.split("\\s*,\\s*");
+        IRegisteredApp app = appsManager.getApp(appId);
+        String[] clientIdsList = new String[] { app.getProviderClientId() };
+        
         Checker checker = new Checker(clientIdsList, clientIdsList);
         
         try {

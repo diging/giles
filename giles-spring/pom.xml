@@ -25,7 +25,6 @@
 		<google.clientId></google.clientId>
 		<google.secret></google.secret>
 		<google.show.login>false</google.show.login>
-		<registered.apps.client.ids></registered.apps.client.ids>
 		<mitreid.clientId></mitreid.clientId>
 		<mitreid.secret></mitreid.secret>
 		<mitreid.server.url></mitreid.server.url>
