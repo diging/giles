@@ -41,7 +41,6 @@ public class EditPropertiesController {
     public String getConfigPage(Model model) {
         SystemConfigPage page = new SystemConfigPage();
         
-        page.setRegisteredApps(propertyManager.getProperty(IPropertiesManager.REGISTERED_APPS_CLIENT_IDS));
         page.setDigilibScalerUrl(propertyManager.getProperty(IPropertiesManager.DIGILIB_SCALER_URL));
         page.setGilesUrl(propertyManager.getProperty(IPropertiesManager.GILES_URL));
         page.setJarsFileUrl(propertyManager.getProperty(IPropertiesManager.JARS_FILE_URL));
@@ -69,6 +68,10 @@ public class EditPropertiesController {
         
         page.setIframingAllowedHosts(propertyManager.getProperty(IPropertiesManager.ALLOW_IFRAMING_FROM));
         
+        page.setShowGithubLogin(propertyManager.getProperty(IPropertiesManager.GITHUB_SHOW_LOGIN).equals("true"));
+        page.setShowGoogleLogin(propertyManager.getProperty(IPropertiesManager.GOOGLE_SHOW_LOGIN).equals("true"));
+        page.setShowMitreidLogin(propertyManager.getProperty(IPropertiesManager.MITREID_SHOW_LOGIN).equals("true"));
+        
         List<String> imageTypes = new ArrayList<String>();
         imageTypes.add(ImageType.ARGB.toString());
         imageTypes.add(ImageType.BINARY.toString());
@@ -91,7 +94,6 @@ public class EditPropertiesController {
         }
         
         Map<String, String> propertiesMap = new HashMap<String, String>();
-        propertiesMap.put(IPropertiesManager.REGISTERED_APPS_CLIENT_IDS, systemConfigPage.getRegisteredApps());
         propertiesMap.put(IPropertiesManager.DIGILIB_SCALER_URL, systemConfigPage.getDigilibScalerUrl());
         propertiesMap.put(IPropertiesManager.GILES_URL, systemConfigPage.getGilesUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_DPI, systemConfigPage.getPdfToImageDpi());
@@ -105,7 +107,9 @@ public class EditPropertiesController {
         propertiesMap.put(IPropertiesManager.METADATA_SERVICE_DOC_ENDPOINT, systemConfigPage.getMetadataServiceDocUrl());
         propertiesMap.put(IPropertiesManager.PDF_TO_IMAGE_FORMAT, systemConfigPage.getPdfToImageFormat());
         propertiesMap.put(IPropertiesManager.ALLOW_IFRAMING_FROM, systemConfigPage.getIframingAllowedHosts());
-        
+        propertiesMap.put(IPropertiesManager.GITHUB_SHOW_LOGIN, new Boolean(systemConfigPage.isShowGithubLogin()).toString());
+        propertiesMap.put(IPropertiesManager.GOOGLE_SHOW_LOGIN, new Boolean(systemConfigPage.isShowGoogleLogin()).toString());
+        propertiesMap.put(IPropertiesManager.MITREID_SHOW_LOGIN, new Boolean(systemConfigPage.isShowMitreidLogin()).toString());
         try {
             propertyManager.updateProperties(propertiesMap);
         } catch (GilesPropertiesStorageException e) {

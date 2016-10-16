@@ -17,6 +17,9 @@ public class SystemConfigPage {
     private boolean ocrImagesFromPdfs;
     private int defaultPageSize;
     private String iframingAllowedHosts;
+    private boolean showGithubLogin;
+    private boolean showGoogleLogin;
+    private boolean showMitreidLogin;
     
     public String getRegisteredApps() {
         return registeredApps;
@@ -107,5 +110,23 @@ public class SystemConfigPage {
     }
     public void setIframingAllowedHosts(String iframingAllowedHosts) {
         this.iframingAllowedHosts = iframingAllowedHosts;
+    }
+    public boolean isShowGithubLogin() {
+        return showGithubLogin;
+    }
+    public void setShowGithubLogin(boolean showGithubLogin) {
+        this.showGithubLogin = showGithubLogin;
+    }
+    public boolean isShowGoogleLogin() {
+        return showGoogleLogin;
+    }
+    public void setShowGoogleLogin(boolean showGoogleLogin) {
+        this.showGoogleLogin = showGoogleLogin;
+    }
+    public boolean isShowMitreidLogin() {
+        return showMitreidLogin;
+    }
+    public void setShowMitreidLogin(boolean showMitreidLogin) {
+        this.showMitreidLogin = showMitreidLogin;
     }
 }
