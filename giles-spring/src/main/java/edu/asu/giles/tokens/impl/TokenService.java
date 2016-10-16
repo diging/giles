@@ -9,6 +9,8 @@ import io.jsonwebtoken.SignatureException;
 import java.util.Date;
 import java.util.UUID;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +29,8 @@ import edu.asu.giles.users.User;
  */
 @Service
 public class TokenService implements ITokenService {
+    
+    private final Logger logger = LoggerFactory.getLogger(getClass());
     
     /**
      * 4 hours
@@ -66,8 +70,10 @@ public class TokenService implements ITokenService {
                 contents.setExpired(expirationTime.before(new Date()));
             }
         } catch (io.jsonwebtoken.ExpiredJwtException e) {
+            logger.info("Token is expired.", e);
             contents.setExpired(true); 
         } catch (SignatureException e) {
+            logger.warn("Token signature not correct.", e);
             return null;
         } 
         
@@ -113,4 +119,5 @@ public class TokenService implements ITokenService {
         
         return appToken;
     }
+    
 }

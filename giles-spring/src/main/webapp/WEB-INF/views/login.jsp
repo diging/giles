@@ -14,10 +14,7 @@ Giles is an app that work in tandem with <a href="http://digilib.sourceforge.net
 that are then accessible through Digilib. Metadata of uploaded images  managed with Jars.
 </p>
 
-<p>
-To use Giles, you need to log in with your Google+ account. Don't have one? You can create one <a target="_blank" href="https://plus.google.com/">here</a>.
-</p>
-
+<c:if test="${googleShowLogin == true}">
 <div class="col-md-3">
 <form action="<c:url value="/signin/google" />" method="POST">
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -27,7 +24,9 @@ To use Giles, you need to log in with your Google+ account. Don't have one? You 
 	</button>
 </form>
 </div>
+</c:if>
 
+<c:if test="${githubShowLogin == 'true'}">
 <div class="col-md-3">
 <form action="<c:url value="/signin/github" />" method="POST">
 <input type="hidden" name="${_csrf.parameterName}" value="${_csrf.token}"/>
@@ -37,8 +36,29 @@ To use Giles, you need to log in with your Google+ account. Don't have one? You 
 	</button>
 </form>
 </div>
+</c:if>
 
-<div class="col-md-6"></div>
+<c:if test="${mitreidShowLogin == 'true'}">
+<div class="col-md-3">
+<form action="<c:url value="/signin/mitreidconnect" />" method="POST">
+	<button class="btn btn-primary btn-lg" type="submit">
+		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with OpenId Connect Server
+	</button>
+</form>
+</div>
+</c:if>
+
+<c:if test="${showGoogleLogin != 'true'}">
+<div class="col-md-3"></div>
+</c:if>
+<c:if test="${showGithubLogin != 'true'}">
+<div class="col-md-3"></div>
+</c:if>
+<c:if test="${showMitreidLogin != 'true'}">
+<div class="col-md-3"></div>
+</c:if>
+
+<div class="col-md-3"></div>
 
 </sec:authorize>
 

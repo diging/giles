@@ -21,9 +21,15 @@
 		<admin.username>admin</admin.username>
 		<github.clientId></github.clientId>
 		<github.secret></github.secret>
+		<github.show.login>true</github.show.login>
 		<google.clientId></google.clientId>
 		<google.secret></google.secret>
+		<google.show.login>false</google.show.login>
 		<registered.apps.client.ids></registered.apps.client.ids>
+		<mitreid.clientId></mitreid.clientId>
+		<mitreid.secret></mitreid.secret>
+		<mitreid.server.url></mitreid.server.url>
+		<mitreid.show.login>true</mitreid.show.login>
 		<jwt.signing.secret></jwt.signing.secret>
 		<jwt.signing.secret.apps></jwt.signing.secret.apps>
 		<db_files></db_files>
@@ -248,6 +254,14 @@
 			<version>1.22.0</version>
 		</dependency>
 
+
+		<!-- Mitreid OpenId Connect Server -->
+		<dependency>
+			<groupId>org.springframework.social</groupId>
+			<artifactId>spring-social-mitreidConnect</artifactId>
+			<version>0.1</version>
+		</dependency>
+
 		<!-- Token generation -->
 		<dependency>
 			<groupId>io.jsonwebtoken</groupId>
@@ -255,6 +269,19 @@
 			<version>0.7.0</version>
 		</dependency>
 
+		<!-- OpenId Connect -->
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/nimbus-jose-jwt -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>nimbus-jose-jwt</artifactId>
+			<version>4.26.1</version>
+		</dependency>
+		<!-- https://mvnrepository.com/artifact/com.nimbusds/oauth2-oidc-sdk -->
+		<dependency>
+			<groupId>com.nimbusds</groupId>
+			<artifactId>oauth2-oidc-sdk</artifactId>
+			<version>5.17.1</version>
+		</dependency>
 
 
 		<!-- Spring AOP + AspectJ -->

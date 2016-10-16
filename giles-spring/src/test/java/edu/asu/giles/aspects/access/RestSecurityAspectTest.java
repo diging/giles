@@ -308,13 +308,13 @@ public class RestSecurityAspectTest {
         tokenContents.setUsername(username);
         tokenContents.setExpired(false);
         validResult.setPayload(tokenContents);
-        Mockito.when(githubChecker.validateToken(ACCESS_TOKEN)).thenReturn(validResult);
+        Mockito.when(githubChecker.validateToken(ACCESS_TOKEN, "appId1")).thenReturn(validResult);
         
         CheckerResult invalidResult = new CheckerResult();
         invalidResult.setResult(ValidationResult.INVALID);
         
         invalidResult.setPayload(null);
-        Mockito.when(githubChecker.validateToken(INVALID_ACCESS_TOKEN)).thenReturn(invalidResult);
+        Mockito.when(githubChecker.validateToken(INVALID_ACCESS_TOKEN, null)).thenReturn(invalidResult);
         
         IAppToken appToken = new AppToken();
         appToken.setAppId("appId1");
@@ -323,12 +323,12 @@ public class RestSecurityAspectTest {
         CheckerResult validAppToken = new CheckerResult();
         validAppToken.setPayload(appToken);
         validAppToken.setResult(ValidationResult.VALID);
-        Mockito.when(appTokenChecker.validateToken(APP_TOKEN)).thenReturn(validAppToken);
+        Mockito.when(appTokenChecker.validateToken(APP_TOKEN, null)).thenReturn(validAppToken);
         
         CheckerResult invalidAppToken = new CheckerResult();
         invalidAppToken.setPayload(null);
         invalidAppToken.setResult(ValidationResult.INVALID);
-        Mockito.when(appTokenChecker.validateToken(INVALID_APP_TOKEN)).thenReturn(invalidAppToken);
+        Mockito.when(appTokenChecker.validateToken(INVALID_APP_TOKEN, null)).thenReturn(invalidAppToken);
     }
 
     private TokenCheck createTokenAccessCheckAnnotation(String parameterName) {

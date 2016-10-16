@@ -40,6 +40,7 @@ import edu.asu.giles.core.IDocument;
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.exceptions.AspectMisconfigurationException;
 import edu.asu.giles.exceptions.InvalidTokenException;
+import edu.asu.giles.exceptions.ServerMisconfigurationException;
 import edu.asu.giles.files.IFilesManager;
 import edu.asu.giles.service.IIdentityProviderRegistry;
 import edu.asu.giles.tokens.IApiTokenContents;
@@ -93,7 +94,7 @@ public class RestSecurityAspect {
         }
         
         TokenHolder holder = new TokenHolder();
-        ResponseEntity<String> authResult = checkAuthorization(user, token, AppTokenChecker.ID, holder);
+        ResponseEntity<String> authResult = checkAuthorization(user, token, AppTokenChecker.ID, holder, null);
         if (authResult != null) {
             return authResult;
         }
@@ -109,7 +110,7 @@ public class RestSecurityAspect {
         }
         
         TokenHolder apiTokenHolder = new TokenHolder();
-        ResponseEntity<String> apiTokenAuthResult = checkAuthorization(user, providerToken, checkerId, apiTokenHolder);
+        ResponseEntity<String> apiTokenAuthResult = checkAuthorization(user, providerToken, checkerId, apiTokenHolder, appToken.getAppId());
         if (apiTokenAuthResult != null) {
             return apiTokenAuthResult;
         }
@@ -151,7 +152,7 @@ public class RestSecurityAspect {
         }
         
         TokenHolder holder = new TokenHolder();
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder);
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder, null);
         if (authResult != null) {
             return authResult;
         }
@@ -187,7 +188,7 @@ public class RestSecurityAspect {
         }
         
         TokenHolder holder = new TokenHolder();
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder);
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder, null);
         if (authResult != null) {
             return authResult;
         }
@@ -228,7 +229,7 @@ public class RestSecurityAspect {
         }
         
         TokenHolder holder = new TokenHolder();
-        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder);
+        ResponseEntity<String> authResult = checkAuthorization(user, token, GilesChecker.ID, holder, null);
         if (authResult != null) {
             return authResult;
         }
@@ -279,7 +280,7 @@ public class RestSecurityAspect {
         return new UserTokenObject(user, token, elementId);
     }
     
-    private ResponseEntity<String> checkAuthorization(User user, String token, String provider, TokenHolder tokenHolder) {
+    private ResponseEntity<String> checkAuthorization(User user, String token, String provider, TokenHolder tokenHolder, String appId) {
         if (token == null) {
             return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
         }
@@ -287,7 +288,7 @@ public class RestSecurityAspect {
         CheckerResult validationResult = null;
         
         try {
-            validationResult = tokenCheckers.get(provider).validateToken(token);
+            validationResult = tokenCheckers.get(provider).validateToken(token, appId);
             tokenHolder.checkResult = validationResult;
             tokenHolder.tokenContents = validationResult.getPayload();
         } catch (GeneralSecurityException e) {
@@ -311,6 +312,13 @@ public class RestSecurityAspect {
             msgs.put("provider", provider);
             
             return generateResponse(msgs, HttpStatus.UNAUTHORIZED);
+        } catch (ServerMisconfigurationException e) {
+            logger.error("Server or apps are misconfigured.", e);
+            Map<String, String> msgs = new HashMap<String, String>();
+            msgs.put("errorMsg", e.getLocalizedMessage());
+            msgs.put("provider", provider);
+            
+            return generateResponse(msgs, HttpStatus.INTERNAL_SERVER_ERROR);
         }
         
         if (validationResult == null || validationResult.getPayload() == null) {

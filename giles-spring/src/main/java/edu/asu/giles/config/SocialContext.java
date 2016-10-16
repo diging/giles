@@ -18,10 +18,12 @@ import org.springframework.social.connect.jdbc.JdbcUsersConnectionRepository;
 import org.springframework.social.connect.web.ProviderSignInController;
 import org.springframework.social.github.connect.GitHubConnectionFactory;
 import org.springframework.social.google.connect.GoogleConnectionFactory;
+import org.springframework.social.mitreidconnect.connect.MitreidConnectConnectionFactory;
 import org.springframework.social.security.AuthenticationNameUserIdSource;
 
 import edu.asu.giles.aspects.access.tokens.impl.GitHubChecker;
 import edu.asu.giles.aspects.access.tokens.impl.GoogleChecker;
+import edu.asu.giles.aspects.access.tokens.impl.MitreidChecker;
 import edu.asu.giles.service.IIdentityProviderRegistry;
 import edu.asu.giles.service.properties.IPropertiesManager;
 import edu.asu.giles.users.IUserManager;
@@ -36,6 +38,9 @@ public class SocialContext implements SocialConfigurer {
 
     @Autowired
     private IUserManager userManager;
+    
+    @Autowired
+    private IUserHelper userHelper;
     
     @Autowired
     private IPropertiesManager propertyManager;
@@ -62,6 +67,14 @@ public class SocialContext implements SocialConfigurer {
         cfConfig.addConnectionFactory(githubFactory);
         identityProviderRegistry.addProvider(githubFactory.getProviderId());
         identityProviderRegistry.addProviderTokenChecker(githubFactory.getProviderId(), GitHubChecker.ID);
+        
+        String mitreidClientId = propertyManager.getProperty(IPropertiesManager.MITREID_CLIENT_ID);
+        String mitreidSecret = propertyManager.getProperty(IPropertiesManager.MITREID_SECRET);
+        String mitreidServer = propertyManager.getProperty(IPropertiesManager.MITREID_SERVER_URL);
+        MitreidConnectConnectionFactory mitreidFactory = new MitreidConnectConnectionFactory(mitreidClientId, mitreidSecret, mitreidServer);
+        cfConfig.addConnectionFactory(mitreidFactory);
+        identityProviderRegistry.addProvider(mitreidFactory.getProviderId());
+        identityProviderRegistry.addProviderTokenChecker(mitreidFactory.getProviderId(), MitreidChecker.ID);
     }
 
     @Override
@@ -74,7 +87,7 @@ public class SocialContext implements SocialConfigurer {
             ConnectionFactoryLocator connectionFactoryLocator) {
         JdbcUsersConnectionRepository repository = new JdbcUsersConnectionRepository(
                 dataSource, connectionFactoryLocator, Encryptors.noOpText());
-        repository.setConnectionSignUp(new GilesConnectionSignUp(userManager));
+        repository.setConnectionSignUp(new GilesConnectionSignUp(userManager, userHelper));
         return repository;
     }
 
@@ -84,7 +97,7 @@ public class SocialContext implements SocialConfigurer {
             UsersConnectionRepository usersConnectionRepository) {
         ProviderSignInController controller = new ProviderSignInController(
                 connectionFactoryLocator, usersConnectionRepository,
-                new SimpleSignInAdapter(userManager));
+                new SimpleSignInAdapter(userManager, userHelper));
         return controller;
     }
 }

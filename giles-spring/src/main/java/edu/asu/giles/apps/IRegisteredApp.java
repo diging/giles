@@ -22,4 +22,8 @@ public interface IRegisteredApp extends IStorableObject {
 
     public abstract String getProviderId();
 
+    public abstract void setProviderClientId(String providerClientId);
+
+    public abstract String getProviderClientId();
+
 }
