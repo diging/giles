@@ -67,7 +67,7 @@ public class UploadDatabaseClient extends DatabaseClient<IUpload> implements
         upload.setUsername(username);
         return getFilesByExample(upload);
     }
-
+    
     @Override
     public List<IUpload> getUploadsForUser(String username, int page,
             int pageSize, String sortBy, int sortDirection) {
@@ -128,12 +128,7 @@ public class UploadDatabaseClient extends DatabaseClient<IUpload> implements
     }
 
    private List<IUpload> getFilesByExample(IUpload upload) {
-        ObjectSet<Upload> uploads = client.queryByExample(upload);
-        List<IUpload> results = new ArrayList<IUpload>();
-        for (IUpload u : uploads) {
-            results.add(u);
-        }
-        return results;
+        return client.queryByExample(upload);
     }
 
     @Override

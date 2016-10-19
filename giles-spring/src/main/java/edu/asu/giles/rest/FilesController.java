@@ -2,7 +2,10 @@ package edu.asu.giles.rest;
 
 import java.io.IOException;
 import java.io.StringWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,6 +46,38 @@ public class FilesController {
     
     @Autowired
     private IJSONHelper jsonHelper;
+    
+    @TokenCheck
+    @RequestMapping(value = "/rest/files/uploads")
+    public ResponseEntity<String> getAllUploadsOfUser(@RequestParam(defaultValue = "") String accessToken, 
+            HttpServletRequest request, User user) {
+        
+        Map<String, Set<String>> filenames = filesManager.getUploadedFilenames(user.getUsername());
+        
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ArrayNode root = mapper.createArrayNode();
+        
+        for (String uploadId : filenames.keySet()) {
+            ObjectNode node = root.addObject();
+            ArrayNode filenameList = node.putArray(uploadId);
+            for (String filename : filenames.get(uploadId)) {
+                filenameList.add(filename);
+            }
+        }
+        
+        StringWriter sw = new StringWriter();
+        try {
+            mapper.writeValue(sw, root);
+        } catch (IOException e) {
+            logger.error("Could not write json.", e);
+            return new ResponseEntity<String>(
+                    "{\"errorMsg\": \"Could not write json result.\", \"errorCode\": \"errorCode\": \"500\" }",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
+    }
 
     @TokenCheck
     @RequestMapping(value = "/rest/files/upload/{uploadId}")

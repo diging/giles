@@ -3,8 +3,11 @@ package edu.asu.giles.files.impl;
 import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -159,7 +162,7 @@ public class FilesManager implements IFilesManager {
 
     @Override
     public List<IFile> getFilesByUploadId(String uploadId) {
-        return databaseClient.getFileByUploadId(uploadId);
+        return databaseClient.getFilesByUploadId(uploadId);
     }
 
     @Override
@@ -223,6 +226,24 @@ public class FilesManager implements IFilesManager {
             page = pageCount;
         }
         return uploadDatabaseClient.getUploadsForUser(username, page, pageSize, sortBy, sortDirection);
+    }
+    
+    @Override
+    public Map<String, Set<String>> getUploadedFilenames(String username) {
+        List<IDocument> documents = documentDatabaseClient.getDocumentsByUsername(username);
+        Map<String, Set<String>> filenames = new HashMap<String, Set<String>>();
+        
+        for (IDocument doc : documents) {
+            Set<String> filenameList = filenames.get(doc.getUploadId());
+            if (filenameList == null) {
+                filenameList = new HashSet<>();
+                filenames.put(doc.getUploadId(), filenameList);
+            }
+            String fileId = doc.getUploadedFileId();
+            IFile file = databaseClient.getFileById(fileId);
+            filenameList.add(file.getFilename());
+        }
+        return filenames;
     }
     
     @Override
