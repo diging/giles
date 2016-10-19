@@ -73,6 +73,13 @@ public class DocumentDatabaseClient extends DatabaseClient<IDocument> implements
         doc.setUploadId(uploadId);
         return getDocumentByExample(doc);
     }
+    
+    @Override
+    public List<IDocument> getDocumentsByUsername(String username) {
+        IDocument doc = new Document();
+        doc.setUsername(username);
+        return getDocumentByExample(doc);
+    }
 
     /*
      * (non-Javadoc)

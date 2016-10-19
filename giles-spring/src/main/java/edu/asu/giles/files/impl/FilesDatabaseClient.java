@@ -54,9 +54,16 @@ public class FilesDatabaseClient extends DatabaseClient<IFile> implements
     }
 
     @Override
-    public List<IFile> getFileByUploadId(String uploadId) {
+    public List<IFile> getFilesByUploadId(String uploadId) {
         IFile file = new File();
         file.setUploadId(uploadId);
+        return getFilesByExample(file);
+    }
+    
+    @Override
+    public List<IFile> getFilesByUsername(String username) {
+        IFile file = new File();
+        file.setUsername(username);
         return getFilesByExample(file);
     }
 

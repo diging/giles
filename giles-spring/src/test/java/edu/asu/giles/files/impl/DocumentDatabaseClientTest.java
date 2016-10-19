@@ -21,6 +21,7 @@ import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.core.impl.Upload;
 import edu.asu.giles.db4o.impl.DatabaseManager;
 import edu.asu.giles.exceptions.UnstorableObjectException;
+import edu.asu.giles.files.IDocumentDatabaseClient;
 
 public class DocumentDatabaseClientTest {
     
@@ -34,7 +35,7 @@ public class DocumentDatabaseClientTest {
     
     @Mock private Iterator<Object> mockedIterator;
     
-    @InjectMocks private DocumentDatabaseClient docDatabaseClientToTest;
+    @InjectMocks private IDocumentDatabaseClient docDatabaseClientToTest;
     
     private final String DOC1_ID = "DOC1";
     private final String DOC_ID_NOT_EXIST = "DOC_NOT_EXISTS";
