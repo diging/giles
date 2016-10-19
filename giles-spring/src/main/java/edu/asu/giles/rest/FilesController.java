@@ -5,6 +5,7 @@ import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
@@ -48,21 +49,24 @@ public class FilesController {
     private IJSONHelper jsonHelper;
     
     @TokenCheck
-    @RequestMapping(value = "/rest/files/uploads")
+    @RequestMapping(value = "/rest/files/uploads", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getAllUploadsOfUser(@RequestParam(defaultValue = "") String accessToken, 
             HttpServletRequest request, User user) {
         
-        Map<String, Set<String>> filenames = filesManager.getUploadedFilenames(user.getUsername());
+        Map<String, Map<String, String>> filenames = filesManager.getUploadedFilenames(user.getUsername());
         
         ObjectMapper mapper = new ObjectMapper();
-        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        //mapper.enable(SerializationFeature.INDENT_OUTPUT);
         ArrayNode root = mapper.createArrayNode();
         
         for (String uploadId : filenames.keySet()) {
             ObjectNode node = root.addObject();
             ArrayNode filenameList = node.putArray(uploadId);
-            for (String filename : filenames.get(uploadId)) {
-                filenameList.add(filename);
+            for (Entry<String, String> fileIdAndName : filenames.get(uploadId).entrySet()) {
+                ObjectNode fileNode = filenameList.addObject();
+                fileNode.put("id", fileIdAndName.getKey());
+                fileNode.put("filename", fileIdAndName.getValue());
+                System.out.println(fileIdAndName.getValue());
             }
         }
         
@@ -80,7 +84,7 @@ public class FilesController {
     }
 
     @TokenCheck
-    @RequestMapping(value = "/rest/files/upload/{uploadId}")
+    @RequestMapping(value = "/rest/files/upload/{uploadId}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getFilePathsForUpload(
             @RequestParam(defaultValue = "") String accessToken, 
             HttpServletRequest request,
@@ -126,7 +130,7 @@ public class FilesController {
     }
     
     @DocumentAccessCheck
-    @RequestMapping(value = "rest/documents/{docId}")
+    @RequestMapping(value = "rest/documents/{docId}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getDocument(
             @RequestParam(defaultValue = "") String accessToken,
             HttpServletRequest request,
@@ -155,7 +159,7 @@ public class FilesController {
 
     
     @FileTokenAccessCheck
-    @RequestMapping(value = "/rest/files/{fileId}/content")
+    @RequestMapping(value = "/rest/files/{fileId}/content", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getFile(
             @PathVariable String fileId,
             @RequestParam(defaultValue="") String accessToken, 

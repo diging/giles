@@ -1,10 +1,7 @@
 package edu.asu.giles.files;
 
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import edu.asu.giles.core.DocumentAccess;
 import edu.asu.giles.core.DocumentType;
@@ -69,6 +66,6 @@ public interface IFilesManager {
 
     public abstract int getUploadsOfUserPageCount(String username);
 
-    public abstract Map<String, Set<String>> getUploadedFilenames(String username);
+    public abstract Map<String, Map<String, String>> getUploadedFilenames(String username);
 
 }

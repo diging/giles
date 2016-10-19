@@ -229,19 +229,19 @@ public class FilesManager implements IFilesManager {
     }
     
     @Override
-    public Map<String, Set<String>> getUploadedFilenames(String username) {
+    public Map<String, Map<String, String>> getUploadedFilenames(String username) {
         List<IDocument> documents = documentDatabaseClient.getDocumentsByUsername(username);
-        Map<String, Set<String>> filenames = new HashMap<String, Set<String>>();
+        Map<String, Map<String, String>> filenames = new HashMap<String, Map<String, String>>();
         
         for (IDocument doc : documents) {
-            Set<String> filenameList = filenames.get(doc.getUploadId());
+            Map<String, String> filenameList = filenames.get(doc.getUploadId());
             if (filenameList == null) {
-                filenameList = new HashSet<>();
+                filenameList = new HashMap<String, String>();
                 filenames.put(doc.getUploadId(), filenameList);
             }
             String fileId = doc.getUploadedFileId();
             IFile file = databaseClient.getFileById(fileId);
-            filenameList.add(file.getFilename());
+            filenameList.put(file.getId(), file.getFilename());
         }
         return filenames;
     }
