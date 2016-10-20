@@ -38,7 +38,7 @@ public interface IPropertiesManager {
     public final static String METADATA_SERVICE_DOC_ENDPOINT = "metadata_service_document_url";
     
     public final static String ALLOW_IFRAMING_FROM = "allow_iframing_from";
-    public final static String EXPIRATION_TIME_UPLOADS_MS = "expiration_time_uploads_hours";
+    public final static String EXPIRATION_TIME_UPLOADS_MS = "expiration_time_uploads_ms";
  
 
     public abstract void setProperty(String key, String value) throws GilesPropertiesStorageException;

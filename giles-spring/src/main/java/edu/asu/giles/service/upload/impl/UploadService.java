@@ -25,6 +25,8 @@ import edu.asu.giles.service.upload.IUploadService;
 
 @Service
 public class UploadService implements IUploadService {
+    
+    private final static long DEFAULT_EXPIRATION = 24 * 60 * 60 * 1000L;
 
     private Map<String, Future<List<StorageStatus>>> currentUploads;
     private Map<Long, List<String>> expirationList;
@@ -42,9 +44,9 @@ public class UploadService implements IUploadService {
         currentUploads = Collections.synchronizedMap(new HashMap<>());
         expirationList = Collections.synchronizedSortedMap(new TreeMap<>());
 
-        expirationMiliseconds = new Long(
-                propertiesManager
-                        .getProperty(IPropertiesManager.EXPIRATION_TIME_UPLOADS_MS));
+        String expirationProp = propertiesManager
+                .getProperty(IPropertiesManager.EXPIRATION_TIME_UPLOADS_MS);
+        expirationMiliseconds = expirationProp != null && !expirationProp.trim().isEmpty() ? new Long(expirationProp) : new Long(DEFAULT_EXPIRATION);
     }
 
     /*
