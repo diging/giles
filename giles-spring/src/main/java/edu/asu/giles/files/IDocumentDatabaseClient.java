@@ -3,7 +3,6 @@ package edu.asu.giles.files;
 import java.util.List;
 
 import edu.asu.giles.core.IDocument;
-import edu.asu.giles.core.impl.Document;
 import edu.asu.giles.db4o.IDatabaseClient;
 import edu.asu.giles.exceptions.UnstorableObjectException;
 
