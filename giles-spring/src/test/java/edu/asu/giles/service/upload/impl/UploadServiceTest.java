@@ -39,7 +39,7 @@ public class UploadServiceTest {
     public void test_startUpload_many() throws InterruptedException {
        List<Thread> threads = new ArrayList<Thread>();
        List<Runnable> failed = Collections.synchronizedList(new ArrayList<>());
-        for (int i = 0; i<6000; i++) {
+        for (int i = 0; i<3000; i++) {
             Mockito.when(uploadThread.runUpload(DocumentAccess.PUBLIC, DocumentType.MULTI_PAGE, null, null, "user"+i)).thenReturn(new BasicFuture<>(null));
             threads.add(new Thread(new UploadRunnable("user"+i, failed)));
         }
@@ -53,7 +53,7 @@ public class UploadServiceTest {
         }
         
         System.out.println(serviceToTest.countNonExpiredUpload());
-        Assert.assertTrue(serviceToTest.countNonExpiredUpload() < 6000);
+        Assert.assertTrue(serviceToTest.countNonExpiredUpload() < 3000);
         Assert.assertEquals(0, failed.size());
     }
 
