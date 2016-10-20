@@ -90,12 +90,7 @@ public class DocumentDatabaseClient extends DatabaseClient<IDocument> implements
      */
     @Override
     public List<IDocument> getDocumentByExample(IDocument doc) {
-        ObjectSet<IDocument> docs = client.queryByExample(doc);
-        List<IDocument> results = new ArrayList<IDocument>();
-        for (IDocument f : docs) {
-            results.add(f);
-        }
-        return results;
+        return client.queryByExample(doc);
     }
 
     protected ObjectContainer getClient() {
