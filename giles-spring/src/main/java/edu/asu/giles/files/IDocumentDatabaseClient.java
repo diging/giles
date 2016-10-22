@@ -16,4 +16,6 @@ public interface IDocumentDatabaseClient extends IDatabaseClient<IDocument> {
 
     public abstract List<IDocument> getDocumentByExample(IDocument doc);
 
+    public abstract List<IDocument> getDocumentsByUsername(String username);
+
 }

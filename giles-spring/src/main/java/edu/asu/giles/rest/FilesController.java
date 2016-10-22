@@ -3,6 +3,8 @@ package edu.asu.giles.rest;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -43,9 +45,44 @@ public class FilesController {
     
     @Autowired
     private IJSONHelper jsonHelper;
+    
+    @TokenCheck
+    @RequestMapping(value = "/rest/files/uploads", produces = "application/json;charset=UTF-8")
+    public ResponseEntity<String> getAllUploadsOfUser(@RequestParam(defaultValue = "") String accessToken, 
+            HttpServletRequest request, User user) {
+        
+        Map<String, Map<String, String>> filenames = filesManager.getUploadedFilenames(user.getUsername());
+        
+        ObjectMapper mapper = new ObjectMapper();
+        //mapper.enable(SerializationFeature.INDENT_OUTPUT);
+        ArrayNode root = mapper.createArrayNode();
+        
+        for (String uploadId : filenames.keySet()) {
+            ObjectNode node = root.addObject();
+            ArrayNode filenameList = node.putArray(uploadId);
+            for (Entry<String, String> fileIdAndName : filenames.get(uploadId).entrySet()) {
+                ObjectNode fileNode = filenameList.addObject();
+                fileNode.put("id", fileIdAndName.getKey());
+                fileNode.put("filename", fileIdAndName.getValue());
+                System.out.println(fileIdAndName.getValue());
+            }
+        }
+        
+        StringWriter sw = new StringWriter();
+        try {
+            mapper.writeValue(sw, root);
+        } catch (IOException e) {
+            logger.error("Could not write json.", e);
+            return new ResponseEntity<String>(
+                    "{\"errorMsg\": \"Could not write json result.\", \"errorCode\": \"errorCode\": \"500\" }",
+                    HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+        
+        return new ResponseEntity<String>(sw.toString(), HttpStatus.OK);
+    }
 
     @TokenCheck
-    @RequestMapping(value = "/rest/files/upload/{uploadId}")
+    @RequestMapping(value = "/rest/files/upload/{uploadId}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getFilePathsForUpload(
             @RequestParam(defaultValue = "") String accessToken, 
             HttpServletRequest request,
@@ -91,7 +128,7 @@ public class FilesController {
     }
     
     @DocumentAccessCheck
-    @RequestMapping(value = "rest/documents/{docId}")
+    @RequestMapping(value = "rest/documents/{docId}", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getDocument(
             @RequestParam(defaultValue = "") String accessToken,
             HttpServletRequest request,
@@ -120,7 +157,7 @@ public class FilesController {
 
     
     @FileTokenAccessCheck
-    @RequestMapping(value = "/rest/files/{fileId}/content")
+    @RequestMapping(value = "/rest/files/{fileId}/content", produces = "application/json;charset=UTF-8")
     public ResponseEntity<String> getFile(
             @PathVariable String fileId,
             @RequestParam(defaultValue="") String accessToken, 

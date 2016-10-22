@@ -42,5 +42,5 @@
 	</bean>
 	
 	<aop:aspectj-autoproxy proxy-target-class="true" />
-	
+
 </beans>

@@ -1,6 +1,5 @@
 package edu.asu.giles.files.impl;
 
-import java.util.ArrayList;
 import java.util.List;
 
 import javax.annotation.PostConstruct;
@@ -10,7 +9,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Component;
 
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 
 import edu.asu.giles.core.IFile;
 import edu.asu.giles.core.impl.File;
@@ -54,9 +52,16 @@ public class FilesDatabaseClient extends DatabaseClient<IFile> implements
     }
 
     @Override
-    public List<IFile> getFileByUploadId(String uploadId) {
+    public List<IFile> getFilesByUploadId(String uploadId) {
         IFile file = new File();
         file.setUploadId(uploadId);
+        return getFilesByExample(file);
+    }
+    
+    @Override
+    public List<IFile> getFilesByUsername(String username) {
+        IFile file = new File();
+        file.setUsername(username);
         return getFilesByExample(file);
     }
 
@@ -80,12 +85,7 @@ public class FilesDatabaseClient extends DatabaseClient<IFile> implements
      */
     @Override
     public List<IFile> getFilesByExample(IFile file) {
-        ObjectSet<File> files = client.queryByExample(file);
-        List<IFile> results = new ArrayList<IFile>();
-        for (IFile f : files) {
-            results.add(f);
-        }
-        return results;
+        return client.queryByExample(file);
     }
 
     @Override

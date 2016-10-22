@@ -334,8 +334,13 @@ public class PdfFileHandler extends AbstractFileHandler implements
         String filePath = dirFolder + File.separator + fileName;
         File fileObject = new File(filePath);
         OutputStream output = new FileOutputStream(fileObject);
-        boolean success = ImageIOUtil.writeImage(image, format, output,
+        boolean success = false;
+        try {
+            success = ImageIOUtil.writeImage(image, format, output,
                 new Integer(dpi));
+        } finally {
+            output.close();
+        }
         if (!success) {
             return null;
         }

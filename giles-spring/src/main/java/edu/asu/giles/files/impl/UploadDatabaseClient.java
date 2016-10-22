@@ -2,7 +2,6 @@ package edu.asu.giles.files.impl;
 
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
@@ -15,7 +14,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
 import com.db4o.ObjectContainer;
-import com.db4o.ObjectSet;
 import com.db4o.query.Query;
 
 import edu.asu.giles.core.IUpload;
@@ -67,7 +65,7 @@ public class UploadDatabaseClient extends DatabaseClient<IUpload> implements
         upload.setUsername(username);
         return getFilesByExample(upload);
     }
-
+    
     @Override
     public List<IUpload> getUploadsForUser(String username, int page,
             int pageSize, String sortBy, int sortDirection) {
@@ -128,12 +126,7 @@ public class UploadDatabaseClient extends DatabaseClient<IUpload> implements
     }
 
    private List<IUpload> getFilesByExample(IUpload upload) {
-        ObjectSet<Upload> uploads = client.queryByExample(upload);
-        List<IUpload> results = new ArrayList<IUpload>();
-        for (IUpload u : uploads) {
-            results.add(u);
-        }
-        return results;
+        return client.queryByExample(upload);
     }
 
     @Override

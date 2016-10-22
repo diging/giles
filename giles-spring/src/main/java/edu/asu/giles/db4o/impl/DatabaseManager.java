@@ -33,14 +33,22 @@ public class DatabaseManager implements Serializable {
         configuration.common().objectClass(Document.class).cascadeOnUpdate(true);
         configuration.common().objectClass(Document.class).cascadeOnDelete(true);
         configuration.common().objectClass(Document.class).cascadeOnActivate(true);
+        configuration.common().objectClass(Document.class).objectField("username").indexed(true);
+        configuration.common().objectClass(Document.class).objectField("documentId").indexed(true);
+        configuration.common().objectClass(Document.class).objectField("uploadId").indexed(true);
+        configuration.common().objectClass(Document.class).objectField("id").indexed(true);
         
         configuration.common().objectClass(File.class).cascadeOnUpdate(true);
         configuration.common().objectClass(File.class).cascadeOnDelete(true);
         configuration.common().objectClass(File.class).cascadeOnActivate(true);
+        configuration.common().objectClass(File.class).objectField("username").indexed(true);
+        configuration.common().objectClass(File.class).objectField("id").indexed(true);
         
         configuration.common().objectClass(Upload.class).cascadeOnUpdate(true);
         configuration.common().objectClass(Upload.class).cascadeOnDelete(true);
         configuration.common().objectClass(Upload.class).cascadeOnActivate(true);
+        configuration.common().objectClass(Upload.class).objectField("username").indexed(true);
+        configuration.common().objectClass(Upload.class).objectField("id").indexed(true);
         
         server = Db4oClientServer.openServer(configuration, databasePath, 0);
     }

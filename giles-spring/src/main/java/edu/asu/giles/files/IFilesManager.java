@@ -66,4 +66,6 @@ public interface IFilesManager {
 
     public abstract int getUploadsOfUserPageCount(String username);
 
+    public abstract Map<String, Map<String, String>> getUploadedFilenames(String username);
+
 }
