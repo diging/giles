@@ -42,7 +42,7 @@ that are then accessible through Digilib. Metadata of uploaded images  managed w
 <div class="col-md-3">
 <form action="<c:url value="/signin/mitreidconnect" />" method="POST">
 	<button class="btn btn-primary btn-lg" type="submit">
-		<i class="fa fa-google-plus" aria-hidden="true"></i> Login with OpenId Connect Server
+		<i class="fa fa-openid" aria-hidden="true"></i> Login with OpenId Connect Server
 	</button>
 </form>
 </div>
