@@ -45,13 +45,14 @@ public class TikaTesseractOCRService implements IOCRService {
        
         String tesseractBin = propertyManager.getProperty(IPropertiesManager.TESSERACT_BIN_FOLDER);
         String tesseractData = propertyManager.getProperty(IPropertiesManager.TESSERACT_DATA_FOLDER);
+        boolean createHocr = propertyManager.getProperty(IPropertiesManager.TESSERACT_CREATE_HOCR).equals("true");
         
         TesseractOCRConfig config = new TesseractOCRConfig();
         config.setTesseractPath(tesseractBin);
         config.setTessdataPath(tesseractData);
         parseContext = new ParseContext();
         parseContext.set(TesseractOCRConfig.class, config);
-        ocrParser = new TesseractOCRParser();
+        ocrParser = new TesseractOCRParser(createHocr);
         
         Metadata metadata = new Metadata();
         BodyContentHandler handler = new BodyContentHandler();
