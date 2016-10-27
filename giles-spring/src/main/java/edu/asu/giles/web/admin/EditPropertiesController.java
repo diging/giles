@@ -64,13 +64,15 @@ public class EditPropertiesController {
         page.setPdfToImageType(propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_TYPE));
         page.setTesseractBinFolder(propertyManager.getProperty(IPropertiesManager.TESSERACT_BIN_FOLDER));
         page.setTesseractDataFolder(propertyManager.getProperty(IPropertiesManager.TESSERACT_DATA_FOLDER));
+        page.setTesseractCreateHOCR(propertyManager.getProperty(IPropertiesManager.TESSERACT_CREATE_HOCR).equalsIgnoreCase("true"));
+        
         page.setPdfToImageFormat(propertyManager.getProperty(IPropertiesManager.PDF_TO_IMAGE_FORMAT));
         
         page.setIframingAllowedHosts(propertyManager.getProperty(IPropertiesManager.ALLOW_IFRAMING_FROM));
         
-        page.setShowGithubLogin(propertyManager.getProperty(IPropertiesManager.GITHUB_SHOW_LOGIN).equals("true"));
-        page.setShowGoogleLogin(propertyManager.getProperty(IPropertiesManager.GOOGLE_SHOW_LOGIN).equals("true"));
-        page.setShowMitreidLogin(propertyManager.getProperty(IPropertiesManager.MITREID_SHOW_LOGIN).equals("true"));
+        page.setShowGithubLogin(propertyManager.getProperty(IPropertiesManager.GITHUB_SHOW_LOGIN).equalsIgnoreCase("true"));
+        page.setShowGoogleLogin(propertyManager.getProperty(IPropertiesManager.GOOGLE_SHOW_LOGIN).equalsIgnoreCase("true"));
+        page.setShowMitreidLogin(propertyManager.getProperty(IPropertiesManager.MITREID_SHOW_LOGIN).equalsIgnoreCase("true"));
         
         List<String> imageTypes = new ArrayList<String>();
         imageTypes.add(ImageType.ARGB.toString());
@@ -101,6 +103,7 @@ public class EditPropertiesController {
         propertiesMap.put(IPropertiesManager.PDF_EXTRACT_TEXT, new Boolean(systemConfigPage.isPdfExtractText()).toString()); 
         propertiesMap.put(IPropertiesManager.TESSERACT_BIN_FOLDER, systemConfigPage.getTesseractBinFolder());
         propertiesMap.put(IPropertiesManager.TESSERACT_DATA_FOLDER, systemConfigPage.getTesseractDataFolder());
+        propertiesMap.put(IPropertiesManager.TESSERACT_CREATE_HOCR, new Boolean(systemConfigPage.isTesseractCreateHOCR()).toString());
         propertiesMap.put(IPropertiesManager.OCR_IMAGES_FROM_PDFS, new Boolean(systemConfigPage.isOcrImagesFromPdfs()).toString());
         propertiesMap.put(IPropertiesManager.JARS_URL, systemConfigPage.getJarsUrl());
         propertiesMap.put(IPropertiesManager.JARS_FILE_URL, systemConfigPage.getJarsFileUrl());

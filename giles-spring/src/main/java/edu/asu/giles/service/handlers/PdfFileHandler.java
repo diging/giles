@@ -229,7 +229,7 @@ public class PdfFileHandler extends AbstractFileHandler implements
             return null;
         }
         
-        IFile textFile = saveTextToFile(mainFile, pageNr, username, document, pageText);
+        IFile textFile = saveTextToFile(mainFile, pageNr, username, document, pageText, ".txt");
 
         if (textFile != null) {
             document.getTextFileIds().add(textFile.getId());
@@ -266,8 +266,14 @@ public class PdfFileHandler extends AbstractFileHandler implements
         if (extractedText == null || extractedText.isEmpty()) {
             return null;
         }
+        
+        boolean createHOCR = propertyManager.getProperty(IPropertiesManager.TESSERACT_CREATE_HOCR).equalsIgnoreCase("true");
 
-        IFile textFile = saveTextToFile(imageFile, -1, username, document, extractedText);
+        String fileExtension = ".txt";
+        if (createHOCR) {
+            fileExtension = ".hocr";
+        }
+        IFile textFile = saveTextToFile(imageFile, -1, username, document, extractedText, fileExtension);
 
         if (textFile != null) {
             document.getTextFileIds().add(textFile.getId());
@@ -278,7 +284,7 @@ public class PdfFileHandler extends AbstractFileHandler implements
     }
     
     private IFile saveTextToFile(IFile mainFile, int pageNr, String username,
-            IDocument document, String pageText) {
+            IDocument document, String pageText, String fileExtentions) {
         String docFolder = textStorageManager.getAndCreateStoragePath(username,
                 document.getUploadId(), document.getDocumentId());
         
@@ -286,7 +292,11 @@ public class PdfFileHandler extends AbstractFileHandler implements
         if (pageNr > -1) {
             filename = filename +  "." + pageNr;
         }
-        filename = filename + ".txt";
+        
+        if (!fileExtentions.startsWith(".")) {
+            fileExtentions = "." + fileExtentions;
+        }
+        filename = filename + fileExtentions;
         
         String filePath = docFolder + File.separator + filename;
         File fileObject = new File(filePath);

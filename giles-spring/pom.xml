@@ -45,6 +45,7 @@
 		<pdf.conversion.format>tiff</pdf.conversion.format>
 		<tesseract.bin></tesseract.bin>
 		<tesseract.data></tesseract.data>
+		<tesseract.create.hocr>false</tesseract.create.hocr>
 		<ocr.worker.count>2</ocr.worker.count>
 		<ocr.images.from.pdfs>true</ocr.images.from.pdfs>
 		<upload.worker.count>2</upload.worker.count>
