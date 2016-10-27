@@ -131,6 +131,17 @@
 		</form:select>
 		<small><form:errors class="error" path="ocrImagesFromPdfs"></form:errors></small>
 	</div>
+	
+	<div class="form-group">
+		<label for="tesseractCreateHOCR">Create HOCR</label>
+		<form:select class="form-control" id="tesseractCreateHOCR"
+			path="tesseractCreateHOCR">
+			<form:option value="true" label="Yes" />
+			<form:option value="false" label="No" />
+		</form:select>
+		<small><form:errors class="error" path="tesseractCreateHOCR"></form:errors></small>
+		<small>If set to "No", Tesseract will create plain text.</small>
+	</div>
 
 	<div class="form-group">
 		<label for="tesseractBinFolder">Path to Tesseract <code>bin</code>

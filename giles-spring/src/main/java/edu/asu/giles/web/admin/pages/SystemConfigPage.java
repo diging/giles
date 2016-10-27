@@ -14,6 +14,7 @@ public class SystemConfigPage {
     private String metadataServiceDocUrl;
     private String tesseractBinFolder;
     private String tesseractDataFolder;
+    private boolean tesseractCreateHOCR;
     private boolean ocrImagesFromPdfs;
     private int defaultPageSize;
     private String iframingAllowedHosts;
@@ -80,6 +81,12 @@ public class SystemConfigPage {
     }
     public void setTesseractDataFolder(String tesseractDataFolder) {
         this.tesseractDataFolder = tesseractDataFolder;
+    }
+    public boolean isTesseractCreateHOCR() {
+        return tesseractCreateHOCR;
+    }
+    public void setTesseractCreateHOCR(boolean tesseractCreateHOCR) {
+        this.tesseractCreateHOCR = tesseractCreateHOCR;
     }
     public boolean isOcrImagesFromPdfs() {
         return ocrImagesFromPdfs;
