@@ -123,13 +123,25 @@
 	</div>
 
 	<div class="form-group">
-		<label for="ocrImagesFromPdfs">Run OCR on Extracted Images</label>
+		<label for="ocrImagesFromPdfs">Run OCR on Images</label>
 		<form:select class="form-control" id="ocrImagesFromPdfs"
 			path="ocrImagesFromPdfs">
 			<form:option value="true" label="Yes" />
 			<form:option value="false" label="No" />
 		</form:select>
 		<small><form:errors class="error" path="ocrImagesFromPdfs"></form:errors></small>
+		<small>If set to "Yes", Giles will try to run Tesseract on uploaded images and images extracted from PDFs.</small>
+	</div>
+	
+	<div class="form-group">
+		<label for="tesseractCreateHOCR">Create HOCR</label>
+		<form:select class="form-control" id="tesseractCreateHOCR"
+			path="tesseractCreateHOCR">
+			<form:option value="true" label="Yes" />
+			<form:option value="false" label="No" />
+		</form:select>
+		<small><form:errors class="error" path="tesseractCreateHOCR"></form:errors></small>
+		<small>If set to "No", Tesseract will create plain text.</small>
 	</div>
 
 	<div class="form-group">
