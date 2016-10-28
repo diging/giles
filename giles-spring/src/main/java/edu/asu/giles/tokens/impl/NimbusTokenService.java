@@ -49,6 +49,9 @@ public class NimbusTokenService implements INimbusTokenService {
     @PostConstruct
     public void init() {
         issuerUrl = propertyManager.getProperty(IPropertiesManager.MITREID_SERVER_URL);
+        if (!issuerUrl.endsWith("/")) {
+            issuerUrl = issuerUrl + "/";
+        }
     }
 
     @Override
